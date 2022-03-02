@@ -12,7 +12,7 @@
 
 					<div class="row before-submit">
 						<div class="col">
-							<form class="form form-horizontal" id='connect-form' :action="`http://${hostname}:8080/connect`" method='post'>
+							<form class="form form-horizontal" id='connect-form' :action="`http://${hostname}/wifi-connect/connect`" method='post'>
 								<div class="form-group">
 									<label for="ssid-select" class="control-label col">{{ $t('settings.wifi_network') }}</label>
 									<div class="col">
@@ -88,7 +88,7 @@ export default {
 				data.append("ssid", this.selected.ssid );
 				data.append("identity", this.selected.identity );
 				data.append("passphrase", this.selected.password );
-				fetch(`http://192.168.42.1:8080/connect`, {
+				fetch(`http://192.168.42.1/wifi-connect/connect`, {
 						"method": "POST",
 						"mode": "cors",
 						"body": data})
@@ -102,7 +102,7 @@ export default {
   },
   mounted(){
     
-    fetch(`http://${location.hostname}:8080/networks`, {
+    fetch(`http://${location.hostname}/wifi-connect/networks`, {
         "method": "GET",
         "mode": "cors"})
     .then(res => res.json())

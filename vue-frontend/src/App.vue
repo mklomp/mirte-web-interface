@@ -143,7 +143,7 @@ export default {
 
       var vue_this = this // TODO: can we do this in another way?
  
-      let websocket = new WebSocket('ws://' + window.location.hostname + ':4567');
+      let websocket = new WebSocket('ws://' + window.location.hostname + '/ws/clients');
       websocket.onmessage = function(event){
          var data = JSON.parse(event.data);
          var names = []
