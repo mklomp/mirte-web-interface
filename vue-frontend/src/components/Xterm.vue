@@ -114,7 +114,7 @@ export default {
     mounted()  {
        // Open the websocket connection to the backend
         const protocol = (location.protocol === 'https:') ? 'wss://' : 'ws://';
-        const shell_socketUrl = `${protocol}${location.hostname}/shell`;
+        const shell_socketUrl = `${protocol}${location.hostname}/ws/shell`;
         const linetrace_socketUrl = `${protocol}${location.hostname}/ws/linetrace`;
         this.shell_socket = new WebSocket(shell_socketUrl);
 
