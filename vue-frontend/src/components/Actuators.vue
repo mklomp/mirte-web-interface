@@ -130,8 +130,7 @@
 
 
       <div v-for="actuator in getActuators()"  class="rounded background-green-light p-3 mb-2">
-              <h5>{{ $t('peripherals.' + peripherals[actuator].text) }}</h5>
-
+              <h5>{{ $t('peripherals.' + peripherals[actuator].text) }}</h5> 
                   <div v-for="instance in getInstancesOfActuator(actuator)" class="rounded background-primary p-2 text-white mb-2">
                      <div v-if="actuator === 'servo'">
                           <div>
@@ -165,7 +164,7 @@
                           </div>
                      </div>
 
-                     <div v-if="actuator === 'motor_l298n'">
+                     <div v-if="actuator === 'motor'">
                           <div>
                             {{instance}}: {{ actuator_values[actuator][instance] }}
                           </div>
@@ -185,6 +184,7 @@
 
 <script>
 import ROSLIB from 'roslib'
+import ros from '../ws-connection/ROS-connection.js'
 import Xterm from '@/components/Xterm.vue'
 import properties_ph from "../assets/json/properties_ph.json"
 import Vue from 'vue'
@@ -197,18 +197,35 @@ export default {
   },
   methods: {
         getActuators() {
-          const AP = new Array()
-          for (let p of this.$store.getters.getPConfig) {
-            if (p.rel_path.split("\\")[0] === "Actuators" && !AP.includes(p.type)) {
-              AP.push(p.type)
-            }
+         let types = [];
+         for (let type in this.param_actuators){
+             if(type == "motor"){
+                types.push("motor_" + this.param_actuators["motor"][Object.keys(this.param_actuators["motor"])[0]].type);
+             } else {
+                types.push(type); 
+             }
+         }
+         return types;
+        },
+        loadConfiguration(rosparams){
+          let actuators_copy = Object.assign({}, rosparams);
+          for (let type in rosparams){
+            for (let instance in rosparams[type]){
+              let type_tmp = (type == "motor") ? "motor_" + rosparams["motor"][instance].type : type;
+              if (!this.peripherals.hasOwnProperty(type_tmp) || this.peripherals[type_tmp].rel_path.split("\\")[0] !== "Actuators" ){
+                 delete actuators_copy[type];
+              }
+            }   
           }
-          return AP
+          this.param_actuators = actuators_copy;
         },
         getInstancesOfActuator(type){
-           var PConfig = this.$store.getters.getPConfig;
-           var filtered = PConfig.filter(T => T.type === type).map(T => T.name);
-           return filtered;
+          type = (type.substr(0,6) == "motor_") ? "motor" : type; 
+          let ret = [];
+          for (let actuator_instance in this.param_actuators[type]){
+            ret.push(actuator_instance);
+          }
+          return ret;
         },
         sendData(actuator, instance){
            var data = {};
@@ -271,34 +288,39 @@ export default {
       cmd_vel: {},
       linear_speed: 0.5,
       angular_speed: 0.5,
-      ros: {},
+      param_actuators: {},
+      ros: {} // TODO: check if this is needed?
     }
   },
   beforeMount(){
      // Instansiate all actuators in this.actuator_values
+     let params = new ROSLIB.Param({
+       ros: ros,
+       name: '/mirte'
+     })
 
-     const actuators = this.getActuators();
-     for (var actuator in actuators){
-        Vue.set(this.actuator_values, actuators[actuator], {});
-        const instances = this.getInstancesOfActuator(actuators[actuator]);
-        for (var instance in instances){
-           if (actuators[actuator] == "oled"){
-              Vue.set(this.actuator_values[actuators[actuator]], instances[instance], {});
-              Vue.set(this.actuator_values[actuators[actuator]][instances[instance]], 'type', '');
-              Vue.set(this.actuator_values[actuators[actuator]][instances[instance]], 'value', '');
-           } else {
-              Vue.set(this.actuator_values[actuators[actuator]], instances[instance], 0);
-           }
-        }
-     }
+     params.get((res) => {
+
+       this.loadConfiguration(res);
+
+       const actuators = this.getActuators();
+       for (var actuator in actuators){
+          Vue.set(this.actuator_values, actuators[actuator], {});
+          const instances = this.getInstancesOfActuator(actuators[actuator]);
+          for (var instance in instances){
+             if (actuators[actuator] == "oled"){
+                Vue.set(this.actuator_values[actuators[actuator]], instances[instance], {});
+                Vue.set(this.actuator_values[actuators[actuator]][instances[instance]], 'type', '');
+                Vue.set(this.actuator_values[actuators[actuator]][instances[instance]], 'value', '');
+             } else {
+                Vue.set(this.actuator_values[actuators[actuator]], instances[instance], 0);
+             }
+          }
+       }
+     });
   },
   mounted(){
-    const ros_protocol = (location.protocol === 'https:') ? 'wss://' : 'ws://';
-    const ros_socketUrl = `${ros_protocol}${location.hostname}/ws/ros`;
-      
-    this.ros = new ROSLIB.Ros({
-      url : ros_socketUrl
-    });
+    this.ros = ros;
 
     this.cmd_vel = new ROSLIB.Topic({
        ros : this.ros,
@@ -306,20 +328,33 @@ export default {
        messageType : 'geometry_msgs/Twist'
     });
 
+    // TODO: loading paramaters twice. This should not be needed
+    let params = new ROSLIB.Param({
+       ros: ros,
+       name: '/mirte'
+    })
+    
+    params.get((res) => {
 
-    var actuators = this.getActuators();
-    for (let actuator in actuators){
-       Vue.set(this.actuator_services, actuators[actuator], {});
-       var instances = this.getInstancesOfActuator(actuators[actuator]);
-       for (let instance in instances){
-          Vue.set(this.actuator_services[actuators[actuator]], instances[instance], {});
-          this.actuator_services[actuators[actuator]][instances[instance]] = new ROSLIB.Service({
-              ros : this.ros,
-              name : '/mirte/set_' + instances[instance] + '_' + this.peripherals[actuators[actuator]].service_name,
-              serviceType : this.peripherals[actuators[actuator]].service_type
-          });
+       this.loadConfiguration(res);
+       var actuators = this.getActuators();
+       for (let actuator in actuators){
+          Vue.set(this.actuator_services, actuators[actuator], {});
+          var instances = this.getInstancesOfActuator(actuators[actuator]);
+          for (let instance in instances){
+             let actuator_renamed = actuators[actuator];
+             if(actuators[actuator] == "motor"){
+                actuator_renamed = "motor_" + this.param_actuators[actuators[actuator]][instances[instance]].type;
+             }
+             Vue.set(this.actuator_services[actuators[actuator]], instances[instance], {});
+             this.actuator_services[actuators[actuator]][instances[instance]] = new ROSLIB.Service({
+                 ros : this.ros,
+                 name : '/mirte/set_' + instances[instance] + '_' + this.peripherals[actuator_renamed].service_name,
+                 serviceType : this.peripherals[actuator_renamed].service_type
+             });
+          }
        }
-    }
+     });
   }
 
 

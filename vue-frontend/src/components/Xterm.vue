@@ -8,6 +8,7 @@
 import { Terminal } from 'xterm';
 import { AttachAddon } from 'xterm-addon-attach';
 import { FitAddon } from 'xterm-addon-fit';
+import shell_socket from '../ws-connection/xterm-connection.js'
 
 import EventBus from '../event-bus';
 
@@ -23,9 +24,10 @@ export default {
     },
     methods: {
         waitForSocketConnection(){
+              // TODO: correctly close the connection
               const protocol = (location.protocol === 'https:') ? 'wss://' : 'ws://';
               const linetrace_socketUrl = `${protocol}${location.hostname}/ws/linetrace`;
-              this.linenr_socket = new WebSocket(linetrace_socketUrl);
+              this.linenr_socket = linetrace_socket; //new WebSocket(linetrace_socketUrl);
 
               this.linenr_socket.onerror = (event) => {
                   setTimeout(function () {
@@ -113,10 +115,7 @@ export default {
     },
     mounted()  {
        // Open the websocket connection to the backend
-        const protocol = (location.protocol === 'https:') ? 'wss://' : 'ws://';
-        const shell_socketUrl = `${protocol}${location.hostname}/ws/shell`;
-        const linetrace_socketUrl = `${protocol}${location.hostname}/ws/linetrace`;
-        this.shell_socket = new WebSocket(shell_socketUrl);
+        this.shell_socket = shell_socket;
 
         // The terminal
         this.term = new Terminal({theme: { background: '#e2e8e9', foreground: '#e2e8e9', cursor: '#e2e8e9' }});
