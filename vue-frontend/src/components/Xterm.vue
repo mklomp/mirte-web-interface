@@ -27,7 +27,7 @@ export default {
               // TODO: correctly close the connection
               const protocol = (location.protocol === 'https:') ? 'wss://' : 'ws://';
               const linetrace_socketUrl = `${protocol}${location.hostname}/ws/linetrace`;
-              this.linenr_socket = linetrace_socket; //new WebSocket(linetrace_socketUrl);
+              this.linenr_socket = linetrace_socketUrl; //new WebSocket(linetrace_socketUrl);
 
               this.linenr_socket.onerror = (event) => {
                   setTimeout(function () {
@@ -123,7 +123,11 @@ export default {
         this.term.loadAddon(new AttachAddon(this.shell_socket));
         this.term.loadAddon(fitAddon);
         this.term.open(this.$refs.terminal);
-        fitAddon.fit();
+        // fitAddodn.fit() gives error
+        const dimensions = fitAddon.proposeDimensions();
+        if (!isNaN(dimensions.cols) && !isNaN(dimensions.rows)){
+           this.term.resize(dimensions.cols, dimensions.rows);
+        }
         this.term.setOption('disableStdin', true);
         
         // Load env variables
@@ -135,7 +139,11 @@ export default {
 
         // Autoresize terminal on size change
         const observer = new ResizeObserver(entries => {
-           fitAddon.fit();
+           //fitAddon.fit() gives error
+           const dimensions = fitAddon.proposeDimensions();
+           if (!isNaN(dimensions.cols) && !isNaN(dimensions.rows)){
+              this.term.resize(dimensions.cols, dimensions.rows);
+           }
         })
         observer.observe(this.$refs.terminal)
 
