@@ -27,7 +27,7 @@ export default {
               // TODO: correctly close the connection
               const protocol = (location.protocol === 'https:') ? 'wss://' : 'ws://';
               const linetrace_socketUrl = `${protocol}${location.hostname}/ws/linetrace`;
-              this.linenr_socket = linetrace_socketUrl; //new WebSocket(linetrace_socketUrl);
+              this.linenr_socket = new WebSocket(linetrace_socketUrl);
 
               this.linenr_socket.onerror = (event) => {
                   setTimeout(function () {
