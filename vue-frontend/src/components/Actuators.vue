@@ -292,33 +292,6 @@ export default {
       ros: {} // TODO: check if this is needed?
     }
   },
-  beforeMount(){
-     // Instansiate all actuators in this.actuator_values
-     let params = new ROSLIB.Param({
-       ros: ros,
-       name: '/mirte'
-     })
-
-     params.get((res) => {
-
-       this.loadConfiguration(res);
-
-       const actuators = this.getActuators();
-       for (var actuator in actuators){
-          Vue.set(this.actuator_values, actuators[actuator], {});
-          const instances = this.getInstancesOfActuator(actuators[actuator]);
-          for (var instance in instances){
-             if (actuators[actuator] == "oled"){
-                Vue.set(this.actuator_values[actuators[actuator]], instances[instance], {});
-                Vue.set(this.actuator_values[actuators[actuator]][instances[instance]], 'type', '');
-                Vue.set(this.actuator_values[actuators[actuator]][instances[instance]], 'value', '');
-             } else {
-                Vue.set(this.actuator_values[actuators[actuator]], instances[instance], 0);
-             }
-          }
-       }
-     });
-  },
   mounted(){
     this.ros = ros;
 
@@ -339,6 +312,7 @@ export default {
        this.loadConfiguration(res);
        var actuators = this.getActuators();
        for (let actuator in actuators){
+          Vue.set(this.actuator_values, actuators[actuator], {});
           Vue.set(this.actuator_services, actuators[actuator], {});
           var instances = this.getInstancesOfActuator(actuators[actuator]);
           for (let instance in instances){
@@ -346,7 +320,16 @@ export default {
              if(actuators[actuator] == "motor"){
                 actuator_renamed = "motor_" + this.param_actuators[actuators[actuator]][instances[instance]].type;
              }
+
+             if (actuator_renamed == "oled"){
+                Vue.set(this.actuator_values[actuators[actuator]], instances[instance], {});
+                Vue.set(this.actuator_values[actuators[actuator]][instances[instance]], 'type', '');
+                Vue.set(this.actuator_values[actuators[actuator]][instances[instance]], 'value', '');
+             } else {
+                Vue.set(this.actuator_values[actuators[actuator]], instances[instance], 0);
+             }
              Vue.set(this.actuator_services[actuators[actuator]], instances[instance], {});
+
              this.actuator_services[actuators[actuator]][instances[instance]] = new ROSLIB.Service({
                  ros : this.ros,
                  name : '/mirte/set_' + instances[instance] + '_' + this.peripherals[actuator_renamed].service_name,
