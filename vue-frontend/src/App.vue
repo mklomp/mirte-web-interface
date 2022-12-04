@@ -165,6 +165,7 @@ export default {
    },
    computed: {
       loginModalShow: function(){
+         return false; // for now disable this. it has not extra functionality ye
          return this.$store.getters.getUser == "";
       },
       keymap() {
