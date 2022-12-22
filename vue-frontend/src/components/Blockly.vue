@@ -502,7 +502,7 @@ export default {
         },
   },
   mounted() {
-
+/*
      let params = new ROSLIB.Param({
        ros: ros,
        name: '/mirte'
@@ -512,6 +512,10 @@ export default {
        this.params = res;
        setTimeout(this.load_blockly, 500);
      })
+*/  
+     setTimeout(this.load_blockly, 500);
+
+
   }
 }
 
