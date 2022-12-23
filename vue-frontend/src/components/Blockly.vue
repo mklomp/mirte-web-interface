@@ -500,6 +500,15 @@ export default {
         function (newVal, oldVal) {
           window.location.reload()
         },
+    '$store.getters.getBlockly':
+        function (newVal, oldVal) {
+          if (newVal != ""){
+            Blockly.mainWorkspace.clear()
+            Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(newVal), this.workspace)
+            Blockly.mainWorkspace.zoomToFit()
+            this.$store.dispatch('setBlockly', "")
+          }
+        },
   },
   mounted() {
 /*
