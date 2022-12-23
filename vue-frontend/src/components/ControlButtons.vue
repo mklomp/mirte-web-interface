@@ -79,6 +79,7 @@ export default {
         },
 
         openFileWindow(){
+            this.$refs.file_input.value = null;
             this.$refs.file_input.click()
         },
 
