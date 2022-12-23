@@ -98,14 +98,12 @@ export default {
             var fr=new FileReader(); 
 
             fr.onload = () => { 
-                console.log(fr.result)
                 this.$store.dispatch('setBlockly', fr.result)
             } 
 
             if(this.$refs.file_input.files.length > 0){
                 fr.readAsText(this.$refs.file_input.files[0]); 
             }
-            
         },
         async connect_serial(){
              if (this.connected){
@@ -114,6 +112,7 @@ export default {
              } else {
                  this.serial_port = await navigator.serial.requestPort();
                  await this.serial_port.open({ baudRate: 115200 });
+                 this.writeLineToPort(this.serial_port, '\x03\x03')
                  this.upload_mirte_api();
                  console.log("connected");
              }
@@ -128,13 +127,14 @@ export default {
              this.putFile(this.serial_port, "/mirte_robot/__init__.py", "");
 
              // Upload Mirte API (TODO: do so in a beter way)
-             let code = "from machine import Pin\nmirte = {}\n\nclass Robot():\n  def __init__(self):\n    i = 20\n\n  def setDigitalPinValue(self, pin, value):\n    Pin(int(pin), Pin.OUT).value(value)\n\ndef createRobot():\n  global mirte\n  mirte = Robot()\n  return mirte"
+             let code = "from machine import Pin, ADC, PWM\nmirte = {}\n\nclass Robot():\n  def __init__(self):\n    i = 20\n\n  def setDigitalPinValue(self, pin, value):\n    Pin(int(pin), Pin.OUT).value(value)\n\n  def setAnalogPinValue(self, pin, value):\n    pwm = PWM(Pin(int(pin)))\n    pwm.freq(1000)\n    pwm.duty_u16(value)\n\n  def getDigitalPinValue(self, pin):\n    return Pin(int(pin), Pin.IN).value()\n\n  def getAnalogPinValue(self, pin):\n    return ADC(int(pin)).read_u16()\n\ndef createRobot():\n  global mirte\n  mirte = Robot()\n  return mirte"
              this.putFile(this.serial_port, "/mirte_robot/robot.py", code);
 
         },
         play(){
              // Uploade code
              const code = this.$store.getters.getCode;
+             this.writeLineToPort(this.serial_port, '\x03\x03') // Send CTRL-C to kill running program (needed?)
              this.putFile(this.serial_port, "main.py", code); 
 
              // And run right away
