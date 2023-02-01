@@ -3,11 +3,11 @@
 
 
 
-      <div v-if="programming">
+      <div v-if="programming" class="h-100" >
 
-            <div class="rounded background-green-light h5 p-3 mb-2">
+            <div class="rounded background-green-light h5 p-3 mb-2 h-100">
               {{ $t('actuators.output') }}              
-                <div class="float-right">
+                <div class="float-right h-100">
 
 <!--
 
@@ -36,7 +36,7 @@
            </div>    
       </div>
 
-
+<!--
            <div class="rounded background-green-light p-3 mb-2">
               <h5>{{ $t('actuators.control') }}</h5> 
 
@@ -126,7 +126,7 @@
               </div>  
 
            </div>
-
+-->
 
 
       <div v-for="actuator in getActuators()"  class="rounded background-green-light p-3 mb-2">

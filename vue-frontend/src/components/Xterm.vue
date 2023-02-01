@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <div id="terminal" ref="terminal" class="xterm"></div>
+    <div class="h-100" >
+        <div id="terminal" ref="terminal" class="xterm h-100"></div>
     </div>
 </template>
 
