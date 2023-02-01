@@ -42,6 +42,8 @@
     "move_stop": "Stop"
   },
   "programming": {
+    "python": "python",
+    "blockly": "blocks",
     "undo": "undo",
     "redo": "redo",
     "start": "start",
