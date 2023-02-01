@@ -24,16 +24,41 @@
 
                 <div class="text-white p-2 h3 m-0 layoutbox-title w-100 background-primary">
                   {{ $t('main.programming') }}
+
+        <button :disabled="isBlockly" class="btn btn-outline-light mr-2"
+            @click="setLanguage('blockly')"
+        >
+           {{ $t('programming.blockly') }}
+        </button>
+
+        <button :disabled="isPython" class="btn btn-outline-light mr-2"
+            @click="setLanguage('python')"
+        >
+           {{ $t('programming.python') }}
+        </button>
+
+
+                      
+
                       <div style="float: right">
                         <ControlButtons/>
                       </div>
                 </div>
                   
            
-                <div class="h-100" style="min-height: 60%; overflow: auto;" >
+                <div v-show="isBlockly" class="h-100" style="min-height: 60%; overflow: auto;" >
                     <Blockly/>
                 </div>
+
+
+                <div v-show="isPython" class="h-100" style="min-height: 60%; overflow: auto;" >
+                    <Codemirror/>
+                </div>
+
+
               
+
+
 
              </div>
          </div> 
@@ -77,6 +102,26 @@ export default {
     Sensors,
     Actuators,
     Codemirror
+  },
+  data: () => ({
+        language: "blockly",
+  }),
+  methods: {
+        setLanguage(language) {
+	   this.language = language;
+        },
+  },
+  computed: {
+       isBlockly: function(){
+           return this.language == "blockly";
+       },
+       isPython: function(){
+           return this.language == "python";
+       },
   }
+
+
+
+
 }
 </script>
