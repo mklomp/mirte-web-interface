@@ -1,7 +1,6 @@
 <template>
-  <div>
-
-    <div id="blocklyArea" ref="blocklyArea" class="blocklyArea">
+  <div class="h-100">
+    <div id="blocklyArea" ref="blocklyArea" class="blocklyArea h-100">
       <div id="blocklyDiv" ref="blocklyDiv" style="height: 480px; width: 600px"></div>
     </div>
 
@@ -184,8 +183,7 @@
      </category>
 
     </xml>
-
-  </div>
+</div>
 </template>
 
 <script>
