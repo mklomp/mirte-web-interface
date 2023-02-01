@@ -423,7 +423,7 @@ export default {
       })
 
       // workspace configuration
-      this.workspace.toolbox_.flyout_.autoClose = true
+      this.workspace.toolbox_.flyout_.autoClose = false
   
       // Window resize listener
       const onresize = (e) => {
