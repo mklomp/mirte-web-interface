@@ -48,8 +48,8 @@
     "pause": "pauze",
     "step": "stap",
     "stop": "stop",
-    "download": "download",
-    "upload": "upload"
+    "download": "opslaan",
+    "upload": "openen"
   },
   "peripherals": {
     "ultrasonic_sensor": "Afstand sensor",
@@ -71,7 +71,7 @@
     "ROBOT": "Robot",
     "SET_ANALOG_PIN": "zet analoge pin %1 op waarde %2",
     "SET_DIGITAL_PIN": "zet digitale pin %1 op waarde %2",
-    "FLOW": "Flow",
+    "FLOW": "Besturen",
     "LOOPS": "Lussen",
     "TIME": "Tijd",
     "SLEEP": "wacht %1 seconden",

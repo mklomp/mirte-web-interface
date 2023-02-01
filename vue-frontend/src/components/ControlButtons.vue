@@ -22,14 +22,14 @@
 
         <span v-b-tooltip :title="connect" style="display: inline-block;">
         <button class="btn btn-outline-light mx-2"
-            @click="connect_serial">
+            @click="control('connect')">
             <i class="fas fa-plug"></i>
         </button>
         </span>
 
         <span v-b-tooltip :title="$t('programming.start')" style="display: inline-block;">
         <button :disabled="isPlayDisabled" class="btn btn-outline-light mx-2" 
-            @click="play">
+            @click="control('play')">
             <i class="fas fa-play"></i>
         </button>
         </span>
@@ -62,7 +62,7 @@
             :title="$t('programming.download')" 
             @click="download"
         >
-            <i class="fa fa-download"></i>
+            <i class="fa fa-save"></i>
         </button>
 
         <button class="btn btn-outline-light mr-2" 
@@ -70,7 +70,7 @@
             :title="$t('programming.upload')" 
             @click="openFileWindow"
         >
-            <i class="fa fa-upload"></i>
+            <i class="fa fa-folder-open"></i>
             <input ref="file_input" @change="upload" type="file" name="name" style="display: none;" />
         </button>
 
@@ -106,61 +106,7 @@ export default {
                 fr.readAsText(this.$refs.file_input.files[0]); 
             }
         },
-        async connect_serial(){
-             if (this.connected){
-                 this.serial_port.close();
-                 console.log("disconnected");
-             } else {
-                 this.serial_port = await navigator.serial.requestPort();
-                 await this.serial_port.open({ baudRate: 115200 });
-                 this.writeLineToPort(this.serial_port, '\x03\x03')
-                 this.upload_mirte_api();
-                 console.log("connected");
-             }
-             this.connected = !this.connected;
-        },
-        upload_mirte_api(){
-             // Make dir
-             this.writeLineToPort(this.serial_port, 'import os')
-             this.writeLineToPort(this.serial_port, 'os.mkdir("mirte_robot")')
 
-             // Make class
-             this.putFile(this.serial_port, "/mirte_robot/__init__.py", "");
-
-             // Upload Mirte API (TODO: do so in a beter way)
-             let code = "from machine import Pin, ADC, PWM\nmirte = {}\n\nclass Robot():\n  def __init__(self):\n    i = 20\n\n  def setDigitalPinValue(self, pin, value):\n    Pin(int(pin), Pin.OUT).value(value)\n\n  def setAnalogPinValue(self, pin, value):\n    pwm = PWM(Pin(int(pin)))\n    pwm.freq(1000)\n    pwm.duty_u16(value)\n\n  def getDigitalPinValue(self, pin):\n    return Pin(int(pin), Pin.IN).value()\n\n  def getAnalogPinValue(self, pin):\n    return ADC(int(pin)).read_u16()\n\ndef createRobot():\n  global mirte\n  mirte = Robot()\n  return mirte"
-             this.putFile(this.serial_port, "/mirte_robot/robot.py", code);
-
-        },
-        play(){
-             // Uploade code
-             const code = this.$store.getters.getCode;
-             this.writeLineToPort(this.serial_port, '\x03\x03') // Send CTRL-C to kill running program (needed?)
-             this.putFile(this.serial_port, "main.py", code); 
-
-             // And run right away
-             this.writeLineToPort(this.serial_port, 'exec(open("main.py").read(),globals())')
-
-             // TODO: nicely close, and catch disconnect events
-        },
-        putFile(port, filename, code){
-          this.writeLineToPort(port, "f = open('" + filename + "', 'wb')");
-
-          var lines = code.split('\n');
-          for(var i = 0;i < lines.length;i++){
-              // do i need to escape anything?
-              this.writeLineToPort(port, 'f.write("' + lines[i] + '\\n")');
-          }
-
-          this.writeLineToPort(port, "f.close()");
-        },
-        writeLineToPort(port, line){
-           let writer = port.writable.getWriter();
-           let encoder = new TextEncoder();
-           console.log("[WRITE] " + line);
-           writer.write(encoder.encode(line + '\r'));
-           writer.releaseLock()
-        },
         download(){
             var text = localStorage.getItem("blockly");
             var filename = "mirte.xml";

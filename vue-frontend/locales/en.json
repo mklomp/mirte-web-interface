@@ -48,8 +48,8 @@
     "pause": "pause",
     "step": "step",
     "stop": "stop",
-    "download": "download",
-    "upload": "upload"
+    "download": "save",
+    "upload": "open"
   },
   "peripherals": {
     "ultrasonic_sensor": "Distance sensor",
@@ -71,7 +71,7 @@
     "ROBOT": "Robot",
     "SET_ANALOG_PIN": "set analog pin %1 to value %2",
     "SET_DIGITAL_PIN": "set digital pin %1 to value %2",
-    "FLOW": "Flow",
+    "FLOW": "Control",
     "LOOPS": "Loops",
     "TIME": "Time",
     "SLEEP": "wait %1 seconds",
