@@ -245,9 +245,14 @@ while (true) {
              this.putFile(this.serial_port, "main.py", code); 
 
              // And run right away
+             // TODO: in order to get step and pause wokring we need to execute it line by line
+             // 1) by introcuding a linetrace? or 2) just doing it step by step here?
              this.writeLineToPort(this.serial_port, 'exec(open("main.py").read(),globals())')
 
              // TODO: nicely close, and catch disconnect events
+        },
+        stopCode(){
+             this.writeLineToPort(this.serial_port, '\x03\x03') // Send CTRL-C to kill running program
         },
         putFile(port, filename, code){
           this.writeLineToPort(port, "f = open('" + filename + "', 'wb')");

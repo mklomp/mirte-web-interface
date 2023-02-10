@@ -33,7 +33,7 @@
             <i class="fas fa-play"></i>
         </button>
         </span>
-
+<!--
         <span v-b-tooltip :title="$t('programming.pause')" style="display: inline-block;">
         <button :disabled="isPauseDisabled" 
             @click="control('pause')" class="btn btn-outline-light mr-2">
@@ -47,7 +47,7 @@
             <i class="fa fa-step-forward"></i>
         </button>
         </span>
-
+-->
         <span v-b-tooltip :title="$t('programming.stop')" style="display: inline-block;">
 	<button :disabled="isStopDisabled" class="btn btn-outline-light mr-2" 
             @click="control('stop')">
@@ -142,6 +142,7 @@ export default {
           return this.$store.getters.getExecution == "stopped";
        },
      	 isStopDisabled: function(){
+          return false; // TODO: get it from some kind of status
           return this.$store.getters.getExecution == "stopped";
        }
     }
