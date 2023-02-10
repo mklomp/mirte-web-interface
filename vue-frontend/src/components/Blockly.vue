@@ -27,6 +27,10 @@
 
       <category name="%{BKY_FLOW}" colour="%{BKY_FLOW_RGB}" expanded="true">
 
+        <category name="%{BKY_EVENTS}" colour="%{BKY_FLOW_RGB}">
+          <block type="robot_start"></block>
+        </category>
+
         <category name="%{BKY_LOOPS}" colour="%{BKY_FLOW_RGB}">
           <block type="controls_repeat_ext">
             <value name="TIMES">
@@ -404,7 +408,8 @@ export default {
       Blockly.Msg.MODULES_RGB = "#cfd186"
       Blockly.Msg.SENSORS_RGB = "#5b8c5a"
       Blockly.Msg.ACTIONS_RGB = "#57467b"
-  
+
+
       // workspace initialization
       const blocklyArea = this.$refs.blocklyArea
       const blocklyDiv = this.$refs.blocklyDiv
@@ -424,7 +429,7 @@ export default {
 
       // workspace configuration
       this.workspace.toolbox_.flyout_.autoClose = false
-  
+
       // Window resize listener
       const onresize = (e) => {
         // Compute the absolute coordinates and dimensions of blocklyArea.
