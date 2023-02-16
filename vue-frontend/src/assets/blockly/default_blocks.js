@@ -28,7 +28,7 @@ export function load(Blockly) {
 		    {
 		      "type": "field_input",
 		      "name": "PIN",
-		      "text": "A0"
+		      "text": "2"
 		    },
 		    {
 		      "type": "input_value",
@@ -60,7 +60,7 @@ export function load(Blockly) {
                     {
                       "type": "field_input",
                       "name": "PIN",
-                      "text": "D0"
+                      "text": "25"
                     },
 		    {
     		      "type": "field_dropdown",
@@ -102,7 +102,7 @@ export function load(Blockly) {
 		    {
                       "type": "field_input",
                       "name": "PIN",
-                      "text": "A0"
+                      "text": "26"
 		    }
 		  ],
 		  "inputsInline": true,
@@ -132,7 +132,7 @@ export function load(Blockly) {
                     {
                       "type": "field_input",
                       "name": "PIN",
-                      "text": "D0"
+                      "text": "2"
                     }
                   ],
                   "inputsInline": true,
