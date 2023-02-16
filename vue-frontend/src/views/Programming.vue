@@ -29,12 +29,12 @@
                 </div>
                   
            
-                <div v-show="isBlockly" class="h-100" style="min-height: 60%; overflow: auto;" >
+                <div v-if="isBlockly" class="h-100"> 
                     <Blockly/>
                 </div>
 
 
-                <div v-show="isPython" class="h-100" style="min-height: 60%; overflow: auto;" >
+                <div v-else class="h-100">
                     <Codemirror/>
                 </div>
 
@@ -97,9 +97,6 @@ export default {
   computed: {
        isBlockly: function(){
            return this.language == "blockly";
-       },
-       isPython: function(){
-           return this.language == "python";
        },
   }
 
