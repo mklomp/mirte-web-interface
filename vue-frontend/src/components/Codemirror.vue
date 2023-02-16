@@ -1,5 +1,7 @@
 <template>
-  <textarea ref="codemirror"></textarea>
+  <div class="h-100">
+    <textarea ref="codemirror"></textarea>
+  </div>
 </template>
 
 <script>
