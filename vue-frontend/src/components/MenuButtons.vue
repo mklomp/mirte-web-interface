@@ -1,5 +1,6 @@
 <template>
     <div>
+<!--
         <button class="btn btn-outline-light mr-2"
             v-b-tooltip.hover
             :title="$t('main.shutdown')"
@@ -7,7 +8,7 @@
         >
             <i class="fas fa-power-off"></i>
         </button>
-
+-->
   <div class="locale-changer">
     <select v-model="lang">
       <option v-for="(lang, i) in langs" :key="`Lang${i}`" :value="lang">{{ lang }}</option>
