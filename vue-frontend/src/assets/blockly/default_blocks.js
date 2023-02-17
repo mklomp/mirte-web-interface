@@ -5,8 +5,14 @@ export function load(Blockly) {
             this.jsonInit({
                 "type": "block_type",
                   "message0": "%{BKY_START}",
+                  "message1": "%1",
+                  "args1": [
+                    {
+                      "type": "input_statement",
+                      "name": "NAME"
+                    }
+                  ],
                   "inputsInline": true,
-                  "nextStatement": null,
                   "colour": "%{BKY_FLOW_RGB}"
             });
         }
@@ -14,9 +20,10 @@ export function load(Blockly) {
 
     Blockly.Python['robot_start'] = function (block) {
         Blockly.Python.definitions_['import_mirte'] = 'from mirte_robot import robot\nmirte=robot.createRobot()';
-        return '';
+        var statements_name = Blockly.Python.statementToCode(block, 'NAME');
+        var code = 'def main():\n' +  statements_name + '\nmain()' ;
+        return code;
     };
-
 
 
     Blockly.Blocks['set_analog_pin_value'] = {
