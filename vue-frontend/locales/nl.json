@@ -44,6 +44,7 @@
   "programming": {
     "python": "python",
     "blockly": "blokken",
+    "connect": "verbinden",
     "undo": "undo",
     "redo": "redo",
     "start": "start",

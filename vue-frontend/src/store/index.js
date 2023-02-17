@@ -12,7 +12,8 @@ export default {
         execution: "stopped",   // TODO: enum?
         user: "none",           // TODO: at the moment it can not be empty on start
         PConfig: "[]",          // For some reason this needs to be a string (persistent?)
-        locale: selectedLocale
+        locale: selectedLocale,
+        serialStatus: "disconnected"
     },
 
     getters: {
@@ -39,6 +40,9 @@ export default {
         },
         getLocal(state){
             return state.locale;
+        },
+        getSerialStatus(state){
+            return state.serialStatus;
         }
     },
     actions: {
@@ -66,6 +70,9 @@ export default {
         setLocale({commit, getters}, locale){
             i18n.locale = locale;
             commit('locale', locale);
+        },
+        setSerialStatus({commit, getters}, status){
+            commit('serialStatus', status);
         }
     },
     mutations: {
@@ -92,7 +99,10 @@ export default {
         },
         locale(state, locale){
             return state.locale = locale;
+        },
+        serialStatus(state, serialStatus){
+            return state.serialStatus = serialStatus;
         }
     },
-    plugins: [createPersistedState()]
+    plugins: [createPersistedState({ paths: ["code", "blockly", "locale"] })]
 }

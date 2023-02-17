@@ -20,10 +20,10 @@
 
         <span class="nav-spacer"></span>
 
-        <span v-b-tooltip :title="connect" style="display: inline-block;">
+        <span v-b-tooltip :title="$t('programming.connect')" style="display: inline-block;">
         <button class="btn btn-outline-light mx-2"
             @click="control('connect')">
-            <i class="fas fa-plug"></i>
+            <i class="fas" v-bind:class="{ 'fa-plug': serialStatus == 'disconnected', 'fa-plug-circle-check': serialStatus == 'connected' }"></i>
         </button>
         </span>
 
@@ -82,8 +82,7 @@ import EventBus from '../event-bus';
 
 export default {
     data: () => ({
-        serial_port: {},
-        connected: false
+        serialStatus: "disconnected"
     }),
     methods: {
         control(command) {
@@ -122,8 +121,12 @@ export default {
 
             document.body.removeChild(element);
         },
-
-
+    },
+    watch: {
+      //TODO: is this needed or could we just get the store in the template?
+      '$store.getters.getSerialStatus': function(newVal, oldVal) {
+         this.serialStatus = newVal;
+      }
     },
     computed: {
        isUndoDisabled: function(){
@@ -132,18 +135,17 @@ export default {
        isRedoDisabled: function(){
            return false; // TODO: determine strategy
        },
-     	 isPlayDisabled: function(){
-          return this.$store.getters.getExecution == "running";
+       isPlayDisabled: function(){
+          return this.serialStatus == "disconnected";
        },
-     	 isPauseDisabled: function(){
+       isPauseDisabled: function(){
           return this.$store.getters.getExecution != "running";
        },
-     	 isStepDisabled: function(){
+       isStepDisabled: function(){
           return this.$store.getters.getExecution == "stopped";
        },
-     	 isStopDisabled: function(){
-          return false; // TODO: get it from some kind of status
-          return this.$store.getters.getExecution == "stopped";
+       isStopDisabled: function(){
+          return this.serialStatus == "disconnected";
        }
     }
 

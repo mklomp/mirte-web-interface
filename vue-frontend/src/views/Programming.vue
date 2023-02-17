@@ -14,7 +14,7 @@
            {{ $t('programming.blockly') }}
         </button>
 
-        <button :disabled="isPython" class="btn btn-outline-light mr-2"
+        <button :disabled="!isBlockly" class="btn btn-outline-light mr-2"
             @click="setLanguage('python')"
         >
            {{ $t('programming.python') }}

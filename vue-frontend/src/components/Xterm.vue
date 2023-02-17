@@ -17,6 +17,10 @@ export default {
         shell_socket: WebSocket,
         linenr_socket: WebSocket,
         term: Terminal,
+        reader: {},
+        writer: {},
+        readableStreamClosed: {},
+        writableStreamClosed: {}
     }),
     activated: function(){
         this.term.focus();
@@ -111,166 +115,103 @@ export default {
             this.setTerminal(this.term.getOption('disableStdin'));
         },
         async connectCode(){
-             if (this.connected){
-                 this.serial_port.close();
-                 console.log("disconnected");
+             if (this.$store.getters.getSerialStatus == "connected"){
+                 this.reader.cancel();
+                 await this.readableStreamClosed.catch(() => { /* Ignore the error */ });
+
+                 this.writer.close();
+                 await this.writableStreamClosed;
+
+                 await this.serial_port.close();
+                 this.$store.dispatch('setSerialStatus', 'disconnected');
              } else {
+                 // TODO: try catch
                  this.serial_port = await navigator.serial.requestPort();
+                 this.serial_port.addEventListener('disconnect', (event) => {
+                     this.$store.dispatch('setSerialStatus', 'disconnected');
+                 });
                  await this.serial_port.open({ baudRate: 115200 });
-                 this.writeLineToPort(this.serial_port, '\x03\x03')
+
+                 const textEncoder = new TextEncoderStream();
+                 this.writer = textEncoder.writable.getWriter();
+                 this.writableStreamClosed = textEncoder.readable.pipeTo(this.serial_port.writable);
+ 
+                 this.writeLineToPort('\x03\x03');
                  this.upload_mirte_api();
-                 console.log("connected");
+
+                 this.$store.dispatch('setSerialStatus', 'connected');
+
+                 const textDecoder = new TextDecoderStream();
+                 this.readableStreamClosed = this.serial_port.readable.pipeTo(textDecoder.writable);
+                 this.reader = textDecoder.readable.getReader();
                  await this.read_serial_data();
              }
-             this.connected = !this.connected;
         },
         async read_serial_data(){
-const textDecoder = new TextDecoderStream();
-const readableStreamClosed = this.serial_port.readable.pipeTo(textDecoder.writable);
-const reader = textDecoder.readable.getReader();
+          // Listen to data coming from the serial device.
+          let line = ""
+          while (true) {
+            const { value, done } = await this.reader.read();
+              if (done) {
+                // Allow the serial port to be closed later.
+                this.reader.releaseLock();
+                break;
+              }
 
-// Listen to data coming from the serial device.
-let line = ""
-while (true) {
-  const { value, done } = await reader.read();
-  if (done) {
-    // Allow the serial port to be closed later.
-    reader.releaseLock();
-    break;
-  }
-
-  let nextpart = line + value
-  let splits = nextpart.split('\n')
-  for (var i = 0; i < splits.length; i++){
-     let curline = splits[i]
-     if (i == splits.length -1){
-       line = curline
-     }
+            let nextpart = line + value
+            let splits = nextpart.split('\n')
+            for (var i = 0; i < splits.length; i++){
+              let curline = splits[i]
+              if (i == splits.length -1){
+                line = curline
+              }
      
-//     console.log(curline);
-     if (curline.substring(0,3) != ">>>"){
-        this.term.write(curline + "\n")
-     }
-
-  }
-
-
-  //if (value.split('\n')[1]){
-  //  console.log("----------")
-  //  console.log(value.split('\n')[0]);
-  //  console.log(value.split('\n')[1]);
-  //}
-  // value is a string.
-  // console.log(value)
-   //console.log(value.substring(0,3));
- //  if (value.substring(0,3) != ">>>"){
- //     this.term.write(value);
- //  }
-}
-
-        },
-/*
-
-
-        async read_serial_data(){
-    let bytes = new Uint8Array(32);
-    let readBytes = 0;
-    let finished = false;
-
-    try {
-      while (true) {
-        const { value, done } = await this.reader.read();
-        if (value) {
-          let chunk = value;
-
-          if (readBytes === 0 && chunk[0] === SerialService.FAIL) {
-            return bytes;
-          }
-
-          for (let i = 0; i < chunk.length; i++) {
-            bytes[i] = chunk[i];
-            readBytes++;
-
-            if (readBytes >= numberOfBytes) {
-              finished = true;
+              if (curline.substring(0,3) != ">>>"){
+                this.term.write(curline + "\n")
+              }
             }
           }
-        }
-        if (done || finished) {
-          break;
-        }
-      }
-    } catch (error) {
-      console.error("Serial port reading error: " + error);
-    }
-
-    console.log(bytes);
-    return bytes;
-
-
-
         },
-
-        async read_serial_data(){
-           const reader = this.serial_port.readable.getReader();
-           // Listen to data coming from the serial device.
-           while (true) {
-              const { value, done } = await reader.read();
-              if (done) {
-                  // Allow the serial port to be closed later.
-                  reader.releaseLock();
-                  break;
-              }
-              // value is a Uint8Array.
-              console.log(value);
-           }
-        },*/
         upload_mirte_api(){
              // Make dir
-             this.writeLineToPort(this.serial_port, 'import os')
-             this.writeLineToPort(this.serial_port, 'os.mkdir("mirte_robot")')
+             this.writeLineToPort('import os')
+             this.writeLineToPort('os.mkdir("mirte_robot")')
 
              // Make class
-             this.putFile(this.serial_port, "/mirte_robot/__init__.py", "");
+             this.putFile("/mirte_robot/__init__.py", "");
 
              // Upload Mirte API (TODO: do so in a beter way)
              let code = "from machine import Pin, ADC, PWM\nmirte = {}\n\nclass Robot():\n  def __init__(self):\n    i = 20\n\n  def setDigitalPinValue(self, pin, value):\n    Pin(int(pin), Pin.OUT).value(value)\n\n  def setAnalogPinValue(self, pin, value):\n    pwm = PWM(Pin(int(pin)))\n    pwm.freq(1000)\n    pwm.duty_u16(value)\n\n  def getDigitalPinValue(self, pin):\n    return Pin(int(pin), Pin.IN).value()\n\n  def getAnalogPinValue(self, pin):\n    return ADC(int(pin)).read_u16()\n\ndef createRobot():\n  global mirte\n  mirte = Robot()\n  return mirte"
-             this.putFile(this.serial_port, "/mirte_robot/robot.py", code);
-
+             this.putFile("/mirte_robot/robot.py", code);
         },
         play(){
              // Uploade code
              const code = this.$store.getters.getCode;
-             this.writeLineToPort(this.serial_port, '\x03\x03') // Send CTRL-C to kill running program (needed?)
-             this.putFile(this.serial_port, "main.py", code); 
+             this.writeLineToPort('\x03\x03') // Send CTRL-C to kill running program (needed?)
+             this.putFile("main.py", code); 
 
              // And run right away
              // TODO: in order to get step and pause wokring we need to execute it line by line
              // 1) by introcuding a linetrace? or 2) just doing it step by step here?
-             this.writeLineToPort(this.serial_port, 'exec(open("main.py").read(),globals())')
-
-             // TODO: nicely close, and catch disconnect events
+             this.writeLineToPort('exec(open("main.py").read(),globals())')
         },
         stopCode(){
-             this.writeLineToPort(this.serial_port, '\x03\x03') // Send CTRL-C to kill running program
+             this.writeLineToPort('\x03\x03') // Send CTRL-C to kill running program
         },
-        putFile(port, filename, code){
-          this.writeLineToPort(port, "f = open('" + filename + "', 'wb')");
+        putFile(filename, code){
+          this.writeLineToPort("f = open('" + filename + "', 'wb')");
 
           var lines = code.split('\n');
           for(var i = 0;i < lines.length;i++){
               // do i need to escape anything?
-              this.writeLineToPort(port, 'f.write("' + lines[i] + '\\n")');
+              this.writeLineToPort('f.write("' + lines[i] + '\\n")');
           }
 
-          this.writeLineToPort(port, "f.close()");
+          this.writeLineToPort("f.close()");
         },
-        writeLineToPort(port, line){
-           let writer = port.writable.getWriter();
-           let encoder = new TextEncoder();
-          // console.log("[WRITE] " + line);
-           writer.write(encoder.encode(line + '\r'));
-           writer.releaseLock()
+        writeLineToPort(line){
+           //console.log("[WRITE] " + line);
+           this.writer.write(line + '\r');
         },
     },
     mounted()  {
