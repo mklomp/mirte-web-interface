@@ -71,7 +71,7 @@
             @click="openFileWindow"
         >
             <i class="fa fa-folder-open"></i>
-            <input ref="file_input" @change="upload" type="file" name="name" style="display: none;" />
+            <input ref="file_input" @change="upload" type="file" accept=".txt" name="name" style="display: none;" />
         </button>
 
     </div>
@@ -106,20 +106,22 @@ export default {
             }
         },
 
-        download(){
+        async download(){
             var text = localStorage.getItem("blockly");
             var filename = "mirte.xml";
-            
-            var element = document.createElement('a');
-            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-            element.setAttribute('download', filename);
 
-            element.style.display = 'none';
-            document.body.appendChild(element);
+            let handle = await this.Window.showSaveFilePicker({
+              suggestedName: 'mirte.txt',
+              types: [{
+                 description: 'Text file',
+                 accept: {'text/plain': ['.txt']},
+              }],
+            });
 
-            element.click();
-
-            document.body.removeChild(element);
+            const blob = new Blob([text]);
+            const writableStream = await handle.createWritable();
+            await writableStream.write(blob);
+            await writableStream.close();
         },
     },
     watch: {

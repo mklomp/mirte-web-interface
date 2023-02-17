@@ -18,6 +18,7 @@ const store = new Vuex.Store(
 )
 
 import i18n from './i18n'
+Vue.prototype.Window = window;
 
 new Vue({
   i18n,
