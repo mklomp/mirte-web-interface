@@ -163,11 +163,12 @@ export default {
             for (var i = 0; i < splits.length; i++){
               let curline = splits[i]
               if (i == splits.length -1){
-                line = curline
-              }
-     
-              if (curline.substring(0,3) != ">>>"){
-                this.term.write(curline + "\n")
+                line = curline;
+              } else {
+                // Do not show the python commands themselves
+                if (curline.substring(0,3) != ">>>" && curline.substring(0,3) != "..."){
+                   this.term.write(curline + "\n")
+                }
               }
             }
           }
@@ -175,13 +176,15 @@ export default {
         upload_mirte_api(){
              // Make dir
              this.writeLineToPort('import os')
-             this.writeLineToPort('os.mkdir("mirte_robot")')
+             this.writeLineToPort('if "mirte_robot" not in os.listdir():')   //os.path. does not exist in micropython
+             this.writeLineToPort('  os.mkdir("mirte_robot")')
+             this.writeLineToPort('')
 
              // Make class
              this.putFile("/mirte_robot/__init__.py", "");
 
              // Upload Mirte API (TODO: do so in a beter way)
-             let code = "from machine import Pin, ADC, PWM\nmirte = {}\n\nclass Robot():\n  def __init__(self):\n    i = 20\n\n  def setDigitalPinValue(self, pin, value):\n    Pin(int(pin), Pin.OUT).value(value)\n\n  def setAnalogPinValue(self, pin, value):\n    pwm = PWM(Pin(int(pin)))\n    pwm.freq(1000)\n    pwm.duty_u16(value)\n\n  def getDigitalPinValue(self, pin):\n    return Pin(int(pin), Pin.IN).value()\n\n  def getAnalogPinValue(self, pin):\n    return ADC(int(pin)).read_u16()\n\ndef createRobot():\n  global mirte\n  mirte = Robot()\n  return mirte"
+             let code = "from machine import Pin, ADC, PWM\n\import sys\nmirte = {}\n\nclass Robot():\n  def __init__(self):\n    i = 20\n\n  def setDigitalPinValue(self, pin, value):\n    Pin(int(pin), Pin.OUT).value(value)\n\n  def setAnalogPinValue(self, pin, value):\n    pwm = PWM(Pin(int(pin)))\n    pwm.freq(1000)\n    pwm.duty_u16(value)\n\n  def getDigitalPinValue(self, pin):\n    return Pin(int(pin), Pin.IN).value()\n\n  def getAnalogPinValue(self, pin):\n    return ADC(int(pin)).read_u16()\n\ndef createRobot():\n  global mirte\n  mirte = Robot()\n  return mirte\n\ndef exception_handler(exception_type, exception, traceback):\n  #NOP\n  a = 10\n\nsys.excepthook = exception_handler"
              this.putFile("/mirte_robot/robot.py", code);
         },
         play(){
@@ -204,7 +207,7 @@ export default {
           var lines = code.split('\n');
           for(var i = 0;i < lines.length;i++){
               // do i need to escape anything?
-              this.writeLineToPort('f.write("' + lines[i] + '\\n")');
+              this.writeLineToPort('e = f.write("' + lines[i] + '\\n")');
           }
 
           this.writeLineToPort("f.close()");
