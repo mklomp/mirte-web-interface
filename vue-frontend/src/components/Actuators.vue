@@ -6,7 +6,6 @@
       <div v-if="programming" class="h-100" >
 
             <div class="rounded background-green-light h5 p-3 mb-2 h-100">
-              {{ $t('actuators.output') }}              
                 <div class="float-right h-100">
 
 <!--

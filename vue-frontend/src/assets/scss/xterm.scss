@@ -62,6 +62,10 @@
     display: block;
 }
 
+#terminal > div {
+    height: 100%;
+}
+
 .xterm .xterm-viewport {
     /* On OS X this is required in order for the scroll bar to appear fully opaque */
     background-color: #000;

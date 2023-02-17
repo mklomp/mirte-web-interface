@@ -51,7 +51,7 @@
              <div class="layoutbox rounded h-100" style="overflow: hidden; display: flex; flex-flow: column;">
 
                 <div class="text-white p-2 h3 m-0 layoutbox-title w-100 background-primary">
-                   {{ $t('main.actuators') }}
+                   {{ $t('actuators.output') }}
                 </div>
                   
            

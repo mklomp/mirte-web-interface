@@ -102,17 +102,17 @@ export default {
            if (terminal){
               //this.term.setOption('theme', {});
               //this.shell_socket.send("stty echo && PS1='\\[\\e]0;\\u@\\h: \\w\\a\\]${debian_chroot:+($debian_chroot)}\\[\\033[01;32m\\]\\u@\\h\\[\\033[00m\\]:\\[\\033[01;34m\\]\\w\\[\\033[00m\\]\\$ ' && clear\n");
-              this.term.setOption('disableStdin', false);
+              //this.term.setOption('disableStdin', false);
            } else {
               //this.term.setOption('theme', { background: '#e2e8e9', foreground: '#e2e8e9', cursor: '#e2e8e9' });
               //this.shell_socket.send("stty -echo && PS1='' && clear\n");
               //this.shell_socket.send("clear\n");
-              this.term.setOption('disableStdin', false);
-              this.term.setOption('theme', { background: '#e2e8e9', foreground: '#000000', cursor: '#e2e8e9' });
+              //this.term.setOption('disableStdin', false);
+              //this.term.setOption('theme', { background: '#e2e8e9', foreground: '#000000', cursor: '#e2e8e9' });
            }
         },
         toggleTerminal() {
-            this.setTerminal(this.term.getOption('disableStdin'));
+            //this.setTerminal(this.term.getOption('disableStdin'));
         },
         async connectCode(){
              if (this.$store.getters.getSerialStatus == "connected"){
@@ -222,16 +222,17 @@ export default {
         this.shell_socket = shell_socket;
 
         // The terminal
-        this.term = new Terminal({theme: { background: '#e2e8e9', foreground: '#e2e8e9', cursor: '#e2e8e9' }});
+        this.term = new Terminal({theme: { background: '#e2e8e9', foreground: '#000000', cursor: '#e2e8e9' }});
         const fitAddon = new FitAddon();
-        this.term.loadAddon(new AttachAddon(this.shell_socket));
+        //this.term.loadAddon(new AttachAddon(this.shell_socket));
         this.term.loadAddon(fitAddon);
         this.term.open(this.$refs.terminal);
-        // fitAddodn.fit() gives error
-        const dimensions = fitAddon.proposeDimensions();
-        if (!isNaN(dimensions.cols) && !isNaN(dimensions.rows)){
-           this.term.resize(dimensions.cols, dimensions.rows);
-        }
+        fitAddon.fit();
+        //const dimensions = fitAddon.proposeDimensions();
+        //console.log(dimensions);
+        //if (!isNaN(dimensions.cols) && !isNaN(dimensions.rows)){
+        //   this.term.resize(dimensions.cols, dimensions.rows);
+        //}
         //this.term.setOption('disableStdin', true);
         
         // Load env variables
@@ -243,11 +244,12 @@ export default {
 
         // Autoresize terminal on size change
         const observer = new ResizeObserver(entries => {
-           //fitAddon.fit() gives error
-           const dimensions = fitAddon.proposeDimensions();
-           if (!isNaN(dimensions.cols) && !isNaN(dimensions.rows)){
-              this.term.resize(dimensions.cols, dimensions.rows);
-           }
+           fitAddon.fit();
+//           const dimensions = fitAddon.proposeDimensions();
+//           console.log(dimensions);
+//           if (!isNaN(dimensions.cols) && !isNaN(dimensions.rows)){
+//              this.term.resize(dimensions.cols, dimensions.rows);
+//           }
         })
         observer.observe(this.$refs.terminal)
 
@@ -259,7 +261,7 @@ export default {
                     this.connectCode()
                     break;
                 case "play":
-                    this.term.setOption('theme', { background: '#e2e8e9', foreground: '#000000', cursor: '#e2e8e9' });
+                    //this.term.setOption('theme', { background: '#e2e8e9', foreground: '#000000', cursor: '#e2e8e9' });
                     //this.playCode()
                     this.play()
                     break;
