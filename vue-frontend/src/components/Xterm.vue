@@ -138,6 +138,7 @@ export default {
  
                  this.writeLineToPort('\x03\x03');
                  this.upload_mirte_api();
+                 this.writeLineToPort('exec(open("resetpins.py").read(),globals())')
 
                  this.$store.dispatch('setSerialStatus', 'connected');
 
@@ -166,7 +167,7 @@ export default {
                 line = curline;
               } else {
                 // Do not show the python commands themselves
-                if (curline.substring(0,3) != ">>>" && curline.substring(0,3) != "..."){
+                if (curline.substring(0,3) != ">>>" && curline.substring(0,3) != "..." && curline.substring(0,19) != "MicroPython v1.19.1" && curline.substring(0,13) != 'Type "help()"'){
                    this.term.write(curline + "\n")
                 }
               }
@@ -184,14 +185,23 @@ export default {
              this.putFile("/mirte_robot/__init__.py", "");
 
              // Upload Mirte API (TODO: do so in a beter way)
-             let code = "from machine import Pin, ADC, PWM\n\import sys\nmirte = {}\n\nclass Robot():\n  def __init__(self):\n    i = 20\n\n  def setDigitalPinValue(self, pin, value):\n    Pin(int(pin), Pin.OUT).value(value)\n\n  def setAnalogPinValue(self, pin, value):\n    pwm = PWM(Pin(int(pin)))\n    pwm.freq(1000)\n    pwm.duty_u16(value)\n\n  def getDigitalPinValue(self, pin):\n    return Pin(int(pin), Pin.IN).value()\n\n  def getAnalogPinValue(self, pin):\n    return ADC(int(pin)).read_u16()\n\ndef createRobot():\n  global mirte\n  mirte = Robot()\n  return mirte\n\ndef exception_handler(exception_type, exception, traceback):\n  #NOP\n  a = 10\n\nsys.excepthook = exception_handler"
+             let code = "from machine import Pin, ADC, PWM\nmirte = {}\n\nclass Robot():\n  def __init__(self):\n    i = 20\n\n  def setDigitalPinValue(self, pin, value):\n    Pin(int(pin), Pin.OUT).value(value)\n\n  def setAnalogPinValue(self, pin, value):\n    pwm = PWM(Pin(int(pin)))\n    pwm.freq(1000)\n    pwm.duty_u16(value)\n\n  def getDigitalPinValue(self, pin):\n    return Pin(int(pin), Pin.IN).value()\n\n  def getAnalogPinValue(self, pin):\n    return ADC(int(pin)).read_u16()\n\ndef createRobot():\n  global mirte\n  mirte = Robot()\n  return mirte"
              this.putFile("/mirte_robot/robot.py", code);
+
+             // Upload Resetpins
+             code = "from machine import Pin\nfor i in range(0,29):\n  Pin(i, Pin.OUT).off()";
+             this.putFile("/resetpins.py", code);
+
+             // Upload main.py
+             code = "import sys\ntry:\n  exec(open('./mirte.py').read(),globals())\nexcept:\n  exec(open('./resetpins.py').read(),globals())\n  sys.exit(0)";
+             this.putFile("/main.py", code);
+
         },
         play(){
              // Uploade code
              const code = this.$store.getters.getCode;
              this.writeLineToPort('\x03\x03') // Send CTRL-C to kill running program (needed?)
-             this.putFile("main.py", code); 
+             this.putFile("mirte.py", code); 
 
              // And run right away
              // TODO: in order to get step and pause wokring we need to execute it line by line
@@ -200,6 +210,8 @@ export default {
         },
         stopCode(){
              this.writeLineToPort('\x03\x03') // Send CTRL-C to kill running program
+             //this.writeLineToPort('import machine');
+             //this.writeLineToPort('machine.soft_reset()');
         },
         putFile(filename, code){
           this.writeLineToPort("f = open('" + filename + "', 'wb')");

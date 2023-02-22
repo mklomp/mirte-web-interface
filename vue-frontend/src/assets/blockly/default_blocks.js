@@ -19,7 +19,6 @@ export function load(Blockly) {
     };
 
     Blockly.Python['robot_start'] = function (block) {
-        Blockly.Python.definitions_['import_mirte'] = 'from mirte_robot import robot\nmirte=robot.createRobot()';
         var statements_name = Blockly.Python.statementToCode(block, 'NAME');
         var code = 'def main():\n' +  statements_name + '\nmain()' ;
         return code;
