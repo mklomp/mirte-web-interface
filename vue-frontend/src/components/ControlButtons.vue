@@ -123,17 +123,17 @@ export default {
        isRedoDisabled: function(){
            return false; // TODO: determine strategy
        },
-     	 isPlayDisabled: function(){
-          return this.$store.getters.getExecution == "running";
+       isPlayDisabled: function(){
+          return this.$store.getters.getExecution == "running" || this.$store.getters.getExecution == "disconnected";
        },
-     	 isPauseDisabled: function(){
-          return this.$store.getters.getExecution != "running";
+       isPauseDisabled: function(){
+          return this.$store.getters.getExecution != "running" || this.$store.getters.getExecution == "disconnected";
        },
-     	 isStepDisabled: function(){
-          return this.$store.getters.getExecution == "stopped";
+       isStepDisabled: function(){
+          return this.$store.getters.getExecution == "stopped" || this.$store.getters.getExecution == "disconnected";
        },
-     	 isStopDisabled: function(){
-          return this.$store.getters.getExecution == "stopped";
+       isStopDisabled: function(){
+          return this.$store.getters.getExecution == "stopped" || this.$store.getters.getExecution == "disconnected";
        }
     }
 
