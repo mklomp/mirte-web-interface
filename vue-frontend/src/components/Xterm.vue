@@ -133,13 +133,13 @@ let strace_cmd = 'strace -ff -e write=1,2 -s 1024 -p ' + debugger_pid + ' 2>&1 |
         this.term.setOption('disableStdin', true);
         
         // Load env variables
-        this.shell_socket.onopen = (ev) => {
-            this.shell_socket.send("stty -echo && PS1='' && clear\n");
-            this.shell_socket.send("clear\n");
-            this.shell_socket.send("source /home/mirte/mirte_ws/devel/setup.bash && cd /home/mirte/workdir && clear\n");
-            this.shell_socket.send("clear\n");
-            this.$store.dispatch('setExecution', 'stopped');
-        };
+        this.shell_socket.onmessage = (ev) => {
+           if (this.$store.getters.getExecution == "disconnected") {
+              this.shell_socket.send("stty -echo && PS1='' && clear\n");
+              this.shell_socket.send("source /home/mirte/mirte_ws/devel/setup.bash && cd /home/mirte/workdir && clear\n");
+              this.$store.dispatch('setExecution', 'stopped');
+           }
+        }
 
         // Autoresize terminal on size change
         const observer = new ResizeObserver(entries => {
