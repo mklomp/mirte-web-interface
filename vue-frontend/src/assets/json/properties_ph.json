@@ -77,15 +77,5 @@
     "rel_path": "Sensors\\Keypad\\keypad\\keypad.py",
     "message_type": "mirte_msgs/Keypad",
     "message_value": "key"
-  },
-  "encoder": {
-    "text": "wheel_encoder",
-    "pins": {
-       "pin": "digital"
-    },
-    "functions": ["get_ticks"],
-    "rel_path": "Sensors\\Encoder\\encoder\\encoder.py",
-    "message_type": "mirte_msgs/Encoder",
-    "message_value": "value"
   }
 }
