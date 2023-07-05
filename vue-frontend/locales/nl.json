@@ -50,8 +50,8 @@
     "pause": "pauze",
     "step": "stap",
     "stop": "stop",
-    "download": "download",
-    "upload": "upload"
+    "save": "opslaan",
+    "open": "openen"
   },
   "peripherals": {
     "ultrasonic_sensor": "Afstand sensor",
