@@ -11,7 +11,7 @@
 
                 <div class="col-8">
 
-                  <div v-for="instance in getInstancesOfSensor(sensor)" class="rounded background-primary p-2 text-white mb-2">
+                  <div v-for="instance in getInstancesOfSensor(sensor)" class="rounded background-value-field p-2 text-white mb-2">
                      {{instance}}: {{ sensor_values[sensor][instance] }}
                   </div>
                 </div>
