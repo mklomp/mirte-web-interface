@@ -340,7 +340,6 @@ export default {
     },
     // Loads in imported blockly modules block definitions
     load_blockly_modules() {
-      let PConfig = this.$store.getters.getPConfig;
 
       // Load default blocks
       PBM["default"].load(Blockly, []);
@@ -473,11 +472,11 @@ export default {
         }
       }
 
-      this.load_blockly_modules();
-
       const storage = localStorage.getItem("blockly")
       if (storage !== null) {
         Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(storage), this.workspace)
+      } else {
+        this.load_blockly_modules();
       }
 
     }
@@ -517,7 +516,7 @@ export default {
 
      params.get((res) => {
        this.params = res;
-       setTimeout(this.load_blockly, 500);
+       setTimeout(this.load_blockly, 10);
      })
   }
 }
