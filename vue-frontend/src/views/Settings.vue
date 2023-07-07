@@ -5,9 +5,9 @@
       <div class="row h-100">
        <div class="col-12 h-100" style="overflow: hidden;">
         <div class="layoutbox rounded h-100" style="overflow: hidden; display: flex; flex-flow: column;">
-          <div class="text-white p-2 h3 layoutbox-title w-100 background-primary">
+          <div class="text-white p-2 h3 layoutbox-title w-100 background-secondary">
             {{ $t('settings.wiring') }}
-            <button @click="uploadYAML" type="button" class="btn btn-danger float-right">
+            <button @click="uploadYAML" type="button" class="btn btn-mirte float-right">
               <span v-if="!busy">{{ $t('settings.save') }}</span>
               <i v-else class="fa fa-spin fa-stroopwafel"></i>
             </button>
@@ -80,7 +80,7 @@
 
           <div class="layoutbox rounded">
 
-          <div class="text-white p-2 h3 layoutbox-title w-100 background-primary">
+          <div class="text-white p-2 h3 layoutbox-title w-100 background-secondary">
             {{ $t('settings.microcontroller') }}
           </div>
 
