@@ -28,7 +28,7 @@ body{
 
 
 .content{
-    background-color: white;
+    background-color: $white;
     height: 20vh;
 }
 
@@ -50,13 +50,13 @@ body{
 
     button{
         background-color: $grey-blue;
-        border: 1px solid white;
+        border: 1px solid $white;
         margin: 0 5px 5px 0;
     }
 
     button:hover{
-        background-color: white;
-        border: 1px solid white;
+        background-color: $white;
+        border: 1px solid $white;
         margin: 0 5px 5px 0;
         color: $grey-blue;
     }
@@ -73,17 +73,17 @@ body{
 
 .nav-spacer{
     height: 100%;
-    border: 1px solid white;
+    border: 1px solid $white;
     margin: 0 .2em;
     border-radius: 5px;
 }
 
 .nav-item a{
-    color: white !important;
+    color: $white !important;
 }
 
 .nav-link.active{
-    background-color: white !important;
+    background-color: $white !important;
     color: $black !important;
 }
 
@@ -135,11 +135,11 @@ $custom-range-thumb-bg: $dark-grey;
 $custom-control-indicator-checked-bg: $grey-blue;
 
 .code-inactive{
-    color: white !important;
+    color: $white !important;
 }
 
 .code-active{
-    background-color: white !important;
+    background-color: $white !important;
     color: $black !important;
 }
 
@@ -158,6 +158,6 @@ $custom-control-indicator-checked-bg: $grey-blue;
 .btn-mirte-control:focus,
 .btn-mirte-control.active {
   background: $yellow;
-  color: white !important;
+  color: $white !important;
   border: 1px solid $black;
 }
