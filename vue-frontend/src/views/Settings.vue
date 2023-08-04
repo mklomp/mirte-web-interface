@@ -196,7 +196,7 @@ export default {
          } else {
 	    for (var k in rosparams[j]){
                if(j == "motor"){
-                 this.add_item("motor_" + rosparams[j][k]['type'], k, rosparams[j][k]['pins']);
+                 this.add_item(rosparams[j][k]['type'] + "_motor", k, rosparams[j][k]['pins']);
                } else {
                  this.add_item(j, k, rosparams[j][k]['pins']);
                }
@@ -216,12 +216,16 @@ export default {
           i['device'] = 'mirte';
           delete i['type'];
           var newtype = type;
-          if (type == 'motor_l9110s'){
-             i['type'] = "l9110s"
+          if (type == 'pp_motor'){
+             i['type'] = "pp"
              newtype = "motor"
           }
-          if (type == 'motor_l298n'){
-             i['type'] = "l298n"
+          if (type == 'ddp_motor'){
+             i['type'] = "ddp"
+             newtype = "motor"
+          }
+          if (type == 'dp_motor'){
+             i['type'] = "dp"
              newtype = "motor"
           }
           if (this.type == "mirte_pcb"){

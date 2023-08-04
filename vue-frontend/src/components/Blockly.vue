@@ -357,7 +357,7 @@ export default {
       for (let type in this.params){
          for (let instance in this.params[type]){
              if(type == "motor"){
-                type = "motor_" + this.params["motor"][Object.keys(this.params["motor"])[0]].type;
+                type = this.params["motor"][Object.keys(this.params["motor"])[0]].type + "_motor";
              }
              if (this.peripherals.hasOwnProperty(type) && this.peripherals[type].rel_path.split("\\")[0] == kind ){
                  AP.add(type)
@@ -374,24 +374,20 @@ export default {
       PBM["default"].load(Blockly, []);
 
       for (let pbm of Object.keys(PBM)) {
-        let pbm2 = pbm;
-        if(pbm.substr(0,6) == "motor_"){
+        let pbm2 = pbm
+        if(pbm.slice(-6) == "_motor"){
            pbm2 = "motor";
         }
 
         if (this.params.hasOwnProperty(pbm2)){
            let items = []
            for (const [key, value] of Object.entries(this.params[pbm2])) {
-             if (pbm2 != "motor" || value.type == pbm.substr(6)){
-               // We use [T.name, T.name] here because the dropdown menu generator
-               // of blockly requires an array as [showSelectOption, resultValue].
-               items.push([value.name, value.name]);
-             }
+              // We use [T.name, T.name] here because the dropdown menu generator
+              // of blockly requires an array as [showSelectOption, resultValue].
+              items.push([value.name, value.name]);
            }
            PBM[pbm].load(Blockly, items )
         }
-
-
       }
     },
     refresh_blockly(){
