@@ -116,9 +116,5 @@ export default {
            return this.language == "blockly";
        },
   }
-
-
-
-
 }
 </script>
