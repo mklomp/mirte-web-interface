@@ -64,14 +64,14 @@
 
         <category name="%{BKY_TIME}" colour="%{BKY_FLOW_RGB}">
           <block type="wait">
-            <value name="wait">
+            <value name="VALUE">
               <block type="math_number">
                 <field name="NUM">1</field>
               </block>
             </value>
           </block>
           <block type="wait_until"></block>
-          <block type="get_timestamp"></block>
+<!--          <block type="get_timestamp"></block>  -->
         </category>
 
         <category name="%{BKY_CONDITIONS}" colour="%{BKY_FLOW_RGB}">
