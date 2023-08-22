@@ -227,6 +227,7 @@ import properties_ph from "../assets/json/properties_ph.json"
 
 //Peripheral Blockly Modules imports
 const PBM = {}
+let isRegistered = false;
 PBM.default = require(`../assets/blockly/default_blocks.js`)
 for (let type of Object.keys(properties_ph)) {
   PBM[type] = require(`../assets/blockly/${type}.js`)
@@ -325,7 +326,6 @@ export default {
     // Load the interpreter now, and upon future changes.
     //generateCodeAndLoadIntoInterpreter();
        this.workspace.addChangeListener((event) => {
-         //console.log(event);
          if (event instanceof Blockly.Events.Move || event instanceof Blockly.Events.Delete || event instanceof Blockly.Events.Change) {
            // Something changed. Parser needs to be reloaded.
 
@@ -490,11 +490,14 @@ export default {
         }
       }
 
+      if (!isRegistered) {
+        this.load_blockly_modules()
+        isRegistered = true
+      }
+
       const storage = localStorage.getItem("blockly")
       if (storage !== null) {
         Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(storage), this.workspace)
-      } else {
-        this.load_blockly_modules();
       }
 
     }
