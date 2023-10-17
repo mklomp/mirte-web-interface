@@ -35,7 +35,13 @@
               </block>
             </value>
           </block>
-          <block type="controls_whileUntil"></block>
+          <block type="controls_whileUntil">
+            <value name="BOOL">
+              <block type="logic_boolean">
+                <field name="BOOL">TRUE</field>
+              </block>
+            </value>
+          </block>
           <block type="controls_for">
             <field name="VAR">i</field>
             <value name="FROM">
