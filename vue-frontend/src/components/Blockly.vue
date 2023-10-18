@@ -142,6 +142,21 @@
           <block type="math_atan2"></block>
         </category>
 
+        <category name="%{BKY_CATTEXT}" colour="%{BKY_DATA_RGB}">
+          <block type="text"></block>
+          <block type="text_join"></block>
+          <block type="text_append"></block>
+          <block type="text_length"></block>
+          <block type="text_isEmpty"></block>
+          <block type="text_indexOf"></block>
+          <block type="text_charAt"></block>
+          <block type="text_getSubstring"></block>
+          <block type="text_changeCase"></block>
+          <block type="text_trim"></block>
+          <block type="text_prompt_ext"></block>
+        </category>
+
+
         <category name="%{BKY_LISTS}" colour="%{BKY_DATA_RGB}">
           <block type="lists_create_empty"></block>
           <block type="lists_create_with"></block>
@@ -272,6 +287,16 @@ const predefined_blocks = {
   math_random_int: "%{BKY_DATA_RGB}",
   math_random_float: "%{BKY_DATA_RGB}",
   math_atan2: "%{BKY_DATA_RGB}",
+  text_join: "%{BKY_DATA_RGB}",
+  text_append: "%{BKY_DATA_RGB}",
+  text_length: "%{BKY_DATA_RGB}",
+  text_isEmpty: "%{BKY_DATA_RGB}",
+  text_indexOf: "%{BKY_DATA_RGB}",
+  text_charAt: "%{BKY_DATA_RGB}",
+  text_getSubstring: "%{BKY_DATA_RGB}",
+  text_changeCase: "%{BKY_DATA_RGB}",
+  text_trim: "%{BKY_DATA_RGB}",
+  text_prompt_ext: "%{BKY_DATA_RGB}",
   lists_create_empty: "%{BKY_DATA_RGB}",
   lists_create_with: "%{BKY_DATA_RGB}",
   lists_repeat: "%{BKY_DATA_RGB}",

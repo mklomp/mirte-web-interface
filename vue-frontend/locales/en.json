@@ -85,6 +85,7 @@
     "DATA": "Data",
     "LOGIC": "Logic",
     "MATH": "Math",
+    "CATTEXT": "Text",
     "LISTS": "Lists",
     "VARIABLES": "Variables",
     "ACTIONS": "Actions",
