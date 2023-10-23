@@ -27,8 +27,8 @@
     "wifi_user": "Gebruikersnaam",
     "wifi_password": "Wachtwoord",
     "wifi_connect": "Verbinden",
-    "wifi_connected": "Er wordt geprobeerd verbinding te maken. Als dit niet lukt komt Mirte_XXXXXX weer online",
-    "wifi_message": "In dat geval dat de verbinding niet tot stand komt wordt het huidige acces point weer gestart. ALs het gelukt is kan je verbinden met http://mirte.local/"
+    "wifi_connected": "Er wordt geprobeerd verbinding te maken. Als dit niet lukt komt Mirte-XXXXXX weer online.",
+    "wifi_message": "Als de verbinding niet tot stand komt wordt het huidige access point weer gestart. Verbind daarna wederom met Mirte-XXXXXX and probeer het nogmaals."
   },
   "actuators": {
     "output": "Output",

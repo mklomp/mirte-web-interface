@@ -27,8 +27,8 @@
     "wifi_user": "User",
     "wifi_password": "Password",
     "wifi_connect": "Connect",
-    "wifi_connected": "Will try to connect to network. If this fails, the current network Mirte_XXXXXX will come up again",
-    "wifi_message": "In case connecting fails, the current acces point will come up again. Please reconnect to the Mirte_XXXXXX network again and try again. You can connect to http://mirte.local/"
+    "wifi_connected": "Trying to connect to network. If this fails, the current network Mirte-XXXXXX will come up again.",
+    "wifi_message": "In case connecting fails, the current access point will come up again. Please reconnect to the Mirte-XXXXXX network and try again."
   },
   "actuators": {
     "output": "Output",
