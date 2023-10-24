@@ -47,6 +47,7 @@
                    v-b-tooltip.hover
                    :title="$t('actuators.move_forward')"
                    @click="control('forward')"
+                   @contextmenu.prevent="control('forward')"
                  >
                  <i class="fa fa-arrow-up"></i>
                  </button>
@@ -59,6 +60,7 @@
                    v-b-tooltip.hover
                    :title="$t('actuators.move_left')"
                    @click="control('left')"
+                   @contextmenu.prevent="control('left')"
                  >
                  <i class="fa fa-arrow-left"></i>
                 </button>
@@ -69,6 +71,7 @@
                    v-b-tooltip.hover
                    :title="$t('actuators.move_stop')"
                    @click="control('stop')"
+                   @contextmenu.prevent="control('stop')"
                  >
                  <i class="fa fa-times-circle"></i>
                 </button>
@@ -79,6 +82,7 @@
                    v-b-tooltip.hover
                    :title="$t('actuators.move_right')"
                    @click="control('right')"
+                   @contextmenu.prevent="control('right')"
                  >
                  <i class="fa fa-arrow-right"></i>
                 </button>
@@ -95,6 +99,7 @@
                    v-b-tooltip.hover
                    :title="$t('actuators.move_backward')"
                    @click="control('backward')"
+                   @contextmenu.prevent="control('backward')"
                  >
                  <i class="fa fa-arrow-down"></i>
                  </button>
