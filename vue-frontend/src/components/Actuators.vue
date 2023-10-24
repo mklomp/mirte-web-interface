@@ -142,7 +142,7 @@
                             {{instance}}: {{ actuator_values[actuator][instance] }}
                           </div>
                           <div>
-                              <b-form-input id="range-1" v-model="actuator_values[actuator][instance]" @change="sendData(actuator, instance)" type="range" min="0" max="180"></b-form-input>
+                              <b-form-input id="range-1" v-model="actuator_values[actuator][instance]" @update="sendData(actuator, instance)" type="range" min="0" max="180"></b-form-input>
                           </div>
                      </div>
 
@@ -165,7 +165,7 @@
                             {{instance}}: {{ actuator_values[actuator][instance] }}
                           </div>
                           <div>
-                              <b-form-input id="range-1" v-model="actuator_values[actuator][instance]" @change="sendData(actuator, instance)" type="range" min="-100" max="100"></b-form-input>
+                              <b-form-input id="range-1" v-model="actuator_values[actuator][instance]" @update="sendData(actuator, instance)" type="range" min="-100" max="100"></b-form-input>
                           </div>
                      </div>
 
