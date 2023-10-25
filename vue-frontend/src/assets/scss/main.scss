@@ -10,6 +10,7 @@
 }
 
 html, body {
+    // disable bw/fw page swipe on chromebooks to not change page while changing a slider
     overscroll-behavior-x: none;
 }
   
