@@ -113,7 +113,7 @@
                        {{ $t('actuators.speed') }}: {{ linear_speed }}
                      </div>
                      <div class="col-8">
-                         <b-form-input id="range-1" v-model="linear_speed" type="range" min="0" max=".1" step="0.01"></b-form-input>
+                         <b-form-input id="range-1" v-model="linear_speed" type="range" min="0" max=".1" step="0.01" @contextmenu.prevent ></b-form-input>
                      </div>
                   </div>
                </div>
@@ -124,7 +124,7 @@
                        {{ $t('actuators.angular_speed') }}: {{ angular_speed }}
                      </div>
                      <div class="col-8">
-                         <b-form-input id="range-1" v-model="angular_speed" type="range" min="0" max="1" step="0.01"></b-form-input>
+                         <b-form-input id="range-1" v-model="angular_speed" type="range" min="0" max="1" step="0.01" @contextmenu.prevent ></b-form-input>
                      </div>
                   </div>
 
@@ -142,7 +142,7 @@
                             {{instance}}: {{ actuator_values[actuator][instance] }}
                           </div>
                           <div>
-                              <b-form-input id="range-1" v-model="actuator_values[actuator][instance]" @update="sendData(actuator, instance)" type="range" min="0" max="180"></b-form-input>
+                              <b-form-input id="range-1" v-model="actuator_values[actuator][instance]" @update="sendData(actuator, instance)" type="range" min="0" max="180" @contextmenu.prevent ></b-form-input>
                           </div>
                      </div>
 
@@ -165,7 +165,7 @@
                             {{instance}}: {{ actuator_values[actuator][instance] }}
                           </div>
                           <div>
-                              <b-form-input id="range-1" v-model="actuator_values[actuator][instance]" @update="sendData(actuator, instance)" type="range" min="-100" max="100"></b-form-input>
+                              <b-form-input id="range-1" v-model="actuator_values[actuator][instance]" @update="sendData(actuator, instance)" type="range" min="-100" max="100" @contextmenu.prevent ></b-form-input>
                           </div>
                      </div>
 
