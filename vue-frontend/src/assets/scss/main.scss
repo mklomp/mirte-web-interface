@@ -10,9 +10,9 @@
 }
 
 html, body {
-
+    overscroll-behavior-x: none;
 }
-
+  
 body{
     font-family: 'Rubik', SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
 }

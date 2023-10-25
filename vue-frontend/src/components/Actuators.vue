@@ -37,7 +37,7 @@
       </div>
 
 
-           <div class="rounded background-tertiary p-3 mb-2">
+           <div class="rounded background-tertiary p-3 mb-2"  @contextmenu.prevent >
               <h5>{{ $t('actuators.control') }}</h5> 
 
                <div class="row mb-4">
@@ -134,7 +134,7 @@
 
 
 
-      <div v-for="actuator in getActuators()"  class="rounded background-tertiary p-3 mb-2">
+      <div v-for="actuator in getActuators()"  class="rounded background-tertiary p-3 mb-2" @contextmenu.prevent >
               <h5>{{ $t('peripherals.' + peripherals[actuator].text) }}</h5> 
                   <div v-for="instance in getInstancesOfActuator(actuator)" class="rounded background-actuator p-2 text-white mb-2">
                      <div v-if="actuator === 'servo'">
