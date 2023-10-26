@@ -37,7 +37,7 @@
       </div>
 
 
-           <div class="rounded background-tertiary p-3 mb-2">
+           <div class="rounded background-tertiary p-3 mb-2"  @contextmenu.prevent >
               <h5>{{ $t('actuators.control') }}</h5> 
 
                <div class="row mb-4">
@@ -47,6 +47,7 @@
                    v-b-tooltip.hover
                    :title="$t('actuators.move_forward')"
                    @click="control('forward')"
+                   @contextmenu.prevent="control('forward')"
                  >
                  <i class="fa fa-arrow-up"></i>
                  </button>
@@ -59,6 +60,7 @@
                    v-b-tooltip.hover
                    :title="$t('actuators.move_left')"
                    @click="control('left')"
+                   @contextmenu.prevent="control('left')"
                  >
                  <i class="fa fa-arrow-left"></i>
                 </button>
@@ -69,6 +71,7 @@
                    v-b-tooltip.hover
                    :title="$t('actuators.move_stop')"
                    @click="control('stop')"
+                   @contextmenu.prevent="control('stop')"
                  >
                  <i class="fa fa-times-circle"></i>
                 </button>
@@ -79,6 +82,7 @@
                    v-b-tooltip.hover
                    :title="$t('actuators.move_right')"
                    @click="control('right')"
+                   @contextmenu.prevent="control('right')"
                  >
                  <i class="fa fa-arrow-right"></i>
                 </button>
@@ -95,6 +99,7 @@
                    v-b-tooltip.hover
                    :title="$t('actuators.move_backward')"
                    @click="control('backward')"
+                   @contextmenu.prevent="control('backward')"
                  >
                  <i class="fa fa-arrow-down"></i>
                  </button>
@@ -108,7 +113,7 @@
                        {{ $t('actuators.speed') }}: {{ linear_speed }}
                      </div>
                      <div class="col-8">
-                         <b-form-input id="range-1" v-model="linear_speed" type="range" min="0" max=".1" step="0.01"></b-form-input>
+                         <b-form-input id="range-1" v-model="linear_speed" type="range" min="0" max=".1" step="0.01" @contextmenu.prevent ></b-form-input>
                      </div>
                   </div>
                </div>
@@ -119,7 +124,7 @@
                        {{ $t('actuators.angular_speed') }}: {{ angular_speed }}
                      </div>
                      <div class="col-8">
-                         <b-form-input id="range-1" v-model="angular_speed" type="range" min="0" max="1" step="0.01"></b-form-input>
+                         <b-form-input id="range-1" v-model="angular_speed" type="range" min="0" max="1" step="0.01" @contextmenu.prevent ></b-form-input>
                      </div>
                   </div>
 
@@ -129,7 +134,7 @@
 
 
 
-      <div v-for="actuator in getActuators()"  class="rounded background-tertiary p-3 mb-2">
+      <div v-for="actuator in getActuators()"  class="rounded background-tertiary p-3 mb-2" @contextmenu.prevent >
               <h5>{{ $t('peripherals.' + peripherals[actuator].text) }}</h5> 
                   <div v-for="instance in getInstancesOfActuator(actuator)" class="rounded background-actuator p-2 text-white mb-2">
                      <div v-if="actuator === 'servo'">
@@ -137,7 +142,7 @@
                             {{instance}}: {{ actuator_values[actuator][instance] }}
                           </div>
                           <div>
-                              <b-form-input id="range-1" v-model="actuator_values[actuator][instance]" @change="sendData(actuator, instance)" type="range" min="0" max="180"></b-form-input>
+                              <b-form-input id="range-1" v-model="actuator_values[actuator][instance]" @update="sendData(actuator, instance)" type="range" min="0" max="180" @contextmenu.prevent ></b-form-input>
                           </div>
                      </div>
 
@@ -160,7 +165,7 @@
                             {{instance}}: {{ actuator_values[actuator][instance] }}
                           </div>
                           <div>
-                              <b-form-input id="range-1" v-model="actuator_values[actuator][instance]" @change="sendData(actuator, instance)" type="range" min="-100" max="100"></b-form-input>
+                              <b-form-input id="range-1" v-model="actuator_values[actuator][instance]" @update="sendData(actuator, instance)" type="range" min="-100" max="100" @contextmenu.prevent ></b-form-input>
                           </div>
                      </div>
 

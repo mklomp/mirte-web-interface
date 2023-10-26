@@ -10,9 +10,10 @@
 }
 
 html, body {
-
+    // disable bw/fw page swipe on chromebooks to not change page while changing a slider
+    overscroll-behavior-x: none;
 }
-
+  
 body{
     font-family: 'Rubik', SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
 }
