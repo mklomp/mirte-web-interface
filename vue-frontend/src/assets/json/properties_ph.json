@@ -5,7 +5,7 @@
       "p1": "pwm",
       "p2": "pwm"
     },
-    "functions": ["set_speed", "stop"],
+    "functions": ["set_speed", "stop", "set_control"],
     "default_value": {"name": "SPEED", "type": "math_number", "field": "NUM", "value": 0},
     "rel_path": "Actuators\\Motor\\pwm_motor\\pwm_motor.py",
     "service_type": "mirte_msgs/SetMotorSpeed",

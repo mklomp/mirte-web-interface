@@ -6,8 +6,10 @@ export function load (Blockly, instances) {
 
     Blockly.Extensions.register('dynamic_instances_extension_pp_motor',
     function() {
-      this.getInput('INSTANCE')
-      .appendField(new Blockly.FieldDropdown(instances), 'INSTANCE');
+      if (this.getInput('INSTANCE')){
+        this.getInput('INSTANCE')
+        .appendField(new Blockly.FieldDropdown(instances), 'INSTANCE');
+      }
     });
 
 
@@ -43,10 +45,41 @@ export function load (Blockly, instances) {
         return `mirte.setMotorSpeed('${instance}', ${speed})\n`;
     };
 
+    Blockly.Blocks['set_control_pp_motor'] = {
+        init: function () {
+            this.jsonInit({
+                  "type": "block_type",
+                  "message0": "%{BKY_SET_MOTOR_CONTROL}",
+                  "args0": [
+                    {
+                      "type": "field_dropdown",
+                      "name": "TYPE",
+                      "options": [
+                        [
+                          "stop",
+                          "False"
+                        ],
+                        [
+                          "start",
+                          "True"
+                        ]
+                      ]
+                    }
+                  ],
+                  "inputsInline": true,
+                  "previousStatement": null,
+                  "nextStatement": null,
+                  "colour": "%{BKY_ACTIONS_RGB}",
+                  "extensions": ["dynamic_instances_extension_pp_motor"]
+            });
+        }
+    };
 
-
-
-
+    Blockly.Python['set_control_pp_motor'] = function (block) {
+        Blockly.Python.definitions_['import_mirte'] = 'from mirte_robot import robot\nmirte=robot.createRobot()';
+        let type = block.getFieldValue('TYPE');
+        return `mirte.setMotorControl(${type})\n`;
+    };
 
     Blockly.Blocks['stop_pp_motor'] = {
         init: function () {
