@@ -50,6 +50,17 @@
     "message_type": "mirte_msgs/Intensity",
     "message_value": "value"
   },
+  "color": {
+    "text": "color_sensor",
+    "pins": {
+      "scl": "digital",
+      "sda": "digital"
+    },
+    "functions": ["get"],
+    "rel_path": "Sensors\\color_sensor\\color_sensor\\color_sensor.py",
+    "message_type": "mirte_msgs/Color",
+    "message_value": "color"
+  },
   "distance": {
     "text": "ultrasonic_sensor",
     "pins": {

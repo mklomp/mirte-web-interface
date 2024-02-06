@@ -54,7 +54,8 @@
   },
   "peripherals": {
     "ultrasonic_sensor": "Afstand sensor",
-    "ir_sensor": "IR Sensor",
+    "ir_sensor": "IR sensor",
+    "color_sensor": "Kleuren sensor",
     "keypad_sensor": "Toetsen",
     "wheel_encoder": "Encoder",
     "pp_motor": "Motor (pp)",
@@ -92,6 +93,7 @@
     "DIGITAL": "digitale",
     "ULTRASONIC_SENSOR": "afstandwaarde van %1",
     "IR_SENSOR": "lichtwaarde van %1",
+    "COLOR": "kleurwaarde %2 van %1",
     "KEYPAD": "ingedrukte knop van %1",
     "WHEEL_ENCODER": "aantal wielomwentelingen van %1",
     "SET_MOTOR_SPEED": "zet snelheid van motor %1 op %2",
