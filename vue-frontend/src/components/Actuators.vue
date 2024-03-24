@@ -310,8 +310,10 @@ export default {
     let self = this;
 
     window.addEventListener('keydown', function(ev) {
-        // Rather than wasd or ijkl, we use the
-        // same keys as the teleopkey node
+      // Rather than wasd or ijkl, we use the
+      // same keys as the teleopkey node
+      let nodeName = ev.target.nodeName;
+      if (nodeName != "TEXTAREA" && nodeName != "INPUT"){
         switch (ev.keyCode){
           case 73: //i
             self.control('forward_down');
@@ -326,6 +328,7 @@ export default {
             self.control('backward_down');
             break;
         }
+      }
     });
 
     window.addEventListener('keyup', function(ev) {
