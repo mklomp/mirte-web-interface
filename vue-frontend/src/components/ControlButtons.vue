@@ -130,7 +130,7 @@ export default {
           return this.$store.getters.getExecution != "running" || this.$store.getters.getExecution == "disconnected";
        },
        isStepDisabled: function(){
-          return this.$store.getters.getExecution == "stopped" || this.$store.getters.getExecution == "disconnected";
+          return this.$store.getters.getExecution != "paused" || this.$store.getters.getExecution == "disconnected";
        },
        isStopDisabled: function(){
           return this.$store.getters.getExecution == "stopped" || this.$store.getters.getExecution == "disconnected";
