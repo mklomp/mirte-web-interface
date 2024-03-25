@@ -5,7 +5,7 @@
       "p1": "pwm",
       "p2": "pwm"
     },
-    "functions": ["set_speed", "stop"],
+    "functions": ["set_speed", "stop", "set_control"],
     "default_value": {"name": "SPEED", "type": "math_number", "field": "NUM", "value": 0},
     "rel_path": "Actuators\\Motor\\pwm_motor\\pwm_motor.py",
     "service_type": "mirte_msgs/SetMotorSpeed",
@@ -49,6 +49,17 @@
     "rel_path": "Sensors\\IR_sensor\\digital_ir_sensor\\digital_ir_sensor.py",
     "message_type": "mirte_msgs/Intensity",
     "message_value": "value"
+  },
+  "color": {
+    "text": "color_sensor",
+    "pins": {
+      "scl": "digital",
+      "sda": "digital"
+    },
+    "functions": ["get"],
+    "rel_path": "Sensors\\color_sensor\\color_sensor\\color_sensor.py",
+    "message_type": "mirte_msgs/ColorStamped",
+    "message_value": "color"
   },
   "distance": {
     "text": "ultrasonic_sensor",
