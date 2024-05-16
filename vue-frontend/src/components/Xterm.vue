@@ -138,7 +138,6 @@ export default {
  
                  this.writeLineToPort('\x03\x03');
                  this.upload_mirte_api();
-                 this.writeLineToPort('exec(open("resetpins.py").read(),globals())')
 
                  this.$store.dispatch('setSerialStatus', 'connected');
 
@@ -167,7 +166,7 @@ export default {
                 line = curline;
               } else {
                 // Do not show the python commands themselves
-                if (curline.substring(0,3) != ">>>" && curline.substring(0,3) != "..." && curline.substring(0,19) != "MicroPython v1.19.1" && curline.substring(0,13) != 'Type "help()"'){
+                if (curline.substring(0,3) != ">>>" && curline.substring(0,3) != "..." && curline.substring(0,13) != "MicroPython v" && curline.substring(0,13) != 'Type "help()"'){
                    this.term.write(curline + "\n")
                 }
               }
@@ -188,12 +187,8 @@ export default {
              let code = "from machine import Pin, ADC, PWM\nmirte = {}\n\nclass Robot():\n  def __init__(self):\n    i = 20\n\n  def setDigitalPinValue(self, pin, value):\n    Pin(int(pin), Pin.OUT).value(value)\n\n  def setAnalogPinValue(self, pin, value):\n    pwm = PWM(Pin(int(pin)))\n    pwm.freq(1000)\n    pwm.duty_u16(value)\n\n  def getDigitalPinValue(self, pin):\n    return Pin(int(pin), Pin.IN).value()\n\n  def getAnalogPinValue(self, pin):\n    return ADC(int(pin)).read_u16()\n\ndef createRobot():\n  global mirte\n  mirte = Robot()\n  return mirte"
              this.putFile("/mirte_robot/robot.py", code);
 
-             // Upload Resetpins
-             code = "from machine import Pin\nfor i in range(0,29):\n  Pin(i, Pin.OUT).off()";
-             this.putFile("/resetpins.py", code);
-
              // Upload main.py
-             code = "import sys\ntry:\n  exec(open('./mirte.py').read(),globals())\nexcept:\n  exec(open('./resetpins.py').read(),globals())\n  sys.exit(0)";
+             code = "import sys\nfrom machine import Pin\ntry:\n  exec(open('./mirte.py').read(),globals())\nexcept KeyboardInterrupt:\n  for i in range(0,29):\n    Pin(i, Pin.IN, Pin.PULL_DOWN)\n  sys.exit(0)\nfor i in range(0,29):\n  Pin(i, Pin.IN, Pin.PULL_DOWN)";
              this.putFile("/main.py", code);
 
         },
