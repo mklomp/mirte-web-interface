@@ -25,21 +25,17 @@ export function load (Blockly, instances) {
                       "name": "TYPE",
                       "options": [
                         [
-                          "red",
-                          "r"
+                          "h",
+                          "h"
                         ],
                         [
-                          "green",
-                          "g"
+                          "s",
+                          "s"
                         ],
                         [
-                          "blue",
-                          "b"
+                          "l",
+                          "l"
                         ],
-                        [
-                          "white",
-                          "w"
-                        ]
                       ]
                     }
                   ],

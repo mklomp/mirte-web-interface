@@ -58,7 +58,7 @@
     },
     "functions": ["get"],
     "rel_path": "Sensors\\color_sensor\\color_sensor\\color_sensor.py",
-    "message_type": "mirte_msgs/ColorStamped",
+    "message_type": "mirte_msgs/ColorHSLStamped",
     "message_value": "color"
   },
   "distance": {
