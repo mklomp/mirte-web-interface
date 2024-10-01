@@ -80,6 +80,11 @@ export default {
 
         openFileWindow(){
             this.$refs.file_input.value = null;
+            if (this.$parent.language == 'blockly') {
+                this.$refs.file_input.accept = ".xml";
+            } else {
+                this.$refs.file_input.accept = ".py";
+            }
             this.$refs.file_input.click()
         },
 
@@ -87,8 +92,11 @@ export default {
             var fr=new FileReader(); 
 
             fr.onload = () => { 
-                console.log(fr.result)
-                this.$store.dispatch('setBlockly', fr.result)
+                if (this.$parent.language == 'blockly') {
+                    this.$store.dispatch('setBlockly', fr.result)
+                } else {
+                    this.$store.dispatch('setCode', fr.result)
+                }
             } 
 
             if(this.$refs.file_input.files.length > 0){
@@ -98,8 +106,13 @@ export default {
         },
 
         download(){
-            var text = localStorage.getItem("blockly");
-            var filename = "mirte.xml";
+            if (this.$parent.language == 'blockly') {
+                var text = localStorage.getItem("blockly");
+                var filename = "mirte.xml";
+            } else {
+                var text = this.$store.getters.getCode;
+                var filename = "mirte.py";
+            }
             
             var element = document.createElement('a');
             element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
@@ -130,7 +143,7 @@ export default {
           return this.$store.getters.getExecution != "running" || this.$store.getters.getExecution == "disconnected";
        },
        isStepDisabled: function(){
-          return this.$store.getters.getExecution == "stopped" || this.$store.getters.getExecution == "disconnected";
+          return this.$store.getters.getExecution != "paused" || this.$store.getters.getExecution == "disconnected";
        },
        isStopDisabled: function(){
           return this.$store.getters.getExecution == "stopped" || this.$store.getters.getExecution == "disconnected";

@@ -11,7 +11,7 @@
 
                 <div class="col-8">
 
-                  <div v-for="instance in getInstancesOfSensor(sensor)" class="rounded background-sensor p-2 text-white mb-2">
+                  <div v-for="instance in getInstancesOfSensor(sensor)" class="rounded background-sensor p-2 text-white mb-2" style="white-space: pre;">
                      {{instance}}: {{ sensor_values[sensor][instance] }}
                   </div>
                 </div>
@@ -98,7 +98,28 @@ export default {
                      messageType : this.peripherals[sensors[sensor]].message_type
                   });
                   topic.subscribe((message) => {
-                     this.sensor_values[sensors[sensor]][instances[instance]] = message[this.peripherals[sensors[sensor]].message_value];
+                     let value = message[this.peripherals[sensors[sensor]].message_value];
+                     let string = ""
+                      
+                     if (typeof value === "object"){
+                        // Parse it
+                        string += "\n";
+                        for (const [k, v] of Object.entries(value)){
+                           let val = v;
+                           if (typeof v === "number" && !Number.isInteger(v)){
+                              val = v.toFixed(4);
+                           }
+                           string += "\t" + k + ": " + val + "\n";
+                        }
+                     } else {
+                        // If raw value, cap if float
+                        if (typeof v === "number" && !Number.isInteger(v)){
+                           string = value.toFixed(4);
+                        } else {
+                           string = value;
+                        }
+                     }
+                     this.sensor_values[sensors[sensor]][instances[instance]] = string;
                   });
                }
             }

@@ -46,8 +46,10 @@
                 <button class="btn btn-mirte-control mr-2 background-actuator"
                    v-b-tooltip.hover
                    :title="$t('actuators.move_forward')"
-                   @click="control('forward')"
-                   @contextmenu.prevent="control('forward')"
+                   @mousedown="control('forward_down')"
+                   @mouseup="control('forward_up')"
+                   @contextmenu.prevent="control('forward_down')"
+                   @contextmenu.prevent="control('forward_up')"
                  >
                  <i class="fa fa-arrow-up"></i>
                  </button>
@@ -59,8 +61,10 @@
                 <button class="btn btn-mirte-control mr-2 background-actuator"
                    v-b-tooltip.hover
                    :title="$t('actuators.move_left')"
-                   @click="control('left')"
-                   @contextmenu.prevent="control('left')"
+                   @mousedown="control('left_down')"
+                   @mouseup="control('left_up')"
+                   @contextmenu.prevent="control('left_down')"
+                   @contextmenu.prevent="control('left_up')"
                  >
                  <i class="fa fa-arrow-left"></i>
                 </button>
@@ -81,8 +85,10 @@
                 <button class="btn btn-mirte-control mr-2 background-actuator"
                    v-b-tooltip.hover
                    :title="$t('actuators.move_right')"
-                   @click="control('right')"
-                   @contextmenu.prevent="control('right')"
+                   @mousedown="control('right_down')"
+                   @mouseup="control('right_up')"
+                   @contextmenu.prevent="control('right_down')"
+                   @contextmenu.prevent="control('right_up')"
                  >
                  <i class="fa fa-arrow-right"></i>
                 </button>
@@ -98,8 +104,10 @@
                 <button class="btn btn-mirte-control mr-2 background-actuator"
                    v-b-tooltip.hover
                    :title="$t('actuators.move_backward')"
-                   @click="control('backward')"
-                   @contextmenu.prevent="control('backward')"
+                   @mousedown="control('backward_down')"
+                   @mouseup="control('backward_up')"
+                   @contextmenu.prevent="control('backward_down')"
+                   @contextmenu.prevent="control('backward_up')"
                  >
                  <i class="fa fa-arrow-down"></i>
                  </button>
@@ -236,41 +244,50 @@ export default {
            this.actuator_services[actuator][instance].callService(request, function(result) {});
         },
         control(command) {
-            var linear = 0.0;
-            var angular = 0.0;
-            switch(command) {
-              case "forward":
-                linear = this.linear_speed;
+          switch(command) {
+              case "forward_down":
+                this.current_linear_speed = this.linear_speed;
                 break;
-              case "backward":
-                linear = -this.linear_speed;
+              case "backward_down":
+                this.current_linear_speed = -this.linear_speed;
                 break;
-              case "left":
-                angular = this.angular_speed;
+              case "left_down":
+                this.current_angular_speed = this.angular_speed;
                 break;
-              case "right":
-                angular = -this.angular_speed;
+              case "right_down":
+                this.current_angular_speed = -this.angular_speed;
                 break;
               case "stop":
+                this.current_linear_speed = 0.0;
+                this.current_angular_speed = 0.0;
+                break;
+              case "left_up":
+              case "right_up":
+                this.current_angular_speed = 0.0;
+                break;
+              case "forward_up":
+              case "backward_up":
+                this.current_linear_speed = 0.0;
+                break;
               default:
-                // nothing, using defaults 0 and 0
-            }
-
+                break;
+          }
 
             var twist = new ROSLIB.Message({
               linear : {
-                x : parseFloat(linear),
+                x : parseFloat(this.current_linear_speed),
                 y : 0.0,
                 z : 0.0
               },
               angular : {
                 x : 0.0,
                 y : 0.0,
-                z : parseFloat(angular)
+                z : parseFloat(this.current_angular_speed)
               }
             });
 
             this.cmd_vel.publish(twist);
+
         },
   },
   data() {
@@ -283,11 +300,57 @@ export default {
       cmd_vel: {},
       linear_speed: 0.5,
       angular_speed: 0.5,
+      current_linear_speed: 0.0,
+      current_angular_speed: 0.0,
       param_actuators: {},
       ros: {} // TODO: check if this is needed?
     }
   },
   mounted(){
+    let self = this;
+
+    window.addEventListener('keydown', function(ev) {
+      // Rather than wasd or ijkl, we use the
+      // same keys as the teleopkey node
+      let nodeName = ev.target.nodeName;
+      if (nodeName != "TEXTAREA" && nodeName != "INPUT"){
+        switch (ev.keyCode){
+          case 73: //i
+            self.control('forward_down');
+            break;
+          case 74: //j
+            self.control('left_down');
+            break;
+          case 76: //l
+            self.control('right_down');
+            break;
+          case 188: //,
+            self.control('backward_down');
+            break;
+        }
+      }
+    });
+
+    window.addEventListener('keyup', function(ev) {
+        // Rather than wasd or ijkl, we use the
+        // same keys as the teleopkey node
+        switch (ev.keyCode){
+          case 73: //i
+            self.control('forward_up');
+            break;
+          case 74: //j
+            self.control('left_up');
+            break;
+          case 76: //l
+            self.control('right_up');
+            break;
+          case 188: //,
+            self.control('backward_up');
+            break;
+        }
+    });
+
+
     this.ros = ros;
 
     this.cmd_vel = new ROSLIB.Topic({
