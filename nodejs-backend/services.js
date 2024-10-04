@@ -239,7 +239,8 @@ app.post('/api/settings', (req, res) => {
     var source = req.body
 
     const fs = require('fs');
-    fs.writeFile("/home/mirte/mirte_ws/src/mirte-ros-packages/mirte_telemetrix/config/mirte_user_config.yaml", source, (err) => {
+    // FIXME: This needs to change to the correct config location. Currently that would be mirte-telemetrix-cpp
+    fs.writeFile("/home/mirte/mirte_ws/src/mirte-telemetrix-cpp/config/mirte_user_config.yaml", source, (err) => {
         if(err) {
             console.log(err);
             res.end("something went wrong writing the file");
@@ -253,7 +254,8 @@ app.post('/api/settings', (req, res) => {
 
 // catch robot settings (ROS params) from the web interface and save them
 app.get('/api/settings', (req, res) => {
-    res.download("/home/mirte/mirte_ws/src/mirte-ros-packages/mirte_telemetrix/config/mirte_user_settings.yaml");
+    // FIXME: This needs to change to the correct config location. Currently that would be mirte-telemetrix-cpp
+    res.download("/home/mirte/mirte_ws/src/mirte-telemetrix-cpp/config/mirte_user_settings.yaml");
 /*
     const fs = require('fs');
     fs.readFile("/home/mirte/mirte_ws/src/mirte_ros_package/config/mirte_user_settings.yaml", function read(err, data) {

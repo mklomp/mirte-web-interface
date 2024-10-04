@@ -139,7 +139,7 @@ export default {
         this.shell_socket.onmessage = (ev) => {
            if (this.$store.getters.getExecution == "disconnected") {
               this.shell_socket.send("unset HISTFILE && stty -echo && PS1='' && clear\n");
-              this.shell_socket.send("source /home/mirte/mirte_ws/devel/setup.bash && cd /home/mirte/workdir && clear\n");
+              this.shell_socket.send("source /home/mirte/mirte_ws/install/setup.bash && cd /home/mirte/workdir && clear\n");
               this.$store.dispatch('setExecution', 'stopped');
            }
         }
