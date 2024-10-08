@@ -68,8 +68,9 @@ export default {
             commit('PConfig', PConfig)
         },
         setLocale({commit, getters}, locale){
-            i18n.locale = locale;
+//            i18n.locale = locale;
             commit('locale', locale);
+            window.location.reload();
         },
         setSerialStatus({commit, getters}, status){
             commit('serialStatus', status);
