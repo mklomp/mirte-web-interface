@@ -24,7 +24,7 @@
 <script>
 import properties_ph from "../assets/json/properties_ph.json"
 import MenuButtons from '@/components/MenuButtons.vue'
-import ROSLIB from 'roslib'
+import * as ROSLIB from 'roslib'
 import ros from '../ws-connection/ROS-connection.js'
 import Vue from 'vue'
 
@@ -78,7 +78,7 @@ export default {
      // TODO: loading paramaters twice. This should not be needed
      let params = new ROSLIB.Param({
        ros: ros,
-       name: '/mirte'
+       name: '/mirte_telemetrix_cpp:mirte'
      })
 
      params.get((res) => {

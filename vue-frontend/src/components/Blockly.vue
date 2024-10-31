@@ -229,7 +229,7 @@
 </template>
 
 <script>
-import ROSLIB from 'roslib'
+import * as ROSLIB from 'roslib'
 import ros from '../ws-connection/ROS-connection.js'
 import Blockly from 'blockly'
 import 'blockly/python'
@@ -563,7 +563,7 @@ export default {
 
      let params = new ROSLIB.Param({
        ros: ros,
-       name: '/mirte'
+       name: '/mirte_telemetrix_cpp:mirte'
      })
 
      params.get((res) => {

@@ -125,7 +125,7 @@
 
 <script>
 
-import ROSLIB from 'roslib'
+import * as ROSLIB from 'roslib'
 import ros from '../ws-connection/ROS-connection.js'
 import YAML from 'js-yaml'
 import properties_ph from "../assets/json/properties_ph.json"
@@ -341,7 +341,7 @@ export default {
   mounted() {
      var params = new ROSLIB.Param({
        ros: ros,
-       name: '/mirte'
+       name: '/mirte_telemetrix_cpp:mirte'
      })
     
      params.get((res) => {

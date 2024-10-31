@@ -49,7 +49,6 @@
                    @mousedown="control('forward_down')"
                    @mouseup="control('forward_up')"
                    @contextmenu.prevent="control('forward_down')"
-                   @contextmenu.prevent="control('forward_up')"
                  >
                  <i class="fa fa-arrow-up"></i>
                  </button>
@@ -64,7 +63,6 @@
                    @mousedown="control('left_down')"
                    @mouseup="control('left_up')"
                    @contextmenu.prevent="control('left_down')"
-                   @contextmenu.prevent="control('left_up')"
                  >
                  <i class="fa fa-arrow-left"></i>
                 </button>
@@ -88,7 +86,6 @@
                    @mousedown="control('right_down')"
                    @mouseup="control('right_up')"
                    @contextmenu.prevent="control('right_down')"
-                   @contextmenu.prevent="control('right_up')"
                  >
                  <i class="fa fa-arrow-right"></i>
                 </button>
@@ -107,7 +104,6 @@
                    @mousedown="control('backward_down')"
                    @mouseup="control('backward_up')"
                    @contextmenu.prevent="control('backward_down')"
-                   @contextmenu.prevent="control('backward_up')"
                  >
                  <i class="fa fa-arrow-down"></i>
                  </button>
@@ -186,7 +182,7 @@
 </template>
 
 <script>
-import ROSLIB from 'roslib'
+import * as ROSLIB from 'roslib'
 import ros from '../ws-connection/ROS-connection.js'
 import Xterm from '@/components/Xterm.vue'
 import properties_ph from "../assets/json/properties_ph.json"
@@ -362,7 +358,7 @@ export default {
     // TODO: loading paramaters twice. This should not be needed
     let params = new ROSLIB.Param({
        ros: ros,
-       name: '/mirte'
+       name: '/mirte_telemetrix_cpp:mirte'
     })
     
     params.get((res) => {
