@@ -9,8 +9,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install dependencies
         run: |
-          apt install -y python3-pip python3-setuptools python3-wheel
-          pip install nodeenv
+          sudo apt install -y python3-pip python3-setuptools python3-wheel
+          sudo -H pip install nodeenv
           nodeenv --node=16.2.0 node_env
           source node_env/bin/activate
           cd vue-frontend
