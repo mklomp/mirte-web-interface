@@ -41,7 +41,7 @@ export function load (Blockly, instances) {
                   ],
                   "inputsInline": true,
                   "colour": "%{BKY_SENSORS_RGB}",
-                  "output": "String",
+                  "output": "Number",
                   "extensions": ["dynamic_instances_extension_color"]
              });
         }
