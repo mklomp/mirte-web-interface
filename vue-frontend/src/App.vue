@@ -53,6 +53,9 @@ import VueHotkey from "v-hotkey";
 import Vue from 'vue'
 import html2canvas from 'html2canvas';
 import canvasToImage from 'canvas-to-image'
+import * as ROSLIB from 'roslib'
+import ros from './ws-connection/ROS-connection.js'
+import properties_ph from "./assets/json/properties_ph.json"
 
 
 Vue.use(VueHotkey);
@@ -66,6 +69,7 @@ export default {
          error: '',
          online: [],
          textVariant: 'dark',
+         peripherals: properties_ph,
       }
    },
    components: {
@@ -105,7 +109,72 @@ export default {
          //if (window.location.href.indexOf(item.toLowerCase()) === -1){
          //   window.location = "http://"  + item.toLowerCase() + ".local";
          //}
-      }, 
+      },
+      getPeripherals(){
+
+        var listParametersService = new ROSLIB.Service({
+          ros : ros,
+          name : '/io/telemetrix/list_parameters',
+          serviceType : 'rcl_interfaces/srv/ListParameters'
+        });
+
+       var getParameterService = new ROSLIB.Service({
+          ros : ros,
+          name : '/io/telemetrix/get_parameters',
+          serviceType : 'rcl_interfaces/srv/GetParameters'
+        });
+
+        let _this = this;
+        let result_counter = 0;
+        let hardware_list = ['intensity', 'distance', 'oled', 'motor']; // TODO: can I get this from this.peripherals?
+        let peripherals = {'sensors': {}, 'actuators': {}};
+
+        for (const hardware of hardware_list){
+          var request = {
+            prefixes: [hardware],
+            depth: 3
+          };
+
+          listParametersService.callService(request, function(result) {
+            for (const item of result.result.prefixes){
+              var nameSplit = item.split(".");
+              let type = nameSplit[0];
+              let name = nameSplit[1];
+
+              if (hardware == "motor"){
+                // we need to get the type first
+                let type_name = item + ".type";
+                var r = { names: [type_name] };
+                getParameterService.callService(r, function(res){
+                  type = res.values[0].string_value + "_motor";
+                  peripherals['actuators'][type] = peripherals['actuators'][type] || [];
+                  peripherals['actuators'][type].push(name);
+                  result_counter++;
+                  if (result_counter == hardware_list.length){
+                    _this.$store.dispatch('setPeripherals', peripherals);
+                  }
+                });
+              } else {
+                // all others can be added right away
+                if (_this.peripherals[type].rel_path.split("\\")[0] == "Sensors"){
+                  peripherals['sensors'][type] = peripherals['sensors'][type] || {};
+                  peripherals['sensors'][type][name] = 'no data';
+                } else {
+                  peripherals['actuators'][type] = peripherals['actuators'][type] || [];
+                  peripherals['actuators'][type].push(name);
+                }
+                result_counter++;
+                if (result_counter == hardware_list.length){
+                  _this.$store.dispatch('setPeripherals', peripherals);
+                }
+              }
+
+
+            }
+          });
+        }
+
+      },
       checkLogin() {
          this.submitted = true;
          const { username, password } = this;
@@ -129,11 +198,14 @@ export default {
                   this.$store.dispatch('setUser', response.data)
             }
          })
-      }
+      },
    },
-   mounted() {   //TODO: could this be beforeMount?
+   async mounted() {   //TODO: could this be beforeMount?
 
-      axios.get("/api/self")    
+      console.log("Retrieving ROS parameters");
+      this.getPeripherals();
+
+      axios.get("/api/self")
       .then((response) => {
 		   this.$store.dispatch('setUser', response.data)
       })
