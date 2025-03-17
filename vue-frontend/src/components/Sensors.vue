@@ -70,6 +70,7 @@ export default {
 
               topic.subscribe((message) => {
                 let value = message[_this.peripherals[sensor_type].message_value];
+                if (!value){ value = "inf" }
                 let string = ""
                       
                 if (typeof value === "object"){
