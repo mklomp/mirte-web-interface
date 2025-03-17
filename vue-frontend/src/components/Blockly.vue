@@ -15,7 +15,7 @@
          </category>
 
 
-        <category v-for="sensor in getPByKind('Sensors')" :name="$t('peripherals.' + peripherals[sensor].text)"
+        <category v-for="sensor in getSensors()" :name="$t('peripherals.' + peripherals[sensor].text)"
                   colour="%{BKY_SENSORS_RGB}">
           <block v-for="func in peripherals[sensor].functions"
                  :type="func.concat('_').concat(sensor)">
@@ -208,7 +208,7 @@
 
          </category>
 
-        <category v-for="actuator in getPByKind('Actuators')" :name="$t('peripherals.' + peripherals[actuator].text)"
+        <category v-for="actuator in getActuators()" :name="$t('peripherals.' + peripherals[actuator].text)"
                   colour="%{BKY_ACTIONS_RGB}">
           <block v-for="func in peripherals[actuator].functions"
                  :type="func.concat('_').concat(actuator)">
@@ -229,6 +229,7 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import * as ROSLIB from 'roslib'
 import ros from '../ws-connection/ROS-connection.js'
 import Blockly from 'blockly'
@@ -313,7 +314,7 @@ export default {
     peripherals: properties_ph,
     workspace: Object,
     prefix: "",
-    params: {},
+    params: {"sensors": {}, "actuators": {}},
   }),
 
   methods: {
@@ -376,20 +377,12 @@ export default {
        });
     },
     //separates peripheral items into sensors and actuators
-    getPByKind(kind) {
-      const AP = new Set()
-
-      for (let type in this.params){
-         for (let instance in this.params[type]){
-             if(type == "motor"){
-                type = this.params["motor"][Object.keys(this.params["motor"])[0]].type + "_motor";
-             }
-             if (this.peripherals.hasOwnProperty(type) && this.peripherals[type].rel_path.split("\\")[0] == kind ){
-                 AP.add(type)
-             }
-         }
-      }
-      return AP
+    getSensors(){
+      return this.params.sensors ? Object.keys(this.params.sensors) : [];
+    },
+    getActuators(){
+      console.log(this.params.actuators);
+      return this.params.actuators ? Object.keys(this.params.actuators) : [];
     },
     // Loads in imported blockly modules block definitions
     load_blockly_modules() {
@@ -398,20 +391,29 @@ export default {
       PBM["default"].load(Blockly, []);
 
       for (let pbm of Object.keys(PBM)) {
-        let pbm2 = pbm
-        if(pbm.slice(-6) == "_motor"){
-           pbm2 = "motor";
-        }
 
-        if (this.params.hasOwnProperty(pbm2)){
+        // Load sensors
+        if (this.params.sensors.hasOwnProperty(pbm)){
            let items = []
-           for (const [key, value] of Object.entries(this.params[pbm2])) {
+           for (const [key, value] of Object.entries(this.params.sensors[pbm])) {
               // We use [T.name, T.name] here because the dropdown menu generator
               // of blockly requires an array as [showSelectOption, resultValue].
               items.push([value.name, value.name]);
            }
            PBM[pbm].load(Blockly, items )
         }
+       
+        // Load actuators
+        if (this.params.actuators.hasOwnProperty(pbm)){
+           let items = []
+           for (const [key, value] of Object.entries(this.params.actuators[pbm])) {
+              // We use [T.name, T.name] here because the dropdown menu generator
+              // of blockly requires an array as [showSelectOption, resultValue].
+              items.push([value.name, value.name]);
+           }
+           PBM[pbm].load(Blockly, items )
+        }
+
       }
     },
     refresh_blockly(){
@@ -558,18 +560,17 @@ export default {
             this.$store.dispatch('setBlockly', "")
           }
         },
-  },
-  mounted() {
+    '$store.getters.getPeripherals':
+        function (newVal, oldVal) {
+          // NOTE: this one should only be called once after
+          // the app is loaded and the ROS paramters have
+          // been set.
 
-     let params = new ROSLIB.Param({
-       ros: ros,
-       name: '/mirte_telemetrix_cpp:mirte'
-     })
+          this.params = newVal; 
+          console.log(this.params);
+          setTimeout(this.load_blockly, 10); // Why?, also not reactive with Vue.set
 
-     params.get((res) => {
-       this.params = res;
-       setTimeout(this.load_blockly, 10);
-     })
+        },     
   }
 }
 

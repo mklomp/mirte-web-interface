@@ -137,7 +137,7 @@ export default {
         });
 
         let _this = this;
-        let hardware_list = ['oled', 'motor']; // TODO: can I get this from this.peripherals?
+        let hardware_list = ['intensity', 'distance', 'oled', 'motor']; // TODO: can I get this from this.peripherals?
         let peripherals = {'sensors': {}, 'actuators': {} };
         let params = {};
  
