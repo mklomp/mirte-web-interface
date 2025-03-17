@@ -110,6 +110,18 @@ export default {
          //   window.location = "http://"  + item.toLowerCase() + ".local";
          //}
       },
+      mergeDeep(target, source) {
+        for (const key in source) {
+          if (source[key] instanceof Object && key in target) {
+            // Recursively merge if both properties are objects
+            target[key] = this.mergeDeep(target[key], source[key]);
+          } else {
+            // Otherwise, directly assign
+            target[key] = source[key];
+          }
+        }
+      return target;
+      },
       getPeripherals(){
 
         var listParametersService = new ROSLIB.Service({
@@ -118,62 +130,75 @@ export default {
           serviceType : 'rcl_interfaces/srv/ListParameters'
         });
 
-       var getParameterService = new ROSLIB.Service({
+        var getParameterService = new ROSLIB.Service({
           ros : ros,
           name : '/io/telemetrix/get_parameters',
           serviceType : 'rcl_interfaces/srv/GetParameters'
         });
 
         let _this = this;
-        let result_counter = 0;
-        let hardware_list = ['intensity', 'distance', 'oled', 'motor']; // TODO: can I get this from this.peripherals?
-        let peripherals = {'sensors': {}, 'actuators': {}};
+        let hardware_list = ['oled', 'motor']; // TODO: can I get this from this.peripherals?
+        let peripherals = {'sensors': {}, 'actuators': {} };
+        let params = {};
+ 
+        var request = {
+          prefixes: hardware_list,
+          depth: 0
+        };
 
-        for (const hardware of hardware_list){
-          var request = {
-            prefixes: [hardware],
-            depth: 3
+        // Get all the parameters
+        listParametersService.callService(request, function(result) {
+
+          let param_names = result.result.names;
+          var req = {
+            names: param_names
           };
 
-          listParametersService.callService(request, function(result) {
-            for (const item of result.result.prefixes){
-              var nameSplit = item.split(".");
-              let type = nameSplit[0];
-              let name = nameSplit[1];
+          // Get the values of all the parameters
+          getParameterService.callService(req, function(res){
 
-              if (hardware == "motor"){
-                // we need to get the type first
-                let type_name = item + ".type";
-                var r = { names: [type_name] };
-                getParameterService.callService(r, function(res){
-                  type = res.values[0].string_value + "_motor";
-                  peripherals['actuators'][type] = peripherals['actuators'][type] || [];
-                  peripherals['actuators'][type].push(name);
-                  result_counter++;
-                  if (result_counter == hardware_list.length){
-                    _this.$store.dispatch('setPeripherals', peripherals);
-                  }
-                });
-              } else {
-                // all others can be added right away
-                if (_this.peripherals[type].rel_path.split("\\")[0] == "Sensors"){
-                  peripherals['sensors'][type] = peripherals['sensors'][type] || {};
-                  peripherals['sensors'][type][name] = 'no data';
-                } else {
-                  peripherals['actuators'][type] = peripherals['actuators'][type] || [];
-                  peripherals['actuators'][type].push(name);
-                }
-                result_counter++;
-                if (result_counter == hardware_list.length){
-                  _this.$store.dispatch('setPeripherals', peripherals);
-                }
+            let values = res.values;
+            for (let param_id in values){
+
+              let value = 0;
+              if (values[param_id].type == 2){
+                value = values[param_id].integer_value;
+              } else if (values[param_id].type == 3){
+                value = values[param_id].double_value;
+              } else if (values[param_id].type == 4){
+                value = values[param_id].string_value;
               }
 
-
+              let item = param_names[param_id].split(".").reduceRight((acc, key) => ({ [key]: acc }), value);
+              params = _this.mergeDeep(params, item);
             }
-          });
-        }
+        
+            // Fix motor issues (TODO: we need to redesign the motor setup
+            let new_params = {}
+            for (let type in params){
+              if (type == "motor"){
+                for (let instance in params[type]){
+                  new_params[params[type][instance].type + "_motor"] = new_params[params[type][instance].type + "_motor"] || {};
+                  new_params[params[type][instance].type + "_motor"][instance] = params[type][instance];
+                }
+              } else {
+                new_params[type] = params[type];
+              }
+            }
+            params = new_params;
 
+            // Save everything in sensors/actuators
+            for (let type in params){
+              console.log(type);
+              if (_this.peripherals[type].rel_path.split("\\")[0] == "Sensors"){
+                peripherals['sensors'][type] = params[type];
+              } else {
+                peripherals['actuators'][type] = params[type];
+              }
+            }
+            _this.$store.dispatch('setPeripherals', peripherals);
+          });
+        });
       },
       checkLogin() {
          this.submitted = true;
@@ -200,7 +225,7 @@ export default {
          })
       },
    },
-   async mounted() {   //TODO: could this be beforeMount?
+   mounted() {   //TODO: could this be beforeMount?
 
       console.log("Retrieving ROS parameters");
       this.getPeripherals();
