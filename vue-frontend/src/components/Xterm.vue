@@ -1,7 +1,11 @@
 <template>
-    <div>
-        <div id="terminal" ref="terminal" class="xterm"></div>
-    </div>
+   <div class="rounded background-tertiary h5 p-3 mb-2">
+     {{ $t('actuators.output') }}
+     <div v-show="isLoading" class="float-right">Loading...</div>
+     <div>
+        <div :style="{ visibility: isLoading ? 'hidden' : 'visible' }" id="terminal" ref="terminal" class="xterm"></div>
+     </div>
+   </div>
 </template>
 
 <script>
@@ -17,9 +21,15 @@ export default {
         shell_socket: WebSocket,
         linenr_socket: WebSocket,
         term: Terminal,
+        isLoading: true
     }),
     activated: function(){
         this.term.focus();
+    },
+    watch: {
+      '$store.getters.getExecution': function (newValue, oldVal) {
+          this.isLoading = (newValue == "disconnected" || newValue == "initializing");
+        }
     },
     methods: {
         waitForSocketConnection(){
@@ -54,6 +64,7 @@ export default {
               };
         },
         playCode() {
+            this.term.clear();
             if (this.$store.getters.getExecution == "paused"){
                this.linenr_socket.send("c");
                this.$store.dispatch('setExecution', 'running');
@@ -69,7 +80,9 @@ export default {
                    },
                    body: this.$store.getters.getCode,
                }).then(res => {
-                   this.linenr_socket.send("c");
+                   this.shell_socket.send('run()\n');
+                   this.$store.dispatch('setExecution', 'running');
+                   //this.linenr_socket.send("c");
                }).catch(err => {
                    console.log("sending failed")
                    console.log(err)
@@ -77,7 +90,8 @@ export default {
                }
         },
         stopCode() {
-            this.linenr_socket.send("e");
+            this.shell_socket.send("\x03");
+            //this.linenr_socket.send("e");
             this.$store.dispatch('setLinenumber', null)
             this.$store.dispatch('setExecution', 'stopped');
         },
@@ -119,7 +133,7 @@ export default {
         this.shell_socket = shell_socket;
 
         // Open the websocket connection to the debugger
-        this.waitForSocketConnection();
+        //this.waitForSocketConnection();
 
         // The terminal
         // TODO: use colors from scss
@@ -134,13 +148,36 @@ export default {
            this.term.resize(dimensions.cols, dimensions.rows);
         }
         this.term.setOption('disableStdin', true);
-        
+
         // Load env variables
         this.shell_socket.onmessage = (ev) => {
-           if (this.$store.getters.getExecution == "disconnected") {
-              this.shell_socket.send("unset HISTFILE && stty -echo && PS1='' && clear\n");
-              this.shell_socket.send("source /home/mirte/mirte_ws/install/setup.bash && cd /home/mirte/workdir && clear\n");
-              this.$store.dispatch('setExecution', 'stopped');
+           if (this.$store.getters.getExecution == "disconnected" && ev.data.slice(-2) == "$ ") {
+              this.$store.dispatch('setExecution', 'initializing');
+              this.shell_socket.send("unset HISTFILE\n");
+              this.shell_socket.send("cd /home/mirte/workdir\n");
+              this.shell_socket.send("ps aux | grep 'python3 -i -c' | awk '{print $2}' | xargs kill -9\n"); // TODO: this should be fixed in the backend
+              this.shell_socket.send("history -c\n");
+              this.shell_socket.send("python3 -i -c 'from mirte_robot import robot; mirte=robot.createRobot()'\n");
+           }
+           else if (this.$store.getters.getExecution == "initializing" && ev.data.slice(-4) == ">>> "){
+              this.shell_socket.send('def run():\n');
+              this.shell_socket.send('  try:\n');
+              this.shell_socket.send('    print("\\033[38;2;0;0;0m", end="")\n');
+              this.shell_socket.send('    exec(open("/home/mirte/workdir/mirte.py").read())\n');
+              this.shell_socket.send('    print("\\033[38;2;254;250;247m", end="")\n');
+              this.shell_socket.send('  except:\n');
+              this.shell_socket.send('    print("\\r", end="")\n');
+              this.shell_socket.send('    print("\\033[38;2;254;250;247m", end="")\n');
+              this.shell_socket.send('  finally: mirte.stop()\n\n');
+              this.shell_socket.send('print("\\033[38;2;254;250;247m", end="")\n');
+              this.$store.dispatch('setExecution', 'initialized');
+           }
+           else if (this.$store.getters.getExecution == "initialized" && ev.data.slice(-4) == ">>> "){
+              this.term.clear();
+              this.$store.dispatch('setExecution', 'ready');
+           }
+           else if ((this.$store.getters.getExecution == "stopped" || this.$store.getters.getExecution == "running") && ev.data.slice(-4) == ">>> "){
+              this.$store.dispatch('setExecution', 'ready');
            }
         }
 

@@ -10,7 +10,7 @@
     "rel_path": "Actuators\\Motor\\pwm_motor\\pwm_motor.py",
     "service_type": "mirte_msgs/SetMotorSpeed",
     "service_value": "speed",
-    "service_name": "speed"
+    "service_name": "set_speed"
   },
   "ddp_motor": {
     "text": "ddp_motor",
@@ -24,7 +24,7 @@
     "rel_path": "Actuators\\Motor\\pwm_motor\\pwm_motor.py",
     "service_type": "mirte_msgs/SetMotorSpeed",
     "service_value": "speed",
-    "service_name": "speed"
+    "service_name": "set_speed"
   },
   "dp_motor": {
     "text": "dp_motor",
@@ -37,7 +37,7 @@
     "rel_path": "Actuators\\Motor\\pwm_motor\\pwm_motor.py",
     "service_type": "mirte_msgs/SetMotorSpeed",
     "service_value": "speed",
-    "service_name": "speed"
+    "service_name": "set_speed"
   },
   "intensity": {
     "text": "ir_sensor",
