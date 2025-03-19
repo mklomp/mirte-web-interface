@@ -4,36 +4,7 @@
 
 
       <div v-if="programming">
-
-            <div class="rounded background-tertiary h5 p-3 mb-2">
-              {{ $t('actuators.output') }}              
-                <div class="float-right">
-
-<!--
-
-        <button class="btn-sm btn-outline-dark mx-2" 
-            v-b-tooltip.hover 
-            title="clear output" 
-            @click="control('clear')"
-        >
-            <i class="fas fa-sync"></i>
-        </button>
-
-        <button class="btn btn-outline-dark mr-2" 
-            v-b-tooltip.hover 
-            title="toggle output/terminal" 
-            @click="control('terminal')"
-        >
-            <i class="fa fa-terminal"></i>
-        </button>
-
--->
-
-                </div>
-              
-
-              <Xterm/>
-           </div>    
+        <Xterm/>
       </div>
 
 

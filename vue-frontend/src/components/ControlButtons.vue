@@ -19,12 +19,13 @@
         <span class="nav-spacer"></span>
 
         <span v-b-tooltip :title="$t('programming.start')" style="display: inline-block;">
-        <button :disabled="isPlayDisabled" class="btn btn-outline-light mx-2" 
+        <button :disabled="!isPlayEnabled" class="btn btn-outline-light mx-2" 
             @click="control('play')">
             <i class="fas fa-play"></i>
         </button>
         </span>
 
+<!--
         <span v-b-tooltip :title="$t('programming.pause')" style="display: inline-block;">
         <button :disabled="isPauseDisabled" 
             @click="control('pause')" class="btn btn-outline-light mr-2">
@@ -38,9 +39,9 @@
             <i class="fa fa-step-forward"></i>
         </button>
         </span>
-
+-->
         <span v-b-tooltip :title="$t('programming.stop')" style="display: inline-block;">
-	<button :disabled="isStopDisabled" class="btn btn-outline-light mr-2" 
+	<button :disabled="!isStopEnabled" class="btn btn-outline-light mr-2" 
             @click="control('stop')">
             <i class="fa fa-stop"></i>
         </button>
@@ -136,8 +137,8 @@ export default {
        isRedoDisabled: function(){
            return false; // TODO: determine strategy
        },
-       isPlayDisabled: function(){
-          return this.$store.getters.getExecution == "running" || this.$store.getters.getExecution == "disconnected";
+       isPlayEnabled: function(){
+          return this.$store.getters.getExecution == "ready";
        },
        isPauseDisabled: function(){
           return this.$store.getters.getExecution != "running" || this.$store.getters.getExecution == "disconnected";
@@ -145,8 +146,8 @@ export default {
        isStepDisabled: function(){
           return this.$store.getters.getExecution != "paused" || this.$store.getters.getExecution == "disconnected";
        },
-       isStopDisabled: function(){
-          return this.$store.getters.getExecution == "stopped" || this.$store.getters.getExecution == "disconnected";
+       isStopEnabled: function(){
+          return this.$store.getters.getExecution == "running";
        }
     }
 
