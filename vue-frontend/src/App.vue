@@ -137,8 +137,11 @@ export default {
         });
 
         let _this = this;
-        let hardware_list = ['intensity', 'distance', 'oled', 'motor']; // TODO: can I get this from this.peripherals?
-        let peripherals = {'sensors': {}, 'actuators': {} };
+        let peripheral_list = Object.keys(this.peripherals);
+        let hardware_list = peripheral_list.filter(item => !item.includes("motor"));
+        hardware_list.push("motor");
+        hardware_list.push("device");
+        let peripherals = {'sensors': {}, 'actuators': {}, 'devices': {} };
         let params = {};
  
         var request = {
@@ -190,7 +193,9 @@ export default {
             // Save everything in sensors/actuators
             for (let type in params){
               console.log(type);
-              if (_this.peripherals[type].rel_path.split("\\")[0] == "Sensors"){
+              if (type == "device"){
+                peripherals['devices'] = params[type];
+              } else if (_this.peripherals[type].rel_path.split("\\")[0] == "Sensors"){
                 peripherals['sensors'][type] = params[type];
               } else {
                 peripherals['actuators'][type] = params[type];

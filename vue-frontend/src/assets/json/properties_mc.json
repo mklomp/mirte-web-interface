@@ -1,5 +1,6 @@
 {
   "nano": {
+    "text": "Arduino Nano",
     "pin_map": {
       "RX0": 0,
       "TX1": 1,
@@ -28,6 +29,7 @@
     "analog_offset": 14
   },
   "nano_old": {
+    "text": "Arduino Nano (old)",
     "pin_map": {
       "RX0": 0,
       "TX1": 1,
@@ -56,6 +58,7 @@
     "analog_offset": 14
   },
   "pico": {
+    "text": "Raspberry Pi Pico",
     "pin_map": {
       "GP0" : 0,
       "GP1" : 1,
@@ -91,6 +94,7 @@
     "analog_offset": 26
   },
   "uno": {
+    "text": "Arduino Uno",
     "pin_map": {
       "RX0": 0,
       "TX1": 1,
