@@ -15,7 +15,7 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
 fs = require('fs')
 
  // FIXME: This needs to change to the correct config location. Doesn't work nicely with pre-compiled packages.
-const mirte_user_config_file = '/home/mirte/mirte_ws/src/mirte-ros-packages/mirte_telemetrix/config/mirte_user_config.yaml';
+const mirte_user_config_file = '/home/mirte/mirte_ws/src/mirte-ros-packages/mirte_bringup/telemetrix_config/mirte_user_config.yaml';
 
 
 // TODO: Currently the local-ip package is not working
