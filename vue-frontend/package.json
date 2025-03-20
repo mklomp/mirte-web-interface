@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve --port 4000",
-    "build": "vue-cli-service build"
+    "build": "rm -rf node_modules/roslib && cp -r roslib node_modules/ && vue-cli-service build"
   },
   "dependencies": {
     "@kazupon/vue-i18n-loader": "^0.5.0",
