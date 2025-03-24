@@ -167,18 +167,19 @@ export default {
        restructured['device']['mirte'] = {type: this.type, board: this.board };
 
        for (let [name, item] of Object.entries(this.items)){
-         console.log(item);
          if (name.slice(-5) == "motor"){
             let type = name.split("_")[0];
             restructured.motor = {};
             for (let [motor_name, motor] of Object.entries(item)){
               motor.type = type;
+              motor.device = "mirte";
               restructured.motor[motor.name] = motor;
             }
          } else {
             restructured[name] = {}; // eg. color
             for (let [i_name, i] of Object.entries(item)){
               restructured[name][i.name] = i;
+              restructured[name][i.name].device = "mirte";
             }
          }
        }
