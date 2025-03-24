@@ -336,7 +336,7 @@ export default {
 
     this.cmd_vel = new ROSLIB.Topic({
        ros : this.ros,
-       name : '/diff_drive_controller/cmd_vel_unstamped',
+       name : '/mirte_base_controller/cmd_vel',
        messageType : 'geometry_msgs/Twist'
     });
 

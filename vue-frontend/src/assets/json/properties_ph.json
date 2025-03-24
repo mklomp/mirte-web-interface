@@ -82,7 +82,7 @@
     "rel_path": "Actuators\\Servo\\servo\\servo.py",
     "service_type": "mirte_msgs/SetServoAngle",
     "service_value": "angle",
-    "service_name": "servo_angle"
+    "service_name": "set_angle"
   },
   "oled": {
     "text": "oled",
