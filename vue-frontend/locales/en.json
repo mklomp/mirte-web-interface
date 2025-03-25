@@ -16,7 +16,7 @@
     "upload": "upload",
     "upload_confirm": "Are you sure you want to upload to the microcontroller?",
     "save": "save",
-    "save_confirm": "Are you sure you want to update the hardware settings?",
+    "save_confirm": "Are you sure you want to update the hardware settings? The changes will be visible after 10 seconds.",
     "name": "name",
     "pin": "pin",
     "add": "add",

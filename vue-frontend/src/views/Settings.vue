@@ -226,8 +226,9 @@ export default {
         })
             .then(res => res.text())
             .then(data => {
-              console.log(data)
-              this.busy = false
+              // It takes about 5 seconds for telemetrix to reload
+              // TODO: check this, rather than 10 secs
+              setTimeout(() => window.location.href = window.location.origin, 10000);
             })
       }
     },
