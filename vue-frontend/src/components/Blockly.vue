@@ -1,7 +1,7 @@
 <template>
   <div class="h-100">
     <div id="blocklyArea" ref="blocklyArea" class="blocklyArea h-100">
-      <div id="blocklyDiv" ref="blocklyDiv" style="height: 480px; width: 600px"></div>
+      <div id="blocklyDiv" ref="blocklyDiv" style="height: 100%; width: 100%;"></div>
     </div>
 
     <xml id="toolbox" ref="toolbox" style="display: none">
