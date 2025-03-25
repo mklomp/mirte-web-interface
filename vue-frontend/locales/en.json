@@ -100,7 +100,7 @@
     "SET_MOTOR_CONTROL": "%1 motor control",
     "STOP_MOTOR": "stop motor %1",
     "SET_SERVO_ANGLE": "set servo %1 to angle %2",
-    "SET_OLED": "show the %2 %3 on screen %1",
+    "SET_OLED": "show %2 on screen %1",
     "GET_ANALOG_PIN_VALUE": "analog value of pin %1",
     "GET_DIGITAL_PIN_VALUE": "digital value of pin %1",
     "WAIT": "wait %1 second(s)",

@@ -100,7 +100,7 @@
     "SET_MOTOR_CONTROL": "%1 motor control",
     "STOP_MOTOR": "stop motor %1",
     "SET_SERVO_ANGLE": "zet servo %1 op hoek %2",
-    "SET_OLED": "laat de %2 %3 op scherm %1 zien",
+    "SET_OLED": "laat %2 op scherm %1 zien",
     "GET_ANALOG_PIN_VALUE": "analoge waarde van pin %1",
     "GET_DIGITAL_PIN_VALUE": "digitale waarde van pin %1",
     "WAIT": "wacht %1 seconde(n)",
