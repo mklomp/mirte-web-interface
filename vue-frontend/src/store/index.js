@@ -12,9 +12,9 @@ export default {
         execution: "disconnected",   // TODO: enum?
         user: "none",           // TODO: at the moment it can not be empty on start
         PConfig: "[]",          // For some reason this needs to be a string (persistent?)
-        locale: selectedLocale
+        locale: selectedLocale,
+        peripherals: {}
     },
-
     getters: {
         getCode(state) {
             return state.code
@@ -39,6 +39,9 @@ export default {
         },
         getLocal(state){
             return state.locale;
+        },
+        getPeripherals(state){
+            return state.peripherals;
         }
     },
     actions: {
@@ -66,7 +69,10 @@ export default {
         setLocale({commit, getters}, locale){
             i18n.locale = locale;
             commit('locale', locale);
-        }
+        },
+        setPeripherals({commit, getters}, peripherals){
+            commit('peripherals', peripherals);
+        },
     },
     mutations: {
         code(state, code) {
@@ -92,7 +98,10 @@ export default {
         },
         locale(state, locale){
             return state.locale = locale;
-        }
+        },
+        peripherals(state, peripherals) {
+            return state.peripherals = peripherals;
+        },
     },
     plugins: [createPersistedState({ paths: ["code", "blockly", "locale"] })]
 }
