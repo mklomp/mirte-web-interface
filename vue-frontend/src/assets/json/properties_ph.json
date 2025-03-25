@@ -91,10 +91,10 @@
        "sda": "digital"
     },
     "functions": ["set_oled"],
-    "default_value": {"name": "VALUE", "type": "text", "field": "TEXT", "value": "Hi"},
+    "default_value": {"text": "Hi"},
     "rel_path": "Actuators\\OLED\\oled\\oled.py",
-    "service_type": "mirte_msgs/SetOLEDImage",
-    "service_name": "image"
+    "service_type": "mirte_msgs/SetOLEDText",
+    "service_name": "set_text"
   },
   "keypad": {
     "text": "keypad_sensor",

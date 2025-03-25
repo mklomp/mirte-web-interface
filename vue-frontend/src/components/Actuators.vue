@@ -126,11 +126,13 @@
                          <div class="col-2">
                            {{instance}}
                          </div>
+<!--
                          <div class="col-5">
                              <b-form-select v-model="actuator_values[actuator][instance].type" :options="oled_options"></b-form-select>
                          </div>
-                         <div class="col-5">
-                             <b-form-input v-model="actuator_values[actuator][instance].value" @change="set_oled(actuator, instance)" placeholder=""></b-form-input>
+-->
+                         <div class="col-10">
+                             <b-form-input v-model="actuator_values[actuator][instance].text" @change="set_oled(actuator, instance)" placeholder=""></b-form-input>
                          </div>
                        </div>
                      </div>
@@ -184,8 +186,7 @@ export default {
 
               if (actuator_type == "oled"){
                 Vue.set(_this.actuator_values["oled"], instance, {});
-                Vue.set(_this.actuator_values["oled"][instance], 'type', '');
-                Vue.set(_this.actuator_values["oled"][instance], 'value', '');
+                Vue.set(_this.actuator_values["oled"][instance], 'text', '');
               } else {
                 Vue.set(_this.actuator_values[actuator_type], instance, 0);
               }
@@ -217,10 +218,7 @@ export default {
            this.actuator_services[actuator][instance].callService(request, function(result) {});
         },
         set_oled(actuator, instance){
-           var request = new ROSLIB.ServiceRequest({
-              type: this.actuator_values[actuator][instance].type,
-              value: this.actuator_values[actuator][instance].value
-           });
+           var request = { text: this.actuator_values[actuator][instance].text };
            this.actuator_services[actuator][instance].callService(request, function(result) {});
         },
         control(command) {
