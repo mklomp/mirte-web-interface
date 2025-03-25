@@ -139,7 +139,9 @@ export default {
            binds[key] = null
          })
       }
-      Vue.set(this.items, type, {}); //eg. intensity
+      if (!this.items[type]){
+        Vue.set(this.items, type, {}); //eg. intensity
+      }
       Vue.set(this.items[type], name, {});  //eg. left
       Vue.set(this.items[type][name], "name", name);
       Vue.set(this.items[type][name], "pins", binds);
