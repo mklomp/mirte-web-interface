@@ -53,7 +53,7 @@
     "open": "open"
   },
   "peripherals": {
-    "ultrasonic_sensor": "Distance sensor",
+    "ultrasonic_sensor": "Distance sensor (m)",
     "ir_sensor": "IR sensor",
     "color_sensor": "Color sensor",
     "keypad_sensor": "Keypad",
