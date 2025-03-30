@@ -62,9 +62,14 @@ export default {
             for (let instance in sensors[sensor_type]){
               Vue.set(_this.sensors[sensor_type], instance, -1);
 
+              let full_instance = instance;
+              if (sensor_type == "color"){
+                 full_instance = instance + "/hsl";
+              }
+
               let topic = new ROSLIB.Topic({
                 ros : ros,
-                name : '/io/' + sensor_type + '/' + instance,
+                name : '/io/' + sensor_type + '/' + full_instance,
                 messageType : _this.peripherals[sensor_type].message_type
               });
 
