@@ -104,6 +104,16 @@
     "GET_ANALOG_PIN_VALUE": "analog value of pin %1",
     "GET_DIGITAL_PIN_VALUE": "digital value of pin %1",
     "WAIT": "wait %1 second(s)",
-    "WAIT_UNTIL": "wait until %1"
+    "WAIT_UNTIL": "wait until %1",
+    "COLOR_SENSOR_TB": "Color sensor",
+    "ULTRASONIC_SENSOR_TB": "Distance sensor (m)",
+    "IR_SENSOR_TB": "IR sensor",
+    "KEYPAD_SENSOR_TB": "Keypad",
+    "WHEEL_ENCODER_TB": "Wheel encoder",
+    "PP_MOTOR_TB": "Motor (pp)",
+    "DP_MOTOR_TB": "Motor (dp)",
+    "DDP_MOTOR_TB": "Motor (ddp)",
+    "SERVO_TB": "Servo",
+    "OLED_TB": "OLED Screen"
   }
 }

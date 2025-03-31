@@ -104,6 +104,16 @@
     "GET_ANALOG_PIN_VALUE": "analoge waarde van pin %1",
     "GET_DIGITAL_PIN_VALUE": "digitale waarde van pin %1",
     "WAIT": "wacht %1 seconde(n)",
-    "WAIT_UNTIL": "wacht totdat %1"
+    "WAIT_UNTIL": "wacht totdat %1",
+    "COLOR_SENSOR_TB": "Kleuren sensor",
+    "ULTRASONIC_SENSOR_TB": "Afstand sensor (m)",
+    "IR_SENSOR_TB": "IR sensor",
+    "KEYPAD_SENSOR_TB": "Toetsen",
+    "WHEEL_ENCODER_TB": "Encoder",
+    "PP_MOTOR_TB": "Motor (pp)",
+    "DP_MOTOR_TB": "Motor (dp)",
+    "DDP_MOTOR_TB": "Motor (ddp)",
+    "SERVO_TB": "Servo",
+    "OLED_TB": "OLED Scherm"
   }
 }

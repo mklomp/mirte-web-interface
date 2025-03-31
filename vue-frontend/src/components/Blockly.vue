@@ -15,7 +15,7 @@
          </category>
 
 
-        <category v-for="sensor in getSensors()" :name="$t('peripherals.' + peripherals[sensor].text)"
+        <category v-for="sensor in getSensors()" :name="'%{BKY_' + peripherals[sensor].text.toUpperCase() + '_TB}'"
                   colour="%{BKY_SENSORS_RGB}">
           <block v-for="func in peripherals[sensor].functions"
                  :type="func.concat('_').concat(sensor)">
@@ -208,7 +208,7 @@
 
          </category>
 
-        <category v-for="actuator in getActuators()" :name="$t('peripherals.' + peripherals[actuator].text)"
+        <category v-for="actuator in getActuators()" :name="'%{BKY_' + peripherals[actuator].text.toUpperCase() + '_TB}'"
                   colour="%{BKY_ACTIONS_RGB}">
           <block v-for="func in peripherals[actuator].functions"
                  :type="func.concat('_').concat(actuator)">
@@ -381,7 +381,6 @@ export default {
       return this.params.sensors ? Object.keys(this.params.sensors) : [];
     },
     getActuators(){
-      console.log(this.params.actuators);
       return this.params.actuators ? Object.keys(this.params.actuators) : [];
     },
     // Loads in imported blockly modules block definitions
@@ -421,7 +420,6 @@ export default {
         // Get current values
         var xml = Blockly.Xml.workspaceToDom(this.workspace);
         var toolbox_item = this.workspace.toolbox_.getSelectedItem();
-        this.workspace.dispose();
 
        // Reint workspace
        this.workspace.dispose();
