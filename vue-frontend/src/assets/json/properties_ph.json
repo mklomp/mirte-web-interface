@@ -91,7 +91,7 @@
        "sda": "digital"
     },
     "functions": ["set_oled"],
-    "default_value": {"text": "Hi"},
+    "default_value": {"name": "VALUE", "type": "text", "field": "TEXT", "value": "Hi"},
     "rel_path": "Actuators\\OLED\\oled\\oled.py",
     "service_type": "mirte_msgs/SetOLEDText",
     "service_name": "set_text"

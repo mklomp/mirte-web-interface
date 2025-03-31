@@ -192,7 +192,6 @@ export default {
 
             // Save everything in sensors/actuators
             for (let type in params){
-              console.log(type);
               if (type == "device"){
                 peripherals['devices'] = params[type];
               } else if (_this.peripherals[type].rel_path.split("\\")[0] == "Sensors"){
