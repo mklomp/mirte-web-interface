@@ -88,7 +88,7 @@ export default {
 				data.append("ssid", this.selected.ssid );
 				data.append("identity", this.selected.identity );
 				data.append("passphrase", this.selected.password );
-				fetch(`http://192.168.42.1/wifi-connect/connect`, {
+				fetch(`http://${location.hostname}/wifi-connect/connect`, {
 						"method": "POST",
 						"mode": "cors",
 						"body": data})
