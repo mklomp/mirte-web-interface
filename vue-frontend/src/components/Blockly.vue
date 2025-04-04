@@ -534,7 +534,13 @@ export default {
     }
    
   },
-
+  mounted() {
+    // Needs to be loaded when re-mounted
+    // (ie. switching between python-blockly)
+    if (isRegistered) {
+      this.load_blockly();
+    }
+  },
   watch: {
      '$i18n.locale': function(newVal, oldVal){
         Blockly.setLocale(locales[newVal]);
