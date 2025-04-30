@@ -161,13 +161,18 @@ export default {
            }
            else if (this.$store.getters.getExecution == "initializing" && ev.data.slice(-4) == ">>> "){
               this.shell_socket.send('def run():\n');
+              this.shell_socket.send('  print("\\033[38;2;0;0;0m", end="")\n');
+              this.shell_socket.send('  spec = importlib.util.spec_from_file_location("mirte", "/home/mirte/workdir/mirte.py")\n');
+              this.shell_socket.send('  mod = importlib.util.module_from_spec(spec)\n');
               this.shell_socket.send('  try:\n');
-              this.shell_socket.send('    print("\\033[38;2;0;0;0m", end="")\n');
-              this.shell_socket.send('    spec = importlib.util.spec_from_file_location("mirte", "/home/mirte/workdir/mirte.py")\n');
-              this.shell_socket.send('    mod = importlib.util.module_from_spec(spec)\n');
               this.shell_socket.send('    spec.loader.exec_module(mod)\n');
               this.shell_socket.send('    print("\\033[38;2;254;250;247m", end="")\n');
-              this.shell_socket.send('  except:\n');
+              this.shell_socket.send('  except SystemExit:\n');
+              this.shell_socket.send('    pass\n');
+              this.shell_socket.send('    print("\\r", end="")\n');
+              this.shell_socket.send('    print("\\033[38;2;254;250;247m", end="")\n');
+              this.shell_socket.send('  except Exception as e:\n');
+              this.shell_socket.send('    print(e)\n');
               this.shell_socket.send('    print("\\r", end="")\n');
               this.shell_socket.send('    print("\\033[38;2;254;250;247m", end="")\n');
               this.shell_socket.send('  finally: mirte.stop()\n\n');
