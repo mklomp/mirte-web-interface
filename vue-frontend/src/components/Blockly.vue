@@ -310,6 +310,8 @@ const predefined_blocks = {
 }
 
 export default {
+  props: ['visible'],
+
   data: () => ({
     peripherals: properties_ph,
     workspace: Object,
@@ -442,6 +444,24 @@ export default {
         this.workspace.toolbox_.setSelectedItem(toolbox_item);
         this.refresh();
     },
+    resize_listener(){
+        // Compute the absolute coordinates and dimensions of blocklyArea.
+        let element = blocklyArea
+        let x = 0
+        let y = 0
+        // Sums over all the elements' parents offsets
+        do {
+          x += element.offsetLeft
+          y += element.offsetTop
+          element = element.offsetParent
+        } while (element)
+        // Position blocklyDiv over blocklyArea.
+        blocklyDiv.style.left = x + 'px'
+        blocklyDiv.style.top = y + 'px'
+        blocklyDiv.style.width = blocklyArea.offsetWidth + 'px'
+        blocklyDiv.style.height = blocklyArea.offsetHeight + 'px'
+        Blockly.svgResize(this.workspace)
+    },
     load_blockly(){
 
       // Blockly configuration
@@ -473,27 +493,8 @@ export default {
       // workspace configuration
       this.workspace.toolbox_.flyout_.autoClose = true
   
-      // Window resize listener
-      const onresize = (e) => {
-        // Compute the absolute coordinates and dimensions of blocklyArea.
-        let element = blocklyArea
-        let x = 0
-        let y = 0
-        // Sums over all the elements' parents offsets
-        do {
-          x += element.offsetLeft
-          y += element.offsetTop
-          element = element.offsetParent
-        } while (element)
-        // Position blocklyDiv over blocklyArea.
-        blocklyDiv.style.left = x + 'px'
-        blocklyDiv.style.top = y + 'px'
-        blocklyDiv.style.width = blocklyArea.offsetWidth + 'px'
-        blocklyDiv.style.height = blocklyArea.offsetHeight + 'px'
-        Blockly.svgResize(this.workspace)
-      }
-      window.addEventListener('resize', onresize, false)
-      onresize()
+      window.addEventListener('resize', this.resize_listener, false)
+      this.resize_listener();
   
       this.refresh();
 
@@ -542,6 +543,13 @@ export default {
     }
   },
   watch: {
+     visible(newVal) {
+       if (newVal) {
+         this.$nextTick(() => {
+           this.resize_listener();
+         });
+       }
+     },
      '$i18n.locale': function(newVal, oldVal){
         Blockly.setLocale(locales[newVal]);
         this.refresh_blockly();
@@ -571,7 +579,6 @@ export default {
           // been set.
 
           this.params = newVal; 
-          console.log(this.params);
           setTimeout(this.load_blockly, 10); // Why?, also not reactive with Vue.set
 
         },     

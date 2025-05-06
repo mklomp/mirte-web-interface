@@ -46,13 +46,13 @@
                 </div>
                   
            
-                <div v-if="isBlockly" class="h-100"> 
-                    <Blockly/>
+                <div v-show="isBlockly" class="h-100">
+                    <Blockly :visible="isBlockly"/>
                 </div>
 
 
-                <div v-else class="h-100">
-                    <Codemirror/>
+                <div v-show="!isBlockly" class="h-100">
+                    <Codemirror :visible="!isBlockly"/>
                 </div>
 
 

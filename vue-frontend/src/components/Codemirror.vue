@@ -10,6 +10,7 @@ import 'codemirror/mode/python/python.js'
 import 'codemirror/lib/codemirror.css'
 
 export default {
+  props: ['visible'],
   data: () => ({
     editor: Object
   }),
@@ -35,7 +36,14 @@ export default {
     this.editor.save()
     this.editor.setValue(this.$store.getters.getCode)
   },
-  watch: { 
+  watch: {
+    visible(newVal) {
+      if (newVal && this.editor) {
+        this.$nextTick(() => {
+          this.editor.refresh();
+        });
+      }
+    },
     '$store.getters.getCode': function(newVal, oldVal) {
        if (newVal != this.editor.getDoc().getValue()){
           this.editor.setValue(newVal)
