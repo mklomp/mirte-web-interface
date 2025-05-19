@@ -23,18 +23,22 @@ jobs:
                 cd nodejs-backend 
                 npm install
                 npm rebuild
-            - name: Run build
-              run: |
-                cd nodejs-backend
-                exit_status=0
-                timeout 60 npm run backend || exit_status=$?
-                
-                if [[ $exit_status -eq 124 ]]; then
-                    echo "Backend ran good!"
-                else
-                    echo "Backend run failed!"
-                    exit 1
-                fi
+            # Disabled for now, we caan enable this one
+            # as soon as we have remove the login from
+            # back- and frondend (and tested its working
+            # with nginx)
+            # - name: Run build
+            #  run: |
+            #    cd nodejs-backend
+            #    exit_status=0
+            #    timeout 60 npm run backend || exit_status=$?
+            #    
+            #    if [[ $exit_status -eq 124 ]]; then
+            #        echo "Backend ran good!"
+            #    else
+            #        echo "Backend run failed!"
+            #        exit 1
+            #    fi
 
             # - name: Run tests
             #     run: npm test
