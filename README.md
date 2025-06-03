@@ -50,4 +50,4 @@ rm -rf dist && npm run build && scp -R dist mirte@<mirte-ip>:/usr/local/src/mirt
 
 ## License
 
-This work is licensed under a Apache-2.0 OSS license.
+This work is licensed under a GPL-3.0 OSS license.
