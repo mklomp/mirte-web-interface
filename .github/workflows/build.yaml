@@ -7,11 +7,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-          uses: actions/checkout@v4
+        uses: actions/checkout@v4
       - name: Build
-          if: github.event_name == 'schedule' && github.repository_owner == 'mirte-robot'
-          id: check
-          run: |
+        run: |
             sudo apt install -y python3-pip python3-setuptools python3-wheel
             sudo -H pip install nodeenv
             nodeenv --node=16.2.0 node_env
