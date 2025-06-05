@@ -6,16 +6,19 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Install dependencies
-        run: |
-          sudo apt install -y python3-pip python3-setuptools python3-wheel
-          sudo -H pip install nodeenv
-          nodeenv --node=16.2.0 node_env
-          source node_env/bin/activate
-          cd vue-frontend
-          npm install
-          npm run build
+      - name: Checkout repository
+          uses: actions/checkout@v4
+      - name: Build
+          if: github.event_name == 'schedule' && github.repository_owner == 'mirte-robot'
+          id: check
+          run: |
+            sudo apt install -y python3-pip python3-setuptools python3-wheel
+            sudo -H pip install nodeenv
+            nodeenv --node=16.2.0 node_env
+            source node_env/bin/activate
+            cd vue-frontend
+            npm install
+            npm run build
       - name: Archive production artifacts
         uses: actions/upload-artifact@v4
         with:
