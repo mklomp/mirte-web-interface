@@ -18,7 +18,7 @@
 
         <span class="nav-spacer"></span>
 
-        <span v-b-tooltip :title="$t('programming.start')" style="display: inline-block;">
+        <span v-b-tooltip.hover :title="$t('programming.start')" style="display: inline-block;">
         <button :disabled="!isPlayEnabled" class="btn btn-outline-light mx-2" 
             @click="control('play')">
             <i class="fas fa-play"></i>
@@ -26,21 +26,21 @@
         </span>
 
 <!--
-        <span v-b-tooltip :title="$t('programming.pause')" style="display: inline-block;">
+        <span v-b-tooltip.hover :title="$t('programming.pause')" style="display: inline-block;">
         <button :disabled="isPauseDisabled" 
             @click="control('pause')" class="btn btn-outline-light mr-2">
             <i class="fa fa-pause"></i>
         </button>
         </span>
 
-        <span v-b-tooltip :title="$t('programming.step')" style="display: inline-block;">
+        <span v-b-tooltip.hover :title="$t('programming.step')" style="display: inline-block;">
         <button :disabled="isStepDisabled" class="btn btn-outline-light mr-2" 
             @click="control('step')">
             <i class="fa fa-step-forward"></i>
         </button>
         </span>
 -->
-        <span v-b-tooltip :title="$t('programming.stop')" style="display: inline-block;">
+        <span v-b-tooltip.hover :title="$t('programming.stop')" style="display: inline-block;">
 	<button :disabled="!isStopEnabled" class="btn btn-outline-light mr-2" 
             @click="control('stop')">
             <i class="fa fa-stop"></i>
