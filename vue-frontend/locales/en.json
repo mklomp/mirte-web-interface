@@ -16,7 +16,7 @@
     "upload": "upload",
     "upload_confirm": "Are you sure you want to upload to the microcontroller?",
     "save": "save",
-    "save_confirm": "Are you sure you want to update the hardware settings?",
+    "save_confirm": "Are you sure you want to update the hardware settings? The changes will be visible after 10 seconds.",
     "name": "name",
     "pin": "pin",
     "add": "add",
@@ -53,7 +53,7 @@
     "open": "open"
   },
   "peripherals": {
-    "ultrasonic_sensor": "Distance sensor",
+    "ultrasonic_sensor": "Distance sensor (m)",
     "ir_sensor": "IR sensor",
     "color_sensor": "Color sensor",
     "keypad_sensor": "Keypad",
@@ -100,10 +100,20 @@
     "SET_MOTOR_CONTROL": "%1 motor control",
     "STOP_MOTOR": "stop motor %1",
     "SET_SERVO_ANGLE": "set servo %1 to angle %2",
-    "SET_OLED": "show the %2 %3 on screen %1",
+    "SET_OLED": "show %2 on screen %1",
     "GET_ANALOG_PIN_VALUE": "analog value of pin %1",
     "GET_DIGITAL_PIN_VALUE": "digital value of pin %1",
     "WAIT": "wait %1 second(s)",
-    "WAIT_UNTIL": "wait until %1"
+    "WAIT_UNTIL": "wait until %1",
+    "COLOR_SENSOR_TB": "Color sensor",
+    "ULTRASONIC_SENSOR_TB": "Distance sensor (m)",
+    "IR_SENSOR_TB": "IR sensor",
+    "KEYPAD_SENSOR_TB": "Keypad",
+    "WHEEL_ENCODER_TB": "Wheel encoder",
+    "PP_MOTOR_TB": "Motor (pp)",
+    "DP_MOTOR_TB": "Motor (dp)",
+    "DDP_MOTOR_TB": "Motor (ddp)",
+    "SERVO_TB": "Servo",
+    "OLED_TB": "OLED Screen"
   }
 }

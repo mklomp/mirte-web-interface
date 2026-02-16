@@ -14,6 +14,10 @@ var flash=require("connect-flash");
 const { createProxyMiddleware } = require('http-proxy-middleware');
 fs = require('fs')
 
+ // FIXME: This needs to change to the correct config location. Doesn't work nicely with pre-compiled packages.
+const mirte_user_config_file = '/home/mirte/mirte_ws/src/mirte-ros-packages/mirte_bringup/telemetrix_config/mirte_user_config.yaml';
+
+
 // TODO: Currently the local-ip package is not working
 function getLocalIP(){
   var  address,os = require('os'),ifaces = os.networkInterfaces();
@@ -67,9 +71,7 @@ server.once('listening', function() {
 
 server.listen(4000);
 
-// Setup passportJS
-//
-//
+// TODO: just remove this, security is done by nginx.
 const authMiddleware = (req, res, next) => {
   if (req.isAuthenticated() || getLocalIP() == "192.168.42.1" || getLocalIP() == "192.168.43.1" || getLocalIP() == "192.168.44.1") {
     return next()
@@ -239,13 +241,13 @@ app.post('/api/settings', (req, res) => {
     var source = req.body
 
     const fs = require('fs');
-    fs.writeFile("/home/mirte/mirte_ws/src/mirte-ros-packages/mirte_telemetrix/config/mirte_user_config.yaml", source, (err) => {
+    fs.writeFile(mirte_user_config_file, source, (err) => {
         if(err) {
             console.log(err);
             res.end("something went wrong writing the file");
         }
         const exec = require('child_process').execFile;
-        const stdout = exec("/usr/local/src/mirte/mirte-web-interface/nodejs-backend/reload_params.sh");
+        const stdout = exec(`${__dirname}/reload_params.sh`);
         res.end("done");
     });
 });
@@ -253,7 +255,7 @@ app.post('/api/settings', (req, res) => {
 
 // catch robot settings (ROS params) from the web interface and save them
 app.get('/api/settings', (req, res) => {
-    res.download("/home/mirte/mirte_ws/src/mirte-ros-packages/mirte_telemetrix/config/mirte_user_settings.yaml");
+    res.download(mirte_user_config_file);
 /*
     const fs = require('fs');
     fs.readFile("/home/mirte/mirte_ws/src/mirte_ros_package/config/mirte_user_settings.yaml", function read(err, data) {

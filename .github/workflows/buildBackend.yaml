@@ -1,0 +1,44 @@
+name: Node.js Build
+
+on:
+    push:
+    pull_request:
+
+jobs:
+    build_backend:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v4
+              with:
+                    node-version: '16'
+                    check-latest: true
+            
+            - name: Install dependencies
+              run: |
+                cd nodejs-backend 
+                npm install
+                npm rebuild
+            # Disabled for now, we caan enable this one
+            # as soon as we have remove the login from
+            # back- and frondend (and tested its working
+            # with nginx)
+            # - name: Run build
+            #  run: |
+            #    cd nodejs-backend
+            #    exit_status=0
+            #    timeout 60 npm run backend || exit_status=$?
+            #    
+            #    if [[ $exit_status -eq 124 ]]; then
+            #        echo "Backend ran good!"
+            #    else
+            #        echo "Backend run failed!"
+            #        exit 1
+            #    fi
+
+            # - name: Run tests
+            #     run: npm test

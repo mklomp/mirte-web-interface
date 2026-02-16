@@ -4,36 +4,7 @@
 
 
       <div v-if="programming">
-
-            <div class="rounded background-tertiary h5 p-3 mb-2">
-              {{ $t('actuators.output') }}              
-                <div class="float-right">
-
-<!--
-
-        <button class="btn-sm btn-outline-dark mx-2" 
-            v-b-tooltip.hover 
-            title="clear output" 
-            @click="control('clear')"
-        >
-            <i class="fas fa-sync"></i>
-        </button>
-
-        <button class="btn btn-outline-dark mr-2" 
-            v-b-tooltip.hover 
-            title="toggle output/terminal" 
-            @click="control('terminal')"
-        >
-            <i class="fa fa-terminal"></i>
-        </button>
-
--->
-
-                </div>
-              
-
-              <Xterm/>
-           </div>    
+        <Xterm/>
       </div>
 
 
@@ -49,7 +20,6 @@
                    @mousedown="control('forward_down')"
                    @mouseup="control('forward_up')"
                    @contextmenu.prevent="control('forward_down')"
-                   @contextmenu.prevent="control('forward_up')"
                  >
                  <i class="fa fa-arrow-up"></i>
                  </button>
@@ -64,7 +34,6 @@
                    @mousedown="control('left_down')"
                    @mouseup="control('left_up')"
                    @contextmenu.prevent="control('left_down')"
-                   @contextmenu.prevent="control('left_up')"
                  >
                  <i class="fa fa-arrow-left"></i>
                 </button>
@@ -88,7 +57,6 @@
                    @mousedown="control('right_down')"
                    @mouseup="control('right_up')"
                    @contextmenu.prevent="control('right_down')"
-                   @contextmenu.prevent="control('right_up')"
                  >
                  <i class="fa fa-arrow-right"></i>
                 </button>
@@ -107,7 +75,6 @@
                    @mousedown="control('backward_down')"
                    @mouseup="control('backward_up')"
                    @contextmenu.prevent="control('backward_down')"
-                   @contextmenu.prevent="control('backward_up')"
                  >
                  <i class="fa fa-arrow-down"></i>
                  </button>
@@ -144,7 +111,7 @@
 
       <div v-for="actuator in getActuators()"  class="rounded background-tertiary p-3 mb-2" @contextmenu.prevent >
               <h5>{{ $t('peripherals.' + peripherals[actuator].text) }}</h5> 
-                  <div v-for="instance in getInstancesOfActuator(actuator)" class="rounded background-actuator p-2 text-white mb-2">
+                  <div v-for="instance in getInstances(actuator)" class="rounded background-actuator p-2 text-white mb-2">
                      <div v-if="actuator === 'servo'">
                           <div>
                             {{instance}}: {{ actuator_values[actuator][instance] }}
@@ -159,11 +126,13 @@
                          <div class="col-2">
                            {{instance}}
                          </div>
+<!--
                          <div class="col-5">
                              <b-form-select v-model="actuator_values[actuator][instance].type" :options="oled_options"></b-form-select>
                          </div>
-                         <div class="col-5">
-                             <b-form-input v-model="actuator_values[actuator][instance].value" @change="set_oled(actuator, instance)" placeholder=""></b-form-input>
+-->
+                         <div class="col-10">
+                             <b-form-input v-model="actuator_values[actuator][instance].text" @change="set_oled(actuator, instance)" placeholder=""></b-form-input>
                          </div>
                        </div>
                      </div>
@@ -186,7 +155,7 @@
 </template>
 
 <script>
-import ROSLIB from 'roslib'
+import * as ROSLIB from 'roslib'
 import ros from '../ws-connection/ROS-connection.js'
 import Xterm from '@/components/Xterm.vue'
 import properties_ph from "../assets/json/properties_ph.json"
@@ -198,49 +167,58 @@ export default {
   components: {
     Xterm
   },
+  watch: {
+    '$store.getters.getPeripherals':
+        function (newVal, oldVal) {
+          // NOTE: this one should only be called once after
+          // the app is loaded and the ROS paramters have
+          // been set.
+
+          let _this = this;
+          let actuators = newVal.actuators;
+
+          for (let actuator_type in actuators){
+
+            Vue.set(_this.actuators, actuator_type, {});
+            Vue.set(_this.actuator_values, actuator_type, {});
+            Vue.set(_this.actuator_services, actuator_type, {});
+            for (let instance in actuators[actuator_type]){
+
+              if (actuator_type == "oled"){
+                Vue.set(_this.actuator_values["oled"], instance, {});
+                Vue.set(_this.actuator_values["oled"][instance], 'text', '');
+              } else {
+                Vue.set(_this.actuator_values[actuator_type], instance, 0);
+              }
+
+              Vue.set(_this.actuators[actuator_type], instance, {});
+              Vue.set(_this.actuator_services[actuator_type], instance, {});
+
+              let real_actuator_type = actuator_type.includes("motor") ? "motor" : actuator_type;
+          
+              _this.actuator_services[actuator_type][instance] = new ROSLIB.Service({
+                 ros : this.ros,
+                 name : '/io/' + real_actuator_type + '/' + instance + '/' + _this.peripherals[actuator_type].service_name,
+                 serviceType : _this.peripherals[actuator_type].service_type
+              });
+            }
+          }
+        }
+  },
   methods: {
         getActuators() {
-         let types = [];
-         for (let type in this.param_actuators){
-             if(type == "motor"){
-                types.push(this.param_actuators["motor"][Object.keys(this.param_actuators["motor"])[0]].type + "_motor");
-             } else {
-                types.push(type); 
-             }
-         }
-         return types;
+          return Object.keys(this.actuators);
         },
-        loadConfiguration(rosparams){
-          let actuators_copy = Object.assign({}, rosparams);
-          for (let type in rosparams){
-            for (let instance in rosparams[type]){
-              let type_tmp = (type == "motor") ? rosparams["motor"][instance].type + "_motor" : type;
-              if (!this.peripherals.hasOwnProperty(type_tmp) || this.peripherals[type_tmp].rel_path.split("\\")[0] !== "Actuators" ){
-                 delete actuators_copy[type];
-              }
-            }   
-          }
-          this.param_actuators = actuators_copy;
-        },
-        getInstancesOfActuator(type){
-          type = (type.slice(-6) == "_motor") ? "motor" : type;
-          let ret = [];
-          for (let actuator_instance in this.param_actuators[type]){
-            ret.push(actuator_instance);
-          }
-          return ret;
+        getInstances(type){
+          return Object.keys(this.actuators[type]);
         },
         sendData(actuator, instance){
-           var data = {};
-           data[this.peripherals[actuator].service_value] = parseInt(this.actuator_values[actuator][instance]);
-           var request = new ROSLIB.ServiceRequest(data);
+           var request = {};
+           request[this.peripherals[actuator].service_value] = parseInt(this.actuator_values[actuator][instance]);
            this.actuator_services[actuator][instance].callService(request, function(result) {});
         },
         set_oled(actuator, instance){
-           var request = new ROSLIB.ServiceRequest({
-              type: this.actuator_values[actuator][instance].type,
-              value: this.actuator_values[actuator][instance].value
-           });
+           var request = { text: this.actuator_values[actuator][instance].text };
            this.actuator_services[actuator][instance].callService(request, function(result) {});
         },
         control(command) {
@@ -273,7 +251,7 @@ export default {
                 break;
           }
 
-            var twist = new ROSLIB.Message({
+            var twist = {
               linear : {
                 x : parseFloat(this.current_linear_speed),
                 y : 0.0,
@@ -284,7 +262,7 @@ export default {
                 y : 0.0,
                 z : parseFloat(this.current_angular_speed)
               }
-            });
+            };
 
             this.cmd_vel.publish(twist);
 
@@ -294,6 +272,7 @@ export default {
     return {
       programming: true,
       peripherals: properties_ph,
+      actuators: {},
       actuator_values: {},
       actuator_services: {},
       oled_options: ["text", "image", "animation"],
@@ -355,49 +334,11 @@ export default {
 
     this.cmd_vel = new ROSLIB.Topic({
        ros : this.ros,
-       name : '/mobile_base_controller/cmd_vel',
+       name : '/mirte_base_controller/cmd_vel',
        messageType : 'geometry_msgs/Twist'
     });
 
-    // TODO: loading paramaters twice. This should not be needed
-    let params = new ROSLIB.Param({
-       ros: ros,
-       name: '/mirte'
-    })
-    
-    params.get((res) => {
-
-       this.loadConfiguration(res);
-       var actuators = this.getActuators();
-       for (let actuator in actuators){
-          Vue.set(this.actuator_values, actuators[actuator], {});
-          Vue.set(this.actuator_services, actuators[actuator], {});
-          var instances = this.getInstancesOfActuator(actuators[actuator]);
-          for (let instance in instances){
-             let actuator_renamed = actuators[actuator];
-             if(actuators[actuator] == "motor"){
-                actuator_renamed = this.param_actuators[actuators[actuator]][instances[instance]].type + "_motor";
-             }
-
-             if (actuator_renamed == "oled"){
-                Vue.set(this.actuator_values[actuators[actuator]], instances[instance], {});
-                Vue.set(this.actuator_values[actuators[actuator]][instances[instance]], 'type', '');
-                Vue.set(this.actuator_values[actuators[actuator]][instances[instance]], 'value', '');
-             } else {
-                Vue.set(this.actuator_values[actuators[actuator]], instances[instance], 0);
-             }
-             Vue.set(this.actuator_services[actuators[actuator]], instances[instance], {});
-
-             this.actuator_services[actuators[actuator]][instances[instance]] = new ROSLIB.Service({
-                 ros : this.ros,
-                 name : '/mirte/set_' + instances[instance] + '_' + this.peripherals[actuator_renamed].service_name,
-                 serviceType : this.peripherals[actuator_renamed].service_type
-             });
-          }
-       }
-     });
   }
-
 
 }
 </script>

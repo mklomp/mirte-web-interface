@@ -53,6 +53,9 @@ import VueHotkey from "v-hotkey";
 import Vue from 'vue'
 import html2canvas from 'html2canvas';
 import canvasToImage from 'canvas-to-image'
+import * as ROSLIB from 'roslib'
+import ros from './ws-connection/ROS-connection.js'
+import properties_ph from "./assets/json/properties_ph.json"
 
 
 Vue.use(VueHotkey);
@@ -66,6 +69,7 @@ export default {
          error: '',
          online: [],
          textVariant: 'dark',
+         peripherals: properties_ph,
       }
    },
    components: {
@@ -105,7 +109,101 @@ export default {
          //if (window.location.href.indexOf(item.toLowerCase()) === -1){
          //   window.location = "http://"  + item.toLowerCase() + ".local";
          //}
-      }, 
+      },
+      mergeDeep(target, source) {
+        for (const key in source) {
+          if (source[key] instanceof Object && key in target) {
+            // Recursively merge if both properties are objects
+            target[key] = this.mergeDeep(target[key], source[key]);
+          } else {
+            // Otherwise, directly assign
+            target[key] = source[key];
+          }
+        }
+      return target;
+      },
+      getPeripherals(){
+
+        var listParametersService = new ROSLIB.Service({
+          ros : ros,
+          name : '/io/telemetrix/list_parameters',
+          serviceType : 'rcl_interfaces/srv/ListParameters'
+        });
+
+        var getParameterService = new ROSLIB.Service({
+          ros : ros,
+          name : '/io/telemetrix/get_parameters',
+          serviceType : 'rcl_interfaces/srv/GetParameters'
+        });
+
+        let _this = this;
+        let peripheral_list = Object.keys(this.peripherals);
+        let hardware_list = peripheral_list.filter(item => !item.includes("motor"));
+        hardware_list.push("motor");
+        hardware_list.push("device");
+        let peripherals = {'sensors': {}, 'actuators': {}, 'devices': {} };
+        let params = {};
+ 
+        var request = {
+          prefixes: hardware_list,
+          depth: 0
+        };
+
+        // Get all the parameters
+        listParametersService.callService(request, function(result) {
+
+          let param_names = result.result.names;
+          var req = {
+            names: param_names
+          };
+
+          // Get the values of all the parameters
+          getParameterService.callService(req, function(res){
+
+            let values = res.values;
+            for (let param_id in values){
+
+              let value = 0;
+              if (values[param_id].type == 2){
+                value = values[param_id].integer_value;
+              } else if (values[param_id].type == 3){
+                value = values[param_id].double_value;
+              } else if (values[param_id].type == 4){
+                value = values[param_id].string_value;
+              }
+
+              let item = param_names[param_id].split(".").reduceRight((acc, key) => ({ [key]: acc }), value);
+              params = _this.mergeDeep(params, item);
+            }
+        
+            // Fix motor issues (TODO: we need to redesign the motor setup
+            let new_params = {}
+            for (let type in params){
+              if (type == "motor"){
+                for (let instance in params[type]){
+                  new_params[params[type][instance].type + "_motor"] = new_params[params[type][instance].type + "_motor"] || {};
+                  new_params[params[type][instance].type + "_motor"][instance] = params[type][instance];
+                }
+              } else {
+                new_params[type] = params[type];
+              }
+            }
+            params = new_params;
+
+            // Save everything in sensors/actuators
+            for (let type in params){
+              if (type == "device"){
+                peripherals['devices'] = params[type];
+              } else if (_this.peripherals[type].rel_path.split("\\")[0] == "Sensors"){
+                peripherals['sensors'][type] = params[type];
+              } else {
+                peripherals['actuators'][type] = params[type];
+              }
+            }
+            _this.$store.dispatch('setPeripherals', peripherals);
+          });
+        });
+      },
       checkLogin() {
          this.submitted = true;
          const { username, password } = this;
@@ -129,11 +227,14 @@ export default {
                   this.$store.dispatch('setUser', response.data)
             }
          })
-      }
+      },
    },
    mounted() {   //TODO: could this be beforeMount?
 
-      axios.get("/api/self")    
+      console.log("Retrieving ROS parameters");
+      this.getPeripherals();
+
+      axios.get("/api/self")
       .then((response) => {
 		   this.$store.dispatch('setUser', response.data)
       })

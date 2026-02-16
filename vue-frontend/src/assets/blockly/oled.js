@@ -20,7 +20,7 @@ export function load (Blockly, instances) {
 		      "type": "input_dummy",
 		      "name": "INSTANCE",
 		    },
-		    {
+/*		    {
 		      "type": "field_dropdown",
 		      "name": "TYPE",
 		      "options": [
@@ -37,7 +37,7 @@ export function load (Blockly, instances) {
 		          "ANIMATION"
 		        ]
 		      ]
-		    },
+		    },*/
 		    {
 		      "type": "input_value",
 		      "name": "VALUE",
@@ -60,7 +60,8 @@ export function load (Blockly, instances) {
         let type = block.getFieldValue('TYPE');
         let instance = block.getFieldValue('INSTANCE');
         let code = '';
-        if (type == "TEXT"){
+        code = `mirte.setOLEDText('${instance}', ${value})\n`;
+/*        if (type == "TEXT"){
            code = `mirte.setOLEDText('${instance}', ${value})\n`;
         }
         if (type == "IMAGE"){
@@ -68,7 +69,7 @@ export function load (Blockly, instances) {
         }
         if (type == "ANIMATION"){
            code = `mirte.setOLEDAnimation('${instance}', ${value})\n`;
-        }
+        }*/
         return code;
     };
 

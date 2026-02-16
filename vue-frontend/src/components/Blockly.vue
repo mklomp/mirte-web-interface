@@ -1,7 +1,7 @@
 <template>
   <div class="h-100">
     <div id="blocklyArea" ref="blocklyArea" class="blocklyArea h-100">
-      <div id="blocklyDiv" ref="blocklyDiv" style="height: 480px; width: 600px"></div>
+      <div id="blocklyDiv" ref="blocklyDiv" style="height: 100%; width: 100%;"></div>
     </div>
 
     <xml id="toolbox" ref="toolbox" style="display: none">
@@ -15,7 +15,7 @@
          </category>
 
 
-        <category v-for="sensor in getPByKind('Sensors')" :name="$t('peripherals.' + peripherals[sensor].text)"
+        <category v-for="sensor in getSensors()" :name="'%{BKY_' + peripherals[sensor].text.toUpperCase() + '_TB}'"
                   colour="%{BKY_SENSORS_RGB}">
           <block v-for="func in peripherals[sensor].functions"
                  :type="func.concat('_').concat(sensor)">
@@ -208,7 +208,7 @@
 
          </category>
 
-        <category v-for="actuator in getPByKind('Actuators')" :name="$t('peripherals.' + peripherals[actuator].text)"
+        <category v-for="actuator in getActuators()" :name="'%{BKY_' + peripherals[actuator].text.toUpperCase() + '_TB}'"
                   colour="%{BKY_ACTIONS_RGB}">
           <block v-for="func in peripherals[actuator].functions"
                  :type="func.concat('_').concat(actuator)">
@@ -229,7 +229,8 @@
 </template>
 
 <script>
-import ROSLIB from 'roslib'
+import Vue from 'vue'
+import * as ROSLIB from 'roslib'
 import ros from '../ws-connection/ROS-connection.js'
 import Blockly from 'blockly'
 import 'blockly/python'
@@ -309,11 +310,13 @@ const predefined_blocks = {
 }
 
 export default {
+  props: ['visible'],
+
   data: () => ({
     peripherals: properties_ph,
     workspace: Object,
     prefix: "",
-    params: {},
+    params: {"sensors": {}, "actuators": {}},
   }),
 
   methods: {
@@ -376,20 +379,11 @@ export default {
        });
     },
     //separates peripheral items into sensors and actuators
-    getPByKind(kind) {
-      const AP = new Set()
-
-      for (let type in this.params){
-         for (let instance in this.params[type]){
-             if(type == "motor"){
-                type = this.params["motor"][Object.keys(this.params["motor"])[0]].type + "_motor";
-             }
-             if (this.peripherals.hasOwnProperty(type) && this.peripherals[type].rel_path.split("\\")[0] == kind ){
-                 AP.add(type)
-             }
-         }
-      }
-      return AP
+    getSensors(){
+      return this.params.sensors ? Object.keys(this.params.sensors) : [];
+    },
+    getActuators(){
+      return this.params.actuators ? Object.keys(this.params.actuators) : [];
     },
     // Loads in imported blockly modules block definitions
     load_blockly_modules() {
@@ -398,20 +392,29 @@ export default {
       PBM["default"].load(Blockly, []);
 
       for (let pbm of Object.keys(PBM)) {
-        let pbm2 = pbm
-        if(pbm.slice(-6) == "_motor"){
-           pbm2 = "motor";
-        }
 
-        if (this.params.hasOwnProperty(pbm2)){
+        // Load sensors
+        if (this.params.sensors.hasOwnProperty(pbm)){
            let items = []
-           for (const [key, value] of Object.entries(this.params[pbm2])) {
+           for (const [key, value] of Object.entries(this.params.sensors[pbm])) {
               // We use [T.name, T.name] here because the dropdown menu generator
               // of blockly requires an array as [showSelectOption, resultValue].
               items.push([value.name, value.name]);
            }
            PBM[pbm].load(Blockly, items )
         }
+       
+        // Load actuators
+        if (this.params.actuators.hasOwnProperty(pbm)){
+           let items = []
+           for (const [key, value] of Object.entries(this.params.actuators[pbm])) {
+              // We use [T.name, T.name] here because the dropdown menu generator
+              // of blockly requires an array as [showSelectOption, resultValue].
+              items.push([value.name, value.name]);
+           }
+           PBM[pbm].load(Blockly, items )
+        }
+
       }
     },
     refresh_blockly(){
@@ -419,7 +422,6 @@ export default {
         // Get current values
         var xml = Blockly.Xml.workspaceToDom(this.workspace);
         var toolbox_item = this.workspace.toolbox_.getSelectedItem();
-        this.workspace.dispose();
 
        // Reint workspace
        this.workspace.dispose();
@@ -441,6 +443,24 @@ export default {
         Blockly.Xml.domToWorkspace(xml, this.workspace);
         this.workspace.toolbox_.setSelectedItem(toolbox_item);
         this.refresh();
+    },
+    resize_listener(){
+        // Compute the absolute coordinates and dimensions of blocklyArea.
+        let element = blocklyArea
+        let x = 0
+        let y = 0
+        // Sums over all the elements' parents offsets
+        do {
+          x += element.offsetLeft
+          y += element.offsetTop
+          element = element.offsetParent
+        } while (element)
+        // Position blocklyDiv over blocklyArea.
+        blocklyDiv.style.left = x + 'px'
+        blocklyDiv.style.top = y + 'px'
+        blocklyDiv.style.width = blocklyArea.offsetWidth + 'px'
+        blocklyDiv.style.height = blocklyArea.offsetHeight + 'px'
+        Blockly.svgResize(this.workspace)
     },
     load_blockly(){
 
@@ -473,27 +493,8 @@ export default {
       // workspace configuration
       this.workspace.toolbox_.flyout_.autoClose = true
   
-      // Window resize listener
-      const onresize = (e) => {
-        // Compute the absolute coordinates and dimensions of blocklyArea.
-        let element = blocklyArea
-        let x = 0
-        let y = 0
-        // Sums over all the elements' parents offsets
-        do {
-          x += element.offsetLeft
-          y += element.offsetTop
-          element = element.offsetParent
-        } while (element)
-        // Position blocklyDiv over blocklyArea.
-        blocklyDiv.style.left = x + 'px'
-        blocklyDiv.style.top = y + 'px'
-        blocklyDiv.style.width = blocklyArea.offsetWidth + 'px'
-        blocklyDiv.style.height = blocklyArea.offsetHeight + 'px'
-        Blockly.svgResize(this.workspace)
-      }
-      window.addEventListener('resize', onresize, false)
-      onresize()
+      window.addEventListener('resize', this.resize_listener, false)
+      this.resize_listener();
   
       this.refresh();
 
@@ -534,8 +535,21 @@ export default {
     }
    
   },
-
+  mounted() {
+    // Needs to be loaded when re-mounted
+    // (ie. switching between python-blockly)
+    if (isRegistered) {
+      this.load_blockly();
+    }
+  },
   watch: {
+     visible(newVal) {
+       if (newVal) {
+         this.$nextTick(() => {
+           this.resize_listener();
+         });
+       }
+     },
      '$i18n.locale': function(newVal, oldVal){
         Blockly.setLocale(locales[newVal]);
         this.refresh_blockly();
@@ -558,18 +572,16 @@ export default {
             this.$store.dispatch('setBlockly', "")
           }
         },
-  },
-  mounted() {
+    '$store.getters.getPeripherals':
+        function (newVal, oldVal) {
+          // NOTE: this one should only be called once after
+          // the app is loaded and the ROS paramters have
+          // been set.
 
-     let params = new ROSLIB.Param({
-       ros: ros,
-       name: '/mirte'
-     })
+          this.params = newVal; 
+          setTimeout(this.load_blockly, 10); // Why?, also not reactive with Vue.set
 
-     params.get((res) => {
-       this.params = res;
-       setTimeout(this.load_blockly, 10);
-     })
+        },     
   }
 }
 

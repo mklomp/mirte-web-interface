@@ -162,3 +162,7 @@ $custom-control-indicator-checked-bg: $grey-blue;
   color: $white !important;
   border: 1px solid $black;
 }
+
+// Fix for bootstrap-vue issue with tooltips:
+// https://github.com/bootstrap-vue/bootstrap-vue/issues/1732
+.tooltip { top: 0; }
