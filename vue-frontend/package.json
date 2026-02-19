@@ -1,44 +1,29 @@
 {
-  "name": "mirte-web-frontend",
-  "version": "0.1.0",
+  "name": "nuxt-app",
   "private": true,
+  "type": "module",
   "scripts": {
-    "serve": "vue-cli-service serve --port 4000",
-    "build": "rm -rf node_modules/roslib && cp -r roslib node_modules/ && vue-cli-service build"
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@kazupon/vue-i18n-loader": "^0.5.0",
-    "vue": "^2.7.16",
-    "vue-cli-plugin-i18n": "^2.3.2",
-    "vue-i18n": "^8.28.2",
-    "vue-router": "^3.6.5",
-    "vuex": "^3.6.2",
-    "vuex-persistedstate": "^4.1.0"
+    "@fortawesome/fontawesome-svg-core": "^7.0.1",
+    "@fortawesome/free-solid-svg-icons": "^7.0.1",
+    "@fortawesome/vue-fontawesome": "^3.1.2",
+    "@nuxt/fonts": "^0.12.1",
+    "@nuxt/image": "^2.0.0",
+    "flag-icons": "^7.5.0",
+    "nuxt": "^3.15.4",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.0"
   },
   "devDependencies": {
-    "@fortawesome/fontawesome-free": "^5.15.4",
-    "@vue/cli-service": "^4.5.19",
-    "axios": "^0.29.0",
-    "blockly": "^6.20210701.0",
-    "bootstrap-vue": "^2.23.1",
-    "canvas-to-image": "2.2.5",
-    "copy-webpack-plugin": "^5.1.2",
-    "hotkeys-js": "^3.13.9",
-    "html2canvas": "^1.4.1",
-    "js-yaml": "^4.1.0",
-    "popper.js": "^1.16.1",
-    "roslib": "RobotWebTools/roslibjs#2999d0afdf812b72f1722c945eb732d230731541",
-    "sass": "^1.85.1",
-    "sass-loader": "^8.0.2",
-    "v-hotkey": "^0.9.0",
-    "vue-codemirror": "^4.0.6",
-    "vue-template-compiler": "^2.7.16",
-    "xterm": "^4.19.0",
-    "xterm-addon-attach": "^0.5.0",
-    "xterm-addon-fit": "^0.3.0"
-  },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions"
-  ]
+    "@nuxtjs/i18n": "^9.2.1",
+    "sass": "^1.89.2",
+    "usebootstrap": "^3.5.100",
+    "vite-svg-loader": "^5.1.0"
+  }
 }

@@ -1,17 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <link rel="icon" href="<%= BASE_URL %>favicon.png">
-    <title><%= htmlWebpackPlugin.options.title %></title>
-  </head>
-  <body>
-    <noscript>
-      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
-    </noscript>
-    <div id="app"></div>
-    <!-- built files will be auto injected -->
-  </body>
-</html>
+<head>
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+
+  <script>
+    // Save original referrer in sessionStorage
+    sessionStorage.setItem('originalReferrer', document.referrer);
+
+    // Set locate to cookie value
+    const cookie = document.cookie.match(/i18n_redirected=(\w+)/);
+    let locale = cookie ? cookie[1] : null;
+
+    // Otherwise, set it to the broswer default (or en)
+    if (!locale) {
+      const lang = (navigator.language || '').toLowerCase();
+      locale = lang.startsWith('nl') ? 'nl' : 'en';
+    }
+
+    let path = window.location.pathname.replace(/\/$/, ''); 
+    window.location.replace(path + '/' + locale);
+  </script>
+</head>
+
+
+
+
+
+
+
+

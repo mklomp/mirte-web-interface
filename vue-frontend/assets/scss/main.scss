@@ -1,0 +1,311 @@
+@use "@/assets/scss/colors.scss" as *;
+
+
+.mirte {
+  font-family: 'Livvic' !important;
+  font-weight: bold !important;
+}
+
+
+// Layout of the main elements
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  margin-top: 82px; // account for fixed navbar
+}
+
+footer {
+  background: #fff;
+  padding: 1rem;
+  text-align: center;
+}
+
+.hero {
+  flex: 1;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  margin: 0px;
+}
+
+
+.content{
+    background-color: $white;
+    height: 20vh;
+}
+
+.container{
+    padding: 2em 0; 
+    width: 100vw;
+}
+
+
+strong {
+  font-weight: bold;
+}
+
+#__nuxt {
+  overflow-x:hidden; // preventing carousel from adding scrollbar. cant be in body due to viewport
+}
+
+.img-wrap {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  margin: 0;
+}
+
+
+.img-wrap > img {
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-height: 100%;
+  max-width: 90%;
+  transform: translate(-50%, -50%);
+  height: 100%;
+}
+
+
+// Colors of the elements
+a { color: inherit !important; } 
+
+
+/*
+.carousel { overflow: hidden; padding-bottom: 10rem; }
+.carousel-caption { top: 100%; }
+.carousel-inner { overflow: visible; }
+.carousel-control-next, .carousel-control-prev, .carousel-indicators { bottom: 10rem; }
+*/
+
+
+
+body{
+    font-family: 'Overpass' !important;
+}
+
+h1,h2,h3,h4,h5,h6 {
+    font-family: 'Livvic' !important;
+    font-weight: bold !important;
+}
+
+body{
+    background-color: $light-grey !important;
+}
+
+.my-button {
+    background-color: $light-blue !important;
+    border-color: $light-blue !important;
+    color: $black !important;
+    margin: 10px;
+}
+
+nav {
+  background-color: $grey-blue !important;
+}
+
+
+input:disabled+label {
+  color: #ccc;
+}
+
+.locale-selector {
+  background-color: $light-blue !important;
+}
+
+.nav-spacer{
+    height: 100%;
+    border: 1px solid $white;
+    margin: 0 .2em;
+    border-radius: 5px;
+}
+
+.nav-item a{
+    color: var(--bs-nav-link-color);
+}
+
+.nav-link.active{
+    background-color: $white !important;
+    color: $black !important;
+    border-radius: 6px;
+}
+
+.nav-link{
+    padding: 5px;
+    margin: 0px 10px 0px 10px;
+}
+
+nav .btn:hover{
+    color: $grey-blue;
+}
+
+body .rounded{
+    border-radius: 10px !important;
+}
+
+$percentages: (
+    "25": 25%,
+    "50": 50%,
+    "75": 75%,
+    "100": 100%,
+);
+
+@each $name, $value in $percentages{
+    .w-#{$name}{
+        color: $value;
+    }
+}
+
+.layoutbox{
+
+    border: 4px solid $dark-grey;
+
+    .layoutbox-content{
+        padding: 1em;
+    }
+}
+
+.center-div{
+    margin: 0 auto;
+    display: block;
+}
+
+$custom-range-thumb-bg: $dark-grey;
+
+$custom-control-indicator-checked-bg: $grey-blue;
+
+.code-inactive{
+    color: $white !important;
+}
+
+.code-active{
+    background-color: $white !important;
+    color: $black !important;
+}
+
+.btn-mirte{
+    background-color: $yellow !important;
+}
+
+.btn-mirte-control {
+  color: $black;
+  font-weight: bold;
+  border: 1px solid $black;
+}
+
+.btn-mirte-control:hover,
+.btn-mirte-control:active,
+.btn-mirte-control:focus,
+.btn-mirte-control.active {
+  background: $yellow;
+  color: $white !important;
+  border: 1px solid $black;
+}
+
+.icon-color{
+  color: $yellow;
+}
+
+.hero-section { 
+  background: #004080; 
+  color: white; 
+  text-align: center; padding: 20px;
+  background-size: cover;
+  background-position: bottom;
+  height: 300px; /* or your preferred fixed height */
+  width: 100%;
+}
+
+
+.hero-section img.hero-img {
+    display: none; /* verberg de img-tag als je background gebruikt */
+}
+
+
+
+.video-container {
+    width: 100%;
+    height: 100%; /* or a fixed height like 400px */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.video-container iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+
+.grey-blue {
+  color: #9db7be !important;
+}
+
+.pillar-card {
+  position: relative;
+  overflow: hidden;
+  border: none;
+  border-radius: 1rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  background: #fff;
+}
+
+.icon-bg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 5rem; /* grote iconen */
+  color: #9db7be;
+  opacity: 0.3; /* transparantie */
+  pointer-events: none;
+  z-index: 0;
+}
+
+.pillar-card .card-body {
+  position: relative;
+  z-index: 1;
+}
+
+
+.hero-section h1 { font-size: 2em; margin-bottom: 10px; }
+
+.section { padding: 40px 20px; }
+.section h2 { font-size: 1.8em; margin-bottom: 20px; text-align: center; }
+
+.two-column { display: flex; flex-direction: column; gap: 20px; }
+.column-text { flex: 1; }
+.column-pillars { flex: 1; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; justify-items: center; align-items: start; }
+.pillar { background: #f9f9f9; padding: 15px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; transition: transform 0.3s; }
+.pillar:hover { transform: rotate(-2deg) scale(1.05); }
+
+
+@media (min-width: 768px) {
+    .hero-section h1 { font-size: 3em; }
+    .hero-section p { font-size: 1.2em; }
+    .cta-buttons { flex-direction: row; justify-content: center; }
+    .cta-buttons a { width: auto; }
+    .two-column { flex-direction: row; }
+}
+
+
+.video-container {
+    max-width: 600px;
+    aspect-ratio: 16 / 9; /* Keeps video proportion */
+}
+
+.video-container video {
+    width: 100%;
+    height: auto;
+}

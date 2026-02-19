@@ -1,0 +1,31 @@
+$grey-blue: #9db7be;
+$light-blue: #cee6ed;
+$yellow: #f1be45;
+$light-grey: #ebebeb;
+$dark-grey: #a6a6a6;
+$black: #000000;
+$white: #fefaf7;
+$red: #9b372a;
+
+$colors: (
+    "primary": $grey-blue,
+    "secondary": $dark-grey,
+    "tertiary": $light-grey,
+    "sensor": $grey-blue,
+    "actuator": $yellow,
+    "flow": $light-blue,
+    "data": $red
+);
+
+
+@each $color, $value in $colors{
+    .text-#{$color}{
+        color: $value;
+    }
+
+    .background-#{$color}{
+        background-color: $value !important;
+    }
+}
+
+
