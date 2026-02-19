@@ -18,7 +18,8 @@
     "flag-icons": "^7.5.0",
     "nuxt": "^3.15.4",
     "vue": "^3.5.13",
-    "vue-router": "^4.5.0"
+    "vue-router": "^4.5.0",
+    "roslib": "RobotWebTools/roslibjs#2999d0afdf812b72f1722c945eb732d230731541"
   },
   "devDependencies": {
     "@nuxtjs/i18n": "^9.2.1",
