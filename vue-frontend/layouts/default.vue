@@ -27,10 +27,10 @@ onMounted(() => {
           <NuxtLink :to="localePath({ path: '/settings' })" class="nav-link"> {{ $t("main.settings") }}
           </NuxtLink>
         </li>
-<!--        <li class="nav-item">
+        <li class="nav-item">
           <NuxtLink :to="localePath({ path: '/programming' })" class="nav-link"> {{ $t("main.programming") }}
           </NuxtLink>
-        </li> -->
+        </li> 
         <li class="nav-item dropdown">
           <LocaleChanger/>
         </li>

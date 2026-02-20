@@ -1,3 +1,19 @@
+<script setup>
+useHead({
+  title: 'webIDE - MIRTE',
+  meta: [
+    {
+      name: 'description',
+      content: 'Programming environment for the MIRTE robot. Using Blocky, Python and ROS.'
+    }
+  ]
+})
+
+import { useLocalePath } from '#i18n'
+const localePath = useLocalePath()
+
+</script>
+
 <template>
 
 
@@ -16,8 +32,11 @@
                 </div>
 
 
-             </div>-         
+             </div>        
          </div>
+
+
+<!--
 
          <div class="col-6 p-2 h-100" style="overflow: hidden;"> 
              <div class="layoutbox rounded h-100" style="overflow: hidden; display: flex; flex-flow: column;">
@@ -61,9 +80,12 @@
 
 
              </div>
+          
          </div> 
 
 
+
+      -->
          <div class="col-3 p-2 h-100" style="overflow: hidden;"> 
              <div class="layoutbox rounded h-100" style="overflow: hidden; display: flex; flex-flow: column;">
 
@@ -81,14 +103,18 @@
          </div> 
 
       </div>
-    </div> 
+
+        
+    
 
 
 
 </template>
 
-<script>
 
+
+<script>
+/*
 import Blockly from '@/components/Blockly.vue'
 import ControlButtons from '@/components/ControlButtons.vue'
 import Sensors from '@/components/Sensors.vue'
@@ -117,4 +143,5 @@ export default {
        },
   }
 }
+*/
 </script>

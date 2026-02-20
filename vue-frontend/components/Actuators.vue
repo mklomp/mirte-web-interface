@@ -2,11 +2,11 @@
       <div class="layoutbox-content" style="height: 100% !important">
 
 
-
-      <div v-if="programming">
+<!--
+      <div>
         <Xterm/>
       </div>
-
+    -->
 
            <div class="rounded background-tertiary p-3 mb-2"  @contextmenu.prevent >
               <h5>{{ $t('actuators.control') }}</h5> 
@@ -15,7 +15,7 @@
 
                 <div class="col-1 offset-6">
                 <button class="btn btn-mirte-control mr-2 background-actuator"
-                   v-b-tooltip.hover
+                 
                    :title="$t('actuators.move_forward')"
                    @mousedown="control('forward_down')"
                    @mouseup="control('forward_up')"
@@ -29,7 +29,7 @@
                <div class="row mb-4">
                 <div class="col-1 offset-4">
                 <button class="btn btn-mirte-control mr-2 background-actuator"
-                   v-b-tooltip.hover
+                 
                    :title="$t('actuators.move_left')"
                    @mousedown="control('left_down')"
                    @mouseup="control('left_up')"
@@ -41,7 +41,7 @@
 
                 <div class="col-2 offset-1">
                 <button class="btn btn-mirte-control mr-2 background-actuator"
-                   v-b-tooltip.hover
+                
                    :title="$t('actuators.move_stop')"
                    @click="control('stop')"
                    @contextmenu.prevent="control('stop')"
@@ -52,7 +52,7 @@
 
                 <div class="col-1 mb-2">
                 <button class="btn btn-mirte-control mr-2 background-actuator"
-                   v-b-tooltip.hover
+                
                    :title="$t('actuators.move_right')"
                    @mousedown="control('right_down')"
                    @mouseup="control('right_up')"
@@ -70,7 +70,7 @@
 
                 <div class="col-1 offset-6">
                 <button class="btn btn-mirte-control mr-2 background-actuator"
-                   v-b-tooltip.hover
+               
                    :title="$t('actuators.move_backward')"
                    @mousedown="control('backward_down')"
                    @mouseup="control('backward_up')"
@@ -88,7 +88,7 @@
                        {{ $t('actuators.speed') }}: {{ linear_speed }}
                      </div>
                      <div class="col-8">
-                         <b-form-input id="range-1" v-model="linear_speed" type="range" min="0" max=".1" step="0.01" @contextmenu.prevent ></b-form-input>
+                         <input class="form-range" id="range-1" v-model="linear_speed" type="range" min="0" max=".1" step="0.01" @contextmenu.prevent ></input>
                      </div>
                   </div>
                </div>
@@ -99,7 +99,7 @@
                        {{ $t('actuators.angular_speed') }}: {{ angular_speed }}
                      </div>
                      <div class="col-8">
-                         <b-form-input id="range-1" v-model="angular_speed" type="range" min="0" max="1" step="0.01" @contextmenu.prevent ></b-form-input>
+                         <input class="form-range" id="range-1" v-model="angular_speed" type="range" min="0" max="1" step="0.01" @contextmenu.prevent ></input>
                      </div>
                   </div>
 
@@ -117,7 +117,7 @@
                             {{instance}}: {{ actuator_values[actuator][instance] }}
                           </div>
                           <div>
-                              <b-form-input id="range-1" v-model="actuator_values[actuator][instance]" @update="sendData(actuator, instance)" type="range" min="0" max="180" @contextmenu.prevent ></b-form-input>
+                              <input class="form-range" id="range-1" v-model="actuator_values[actuator][instance]" @update="sendData(actuator, instance)" type="range" min="0" max="180" @contextmenu.prevent ></input>
                           </div>
                      </div>
 
@@ -132,7 +132,7 @@
                          </div>
 -->
                          <div class="col-10">
-                             <b-form-input v-model="actuator_values[actuator][instance].text" @change="set_oled(actuator, instance)" placeholder=""></b-form-input>
+                             <input class="form-range" v-model="actuator_values[actuator][instance].text" @change="set_oled(actuator, instance)" placeholder=""></input>
                          </div>
                        </div>
                      </div>
@@ -142,7 +142,7 @@
                             {{instance}}: {{ actuator_values[actuator][instance] }}
                           </div>
                           <div>
-                              <b-form-input id="range-1" v-model="actuator_values[actuator][instance]" @update="sendData(actuator, instance)" type="range" min="-100" max="100" @contextmenu.prevent ></b-form-input>
+                              <input class="form-range" id="range-1" v-model="actuator_values[actuator][instance]" @update="sendData(actuator, instance)" type="range" min="-100" max="100" @contextmenu.prevent ></input>
                           </div>
                      </div>
 
@@ -156,54 +156,16 @@
 
 <script>
 import * as ROSLIB from 'roslib'
-import ros from '../ws-connection/ROS-connection.js'
-import Xterm from '@/components/Xterm.vue'
+//import ros from '../ws-connection/ROS-connection.js'
+//import Xterm from '@/components/Xterm.vue'
 import properties_ph from "../assets/json/properties_ph.json"
-import Vue from 'vue'
+//import Vue from 'vue'
 
 
 export default {
   name: 'actuators',
   components: {
-    Xterm
-  },
-  watch: {
-    '$store.getters.getPeripherals':
-        function (newVal, oldVal) {
-          // NOTE: this one should only be called once after
-          // the app is loaded and the ROS paramters have
-          // been set.
-
-          let _this = this;
-          let actuators = newVal.actuators;
-
-          for (let actuator_type in actuators){
-
-            Vue.set(_this.actuators, actuator_type, {});
-            Vue.set(_this.actuator_values, actuator_type, {});
-            Vue.set(_this.actuator_services, actuator_type, {});
-            for (let instance in actuators[actuator_type]){
-
-              if (actuator_type == "oled"){
-                Vue.set(_this.actuator_values["oled"], instance, {});
-                Vue.set(_this.actuator_values["oled"][instance], 'text', '');
-              } else {
-                Vue.set(_this.actuator_values[actuator_type], instance, 0);
-              }
-
-              Vue.set(_this.actuators[actuator_type], instance, {});
-              Vue.set(_this.actuator_services[actuator_type], instance, {});
-
-              let real_actuator_type = actuator_type.includes("motor") ? "motor" : actuator_type;
-          
-              _this.actuator_services[actuator_type][instance] = new ROSLIB.Service({
-                 ros : this.ros,
-                 name : '/io/' + real_actuator_type + '/' + instance + '/' + _this.peripherals[actuator_type].service_name,
-                 serviceType : _this.peripherals[actuator_type].service_type
-              });
-            }
-          }
-        }
+  //  Xterm
   },
   methods: {
         getActuators() {
@@ -286,6 +248,50 @@ export default {
     }
   },
   mounted(){
+
+    const rosStore = useRosStore()
+    const { peripherals: storePeripherals } = storeToRefs(rosStore)
+    const { $ros } = useNuxtApp() // get ros from plugin
+
+    watch(
+      storePeripherals,
+      (newVal) => {
+          // NOTE: this one should only be called once after
+          // the app is loaded and the ROS paramters have
+          // been set.
+
+          let actuators = newVal.actuators;
+
+          for (let actuator_type in actuators) {
+
+            // Initialize objects directly
+            this.actuators[actuator_type] = {}
+            this.actuator_values[actuator_type] = {}
+            this.actuator_services[actuator_type] = {}
+
+            for (let instance in actuators[actuator_type]) {
+
+              if (actuator_type === "oled") {
+                this.actuator_values["oled"][instance] = { text: '' }
+              } else {
+                this.actuator_values[actuator_type][instance] = 0
+              }
+
+              this.actuators[actuator_type][instance] = {}
+              this.actuator_services[actuator_type][instance] = {}
+
+              let real_actuator_type = actuator_type.includes("motor") ? "motor" : actuator_type
+
+              
+              this.actuator_services[actuator_type][instance] = new ROSLIB.Service({
+                ros: $ros,
+                name: `/io/${real_actuator_type}/${instance}/${this.peripherals[actuator_type].service_name}`,
+                serviceType: this.peripherals[actuator_type].service_type
+              })
+            }
+          }
+    });
+
     let self = this;
 
     window.addEventListener('keydown', function(ev) {
@@ -329,11 +335,8 @@ export default {
         }
     });
 
-
-    this.ros = ros;
-
     this.cmd_vel = new ROSLIB.Topic({
-       ros : this.ros,
+       ros : $ros,
        name : '/mirte_base_controller/cmd_vel',
        messageType : 'geometry_msgs/Twist'
     });
