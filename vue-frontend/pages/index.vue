@@ -1,6 +1,6 @@
 <script setup>
 useHead({
-  title: 'MIRTE web IDE',
+  title: 'webIDE - MIRTE',
   meta: [
     {
       name: 'description',
@@ -12,19 +12,20 @@ useHead({
 import { useLocalePath } from '#i18n'
 const localePath = useLocalePath()
 
-import * as ROSLIB from 'roslib'
-const { $ros } = useNuxtApp()
+//import * as ROSLIB from 'roslib'
+//const { $ros } = useNuxtApp()
 
-
+/*
 const listener = new ROSLIB.Topic({
   ros: $ros,
-  name: '/chatter',
-  messageType: 'std_msgs/String'
+  name: '/io/power/power_watcher',
+  messageType: 'sensor_msgs/msg/BatteryState'
 })
 
 listener.subscribe((message) => {
-  console.log('Received:', message.data)
+  console.log('Received:', message)
 })
+*/
 
 </script>
 
@@ -34,3 +35,4 @@ listener.subscribe((message) => {
    Hello world
 
 </template>
+

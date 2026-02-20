@@ -21,7 +21,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   css: ['bootstrap/dist/css/bootstrap.min.css', '@/assets/scss/main.scss'],
   plugins: ['@/plugins/bootstrap.client.js'],
-  modules: ['@nuxtjs/i18n', '@nuxt/image', '@nuxt/fonts'],
+  modules: ['@nuxtjs/i18n', '@nuxt/image', '@nuxt/fonts', '@pinia/nuxt'],
 
   fonts: {
     families: [

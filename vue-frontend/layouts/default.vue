@@ -2,6 +2,12 @@
 import { useLocalePath } from '#i18n'
 const localePath = useLocalePath()
 const head = useLocaleHead()
+
+onMounted(() => {
+  const { $connectRos } = useNuxtApp()
+  $connectRos()
+})
+
 </script>
 
 <template>
@@ -11,20 +17,20 @@ const head = useLocaleHead()
       <NuxtImg style="float: left; margin-right: 10px;" src="/images/mirte_logo.png" alt="MIRTE lite" height="45" width="45" format="webp"/>
       <h1>MIRTE</h1>
     </NuxtLink>
-    <button aria-label="navbar-toggler" class="navbar-toggler" type="button" @click="visible = !visible" data-bs-toggle="collapse"
+    <button aria-label="navbar-toggler" class="navbar-toggler" type="button" data-bs-toggle="collapse"
       data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="navbar-collapse" :class="!visible ? 'collapse' : ''" id="navbarNavDropdown">
+    <div class="navbar-collapse"  id="navbarNavDropdown">
       <ul class="navbar-nav ms-auto">
         <li class="nav-item">
-          <NuxtLink :to="localePath({ path: '/settings' })" class="nav-link" @click="visible = !visible"> {{ $t("main.settings") }}
+          <NuxtLink :to="localePath({ path: '/settings' })" class="nav-link"> {{ $t("main.settings") }}
           </NuxtLink>
         </li>
-        <li class="nav-item">
-          <NuxtLink :to="localePath({ path: '/programming' })" class="nav-link" @click="visible = !visible"> {{ $t("main.programming") }}
+<!--        <li class="nav-item">
+          <NuxtLink :to="localePath({ path: '/programming' })" class="nav-link"> {{ $t("main.programming") }}
           </NuxtLink>
-        </li>
+        </li> -->
         <li class="nav-item dropdown">
           <LocaleChanger/>
         </li>
