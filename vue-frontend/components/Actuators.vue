@@ -2,11 +2,11 @@
       <div class="layoutbox-content" style="height: 100% !important">
 
 
-<!--
+
       <div>
         <Xterm/>
       </div>
-    -->
+  
 
            <div class="rounded background-tertiary p-3 mb-2"  @contextmenu.prevent >
               <h5>{{ $t('actuators.control') }}</h5> 

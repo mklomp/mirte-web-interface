@@ -3,28 +3,30 @@
      {{ $t('actuators.output') }}
      <div v-show="isLoading" class="float-right">Loading...</div>
      <div>
-        <div :style="{ visibility: isLoading ? 'hidden' : 'visible' }" id="terminal" ref="terminal" class="xterm"></div>
+        <div :style="{ visibility: isLoading ? 'hidden' : 'visible' }" id="terminal" ref="terminal" class="xterm2"></div>
      </div>
    </div>
 </template>
 
 <script>
-import { Terminal } from 'xterm';
-import { AttachAddon } from 'xterm-addon-attach';
-import { FitAddon } from 'xterm-addon-fit';
-import shell_socket from '../ws-connection/xterm-connection.js'
 
-import EventBus from '../event-bus';
+import { ref, onMounted } from 'vue'
+const termContainer = ref(null)
+
+// Get from plugin
+const { $attachShell } = useNuxtApp()
+const { $shellSocket } = useNuxtApp()
+
 
 export default {
     data: () => ({
         shell_socket: WebSocket,
         linenr_socket: WebSocket,
-        term: Terminal,
-        isLoading: true
+        //term: Terminal,
+        isLoading: false
     }),
     activated: function(){
-        this.term.focus();
+       // this.term.focus();
     },
     watch: {
       '$store.getters.getExecution': function (newValue, oldVal) {
@@ -111,17 +113,17 @@ export default {
         },
         setTerminal(terminal){
            if (terminal){
-              this.term.setOption('theme', {});
+              this.term.options.theme = { background: '#fefaf7', foreground: '#000000', cursor: '#fefaf7'}
               this.shell_socket.send("stty echo && PS1='\\[\\e]0;\\u@\\h: \\w\\a\\]${debian_chroot:+($debian_chroot)}\\[\\033[01;32m\\]\\u@\\h\\[\\033[00m\\]:\\[\\033[01;34m\\]\\w\\[\\033[00m\\]\\$ ' && clear\n");
-              this.term.setOption('disableStdin', false);
+              this.term.options.disableStdin = false
            } else {
               // TODO: use colors from scss
-              this.term.setOption('theme', { background: '#fefaf7', foreground: '#fefaf7', cursor: '#fefaf7' });
+              this.term.options.theme = { background: '#fefaf7', foreground: '#fefaf7', cursor: '#fefaf7'}
               this.shell_socket.send("stty -echo && PS1='' && clear\n");
               this.shell_socket.send("clear\n");
-              this.term.setOption('disableStdin', true);
+              this.term.options.disableStdin = true
               // TODO: use colors from scss
-              this.term.setOption('theme', { background: '#fefaf7', foreground: '#000000', cursor: '#fefaf7' });
+              this.term.options.theme = { background: '#fefaf7', foreground: '#000000', cursor: '#fefaf7'}
            }
         },
         toggleTerminal() {
@@ -129,25 +131,12 @@ export default {
         },
     },
     mounted()  {
-        // Open the websocket connection to the backend
-        this.shell_socket = shell_socket;
+        this.term = $attachShell(this.$refs.terminal)
+        this.shell_socket = $shellSocket;
+        this.setTerminal(true);
 
-        // Open the websocket connection to the debugger
-        //this.waitForSocketConnection();
 
-        // The terminal
-        // TODO: use colors from scss
-        this.term = new Terminal({theme: { background: '#fefaf7', foreground: '#fefaf7', cursor: '#fefaf7' }});
-        const fitAddon = new FitAddon();
-        this.term.loadAddon(new AttachAddon(this.shell_socket));
-        this.term.loadAddon(fitAddon);
-        this.term.open(this.$refs.terminal);
-        // fitAddodn.fit() gives error
-        const dimensions = fitAddon.proposeDimensions();
-        if (!isNaN(dimensions.cols) && !isNaN(dimensions.rows)){
-           this.term.resize(dimensions.cols, dimensions.rows);
-        }
-        this.term.setOption('disableStdin', true);
+
 
         // Load env variables
         this.shell_socket.onmessage = (ev) => {
@@ -188,16 +177,8 @@ export default {
            }
         }
 
-        // Autoresize terminal on size change
-        const observer = new ResizeObserver(entries => {
-           //fitAddon.fit() gives error
-           const dimensions = fitAddon.proposeDimensions();
-           if (!isNaN(dimensions.cols) && !isNaN(dimensions.rows)){
-              this.term.resize(dimensions.cols, dimensions.rows);
-           }
-        })
-        observer.observe(this.$refs.terminal)
 
+        /*
         // event bus for control functions
         EventBus.$on('control', (payload) => {
 
@@ -223,7 +204,8 @@ export default {
                     this.toggleTerminal()
                     break;
             }
-        });
+        }); 
+        */
     }
 
 }
