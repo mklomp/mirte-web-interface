@@ -73,8 +73,6 @@ export default defineNuxtPlugin(() => {
           depth: 0
         };
 
-        console.log("hier");
-
         // Get all the parameters
         listParametersService.callService(request, function(result) {
 
@@ -82,8 +80,6 @@ export default defineNuxtPlugin(() => {
           var req = {
             names: param_names
           };
-
-          console.log(param_names);
 
           // Get the values of all the parameters
           getParameterService.callService(req, function(res){
@@ -131,7 +127,6 @@ export default defineNuxtPlugin(() => {
             
             const rosStore = useRosStore()
             rosStore.setPeripherals(peripherals)
-            console.log(peripherals);
           });
         }); 
       }
