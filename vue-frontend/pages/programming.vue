@@ -36,7 +36,7 @@ const localePath = useLocalePath()
          </div>
 
 
-<!--
+
 
          <div class="col-6 p-2 h-100" style="overflow: hidden;"> 
              <div class="layoutbox rounded h-100" style="overflow: hidden; display: flex; flex-flow: column;">
@@ -62,14 +62,15 @@ const localePath = useLocalePath()
                       <div style="float: right">
                         <ControlButtons/>
                       </div>
+                     
                 </div>
                   
-           
+           <!--
                 <div v-show="isBlockly" class="h-100">
                     <Blockly :visible="isBlockly"/>
                 </div>
 
-
+               -->
                 <div v-show="!isBlockly" class="h-100">
                     <Codemirror :visible="!isBlockly"/>
                 </div>
@@ -85,8 +86,8 @@ const localePath = useLocalePath()
 
 
 
-      -->
-         <div class="col-5 p-2 h-100" style="overflow: hidden;"> 
+   
+         <div class="col-3 p-2 h-100" style="overflow: hidden;"> 
              <div class="layoutbox rounded h-100" style="overflow: hidden; display: flex; flex-flow: column;">
 
                 <div class="text-black p-2 h3 m-0 layoutbox-title w-100 background-secondary">
@@ -114,23 +115,11 @@ const localePath = useLocalePath()
 
 
 <script>
-/*
-import Blockly from '@/components/Blockly.vue'
-import ControlButtons from '@/components/ControlButtons.vue'
-import Sensors from '@/components/Sensors.vue'
-import Actuators from '@/components/Actuators.vue'
-import Codemirror from '@/components/Codemirror.vue'
 
 export default {
-  components: {
-    Blockly,
-    ControlButtons,
-    Sensors,
-    Actuators,
-    Codemirror
-  },
+
   data: () => ({
-        language: "blockly",
+        language: "blockly1",
   }),
   methods: {
         setLanguage(language) {
@@ -143,5 +132,5 @@ export default {
        },
   }
 }
-*/
+
 </script>

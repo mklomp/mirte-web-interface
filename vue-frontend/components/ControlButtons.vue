@@ -1,15 +1,13 @@
 <template>
     <div>
         <button :disabled="isUndoDisabled" class="btn btn-outline-light mr-2"
-            v-b-tooltip.hover
-            :title="$t('programming.undo')"
+              :title="$t('programming.undo')"
             @click="control('undo')"
         >
-            <i class="fas fa-undo"></i>
+            <FontAwesomeIcon icon="undo" />
         </button>
 
         <button :disabled="isRedoDisabled" class="btn btn-outline-light mr-2"
-            v-b-tooltip.hover 
             :title="$t('programming.redo')"
             @click="control('redo')"
         >
@@ -18,9 +16,9 @@
 
         <span class="nav-spacer"></span>
 
-        <span v-b-tooltip.hover :title="$t('programming.start')" style="display: inline-block;">
+        <span  :title="$t('programming.start')" style="display: inline-block;">
         <button :disabled="!isPlayEnabled" class="btn btn-outline-light mx-2" 
-            @click="control('play')">
+            @click="control('running')">
             <i class="fas fa-play"></i>
         </button>
         </span>
@@ -40,9 +38,9 @@
         </button>
         </span>
 -->
-        <span v-b-tooltip.hover :title="$t('programming.stop')" style="display: inline-block;">
+        <span :title="$t('programming.stop')" style="display: inline-block;">
 	<button :disabled="!isStopEnabled" class="btn btn-outline-light mr-2" 
-            @click="control('stop')">
+            @click="control('idle')">
             <i class="fa fa-stop"></i>
         </button>
         </span>
@@ -50,7 +48,7 @@
         <span class="nav-spacer"></span>
 
         <button href="#" class="btn btn-outline-light mx-2" 
-            v-b-tooltip.hover 
+   
             :title="$t('programming.save')" 
             @click="download"
         >
@@ -58,7 +56,7 @@
         </button>
 
         <button class="btn btn-outline-light mr-2" 
-            v-b-tooltip.hover 
+       
             :title="$t('programming.open')" 
             @click="openFileWindow"
         >
@@ -70,15 +68,17 @@
 </template>
 
 <script>
-import EventBus from '../event-bus';
+
+const programmingState = useState('programming-state')
+
 
 export default {
 
     methods: {
+        
         control(command) {
-            EventBus.$emit('control', command);
+            programmingState.value = command;
         },
-
         openFileWindow(){
             this.$refs.file_input.value = null;
             if (this.$parent.language == 'blockly') {
@@ -94,9 +94,9 @@ export default {
 
             fr.onload = () => { 
                 if (this.$parent.language == 'blockly') {
-                    this.$store.dispatch('setBlockly', fr.result)
+                   // this.$store.dispatch('setBlockly', fr.result)
                 } else {
-                    this.$store.dispatch('setCode', fr.result)
+                   // this.$store.dispatch('setCode', fr.result)
                 }
             } 
 
@@ -111,7 +111,7 @@ export default {
                 var text = localStorage.getItem("blockly");
                 var filename = "mirte.xml";
             } else {
-                var text = this.$store.getters.getCode;
+                //var text = this.$store.getters.getCode;
                 var filename = "mirte.py";
             }
             
@@ -138,16 +138,16 @@ export default {
            return false; // TODO: determine strategy
        },
        isPlayEnabled: function(){
-          return this.$store.getters.getExecution == "ready";
+         return programmingState.value == "ready";
        },
        isPauseDisabled: function(){
-          return this.$store.getters.getExecution != "running" || this.$store.getters.getExecution == "disconnected";
+         // return this.$store.getters.getExecution != "running" || this.$store.getters.getExecution == "disconnected";
        },
        isStepDisabled: function(){
-          return this.$store.getters.getExecution != "paused" || this.$store.getters.getExecution == "disconnected";
+         // return this.$store.getters.getExecution != "paused" || this.$store.getters.getExecution == "disconnected";
        },
        isStopEnabled: function(){
-          return this.$store.getters.getExecution == "running";
+         // return this.$store.getters.getExecution == "running";
        }
     }
 

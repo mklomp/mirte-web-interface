@@ -17,6 +17,7 @@ const termContainer = ref(null)
 const { $attachShell } = useNuxtApp()
 const { $shellSocket } = useNuxtApp()
 
+const programmingState = useState('programming-state')
 
 export default {
     data: () => ({
@@ -28,11 +29,12 @@ export default {
     activated: function(){
        // this.term.focus();
     },
-    watch: {
-      '$store.getters.getExecution': function (newValue, oldVal) {
-          this.isLoading = (newValue == "disconnected" || newValue == "initializing");
+ /*   watch: {
+      programmingState: function (newValue, oldVal) {
+            console.log(newValue)
+          //this.isLoading = (newValue == "disconnected" || newValue == "initializing");
         }
-    },
+    },*/
     methods: {
         waitForSocketConnection(){
               // TODO: correctly close the connection
@@ -67,12 +69,14 @@ export default {
         },
         playCode() {
             this.term.clear();
-            if (this.$store.getters.getExecution == "paused"){
+            const codeStore = useCodeStore();
+
+            if (programmingState.value == "paused"){
                this.linenr_socket.send("c");
-               this.$store.dispatch('setExecution', 'running');
+               programmingState.value = "running"
             } else {
                // Not running, so upload code and start executing
-               const pythonUrl = `http://${location.hostname}/api/python`;
+               const pythonUrl = `http://192.168.0.16/api/python`;
 
                fetch(pythonUrl, {
                    method: 'POST',
@@ -80,10 +84,10 @@ export default {
                        'Content-Type': 'text/plain',
                        'CORS': 'Access-Control-Allow-Origin'
                    },
-                   body: this.$store.getters.getCode,
+                   body: codeStore.python,
                }).then(res => {
                    this.shell_socket.send('run()\n');
-                   this.$store.dispatch('setExecution', 'running');
+                   programmingState.value = "running"
                    //this.linenr_socket.send("c");
                }).catch(err => {
                    console.log("sending failed")
@@ -135,20 +139,22 @@ export default {
         this.shell_socket = $shellSocket;
         this.setTerminal(true);
 
-
-
+        const programmingState = useState('programming-state')
+        const ROSState = useState('ros-state')
+        const termState = useState('term-state')
 
         // Load env variables
         this.shell_socket.onmessage = (ev) => {
-           if (this.$store.getters.getExecution == "disconnected" && ev.data.slice(-2) == "$ ") {
-              this.$store.dispatch('setExecution', 'initializing');
+           if (termState.value == "disconnected" && ev.data.slice(-2) == "$ ") {
+              termState.value = "initializing";
               this.shell_socket.send("unset HISTFILE\n");
               this.shell_socket.send("cd /home/mirte/workdir\n");
               this.shell_socket.send("ps aux | grep 'python3 -i -c' | awk '{print $2}' | xargs kill -9\n"); // TODO: this should be fixed in the backend
               this.shell_socket.send("history -c\n");
               this.shell_socket.send("python3 -i -c 'from mirte_robot import robot; import importlib.util; mirte=robot.createRobot()'\n");
+              console.log("initializeing");
            }
-           else if (this.$store.getters.getExecution == "initializing" && ev.data.slice(-4) == ">>> "){
+           else if (termState.value == "initializing" && ev.data.slice(-4) == ">>> "){
               this.shell_socket.send('def run():\n');
               this.shell_socket.send('  print("\\033[38;2;0;0;0m", end="")\n');
               this.shell_socket.send('  spec = importlib.util.spec_from_file_location("mirte", "/home/mirte/workdir/mirte.py")\n');
@@ -166,17 +172,37 @@ export default {
               this.shell_socket.send('    print("\\033[38;2;254;250;247m", end="")\n');
               this.shell_socket.send('  finally: mirte.stop()\n\n');
               this.shell_socket.send('print("\\033[38;2;254;250;247m", end="")\n');
-              this.$store.dispatch('setExecution', 'initialized');
+              console.log("initialized11")
+              termState.value = 'initialized';
            }
-           else if (this.$store.getters.getExecution == "initialized" && ev.data.slice(-4) == ">>> "){
+           else if (termState.value == "initialized" && ev.data.slice(-4) == ">>> "){
+              // If python console is started and active
+              console.log("initialized")
               this.term.clear();
-              this.$store.dispatch('setExecution', 'ready');
+              termState.value = "python-active";
+              console.log(ROSState.value)
+              if (ROSState.value == "connected"){
+                programmingState.value = "ready";
+              }
            }
-           else if ((this.$store.getters.getExecution == "stopped" || this.$store.getters.getExecution == "running") && ev.data.slice(-4) == ">>> "){
-              this.$store.dispatch('setExecution', 'ready');
+           else if ((programmingState.value == "stopped" || programmingState.value == "running") && ev.data.slice(-4) == ">>> "){
+              programmingState.value = "ready";
            }
         }
 
+   
+
+        watch(programmingState, (newVal, oldVal) => {
+          console.log('Programming state changed:', newVal)
+          this.isLoading = (newVal === "disconnected" || newVal === "initializing")
+          switch(newVal){
+
+            case "running":
+                this.term.options.theme = { background: '#fefaf7', foreground: '#000000', cursor: '#fefaf7'}
+                this.playCode()
+                break;
+          }
+        })
 
         /*
         // event bus for control functions

@@ -8,6 +8,12 @@ onMounted(() => {
   $connectRos()
 })
 
+useState('programming-state', () => "initializing") // ready (todo: rename idle), running, paused
+useState('ros-state', () => "disconnected") // connecting, connected
+useState('term-state', () => "disconnected") // initializing, initialized, python-active
+
+// TODO: watch op ros-state and term-state -> and set programming-state
+
 </script>
 
 <template>

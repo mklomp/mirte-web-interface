@@ -11,7 +11,13 @@ export default defineNuxtPlugin(() => {
   let connected = false
   const ros = new ROSLIB.Ros({})
 
+  const programmingState = useState('programming-state')
+  const ROSState = useState('ros-state')
+  const termState = useState('term-state')
+
+
   function connect() {
+    ROSState.value = "connecting"
     if (connected) return
     connected = true
     ros.connect('ws://192.168.0.16/ws/ros')
@@ -21,14 +27,20 @@ export default defineNuxtPlugin(() => {
   ros.on('connection', () => {
     console.log('Connected to ROS2')
     getPeripherals();
+    ROSState.value = "connected"
+    if (termState.value == "python-active"){
+      programmingState.value = "ready"
+    }
   })
 
   ros.on('error', (error) => {
     console.error('ROS error:', error)
+    ROSState.value = "disconnected"
   })
 
   ros.on('close', () => {
     console.log('ROS connection closed')
+    ROSState.value = "disconnected"
   })
 
   
