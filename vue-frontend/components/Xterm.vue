@@ -98,10 +98,11 @@ export default {
                }
         },
         stopCode() {
-            this.shell_socket.send("\x03");
+            console.log("stoppppp")
+            shell.send("\x03");
             //this.linenr_socket.send("e");
-            this.$store.dispatch('setLinenumber', null)
-            this.$store.dispatch('setExecution', 'stopped');
+            //this.$store.dispatch('setLinenumber', null)
+            //this.$store.dispatch('setExecution', 'stopped');
         },
         pauseCode() {
             this.linenr_socket.send("b");
@@ -206,13 +207,12 @@ export default {
 
                 this.isLoading = false; // TODO: should be connected to termState
                 if (ROSState.value == "connected"){  // TODO: should be done somehere else with wathinng ROSState and termState
-                    programmingState.value = "ready"; 
+                    programmingState.value = "idle"; 
                 }   
   
-            }
-            else if ((programmingState.value == "stopped" || programmingState.value == "running") && buffer.includes("__STOP__\r\n>>> ")){
+            } else if (buffer.includes("__STOP__\r\n>>> ")){
                 buffer = ''
-                programmingState.value = "ready"; 
+                programmingState.value = "idle"; 
             }
         }
    
@@ -222,8 +222,11 @@ export default {
           this.isLoading = (newVal === "disconnected" || newVal === "initializing")
           switch(newVal){
 
-            case "running":
+            case "start_initiated":
                 this.playCode()
+                break;
+            case "stop_initiated":
+                this.stopCode()
                 break;
           }
         })

@@ -18,7 +18,7 @@
 
         <span  :title="$t('programming.start')" style="display: inline-block;">
         <button :disabled="!isPlayEnabled" class="btn btn-outline-light mx-2" 
-            @click="control('running')">
+            @click="control('start_initiated')">
             <i class="fas fa-play"></i>
         </button>
         </span>
@@ -40,7 +40,7 @@
 -->
         <span :title="$t('programming.stop')" style="display: inline-block;">
 	<button :disabled="!isStopEnabled" class="btn btn-outline-light mr-2" 
-            @click="control('idle')">
+            @click="control('stop_initiated')">
             <i class="fa fa-stop"></i>
         </button>
         </span>
@@ -138,7 +138,7 @@ export default {
            return false; // TODO: determine strategy
        },
        isPlayEnabled: function(){
-         return programmingState.value == "ready";
+         return programmingState.value == "idle";
        },
        isPauseDisabled: function(){
          // return this.$store.getters.getExecution != "running" || this.$store.getters.getExecution == "disconnected";
