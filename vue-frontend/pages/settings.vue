@@ -91,11 +91,7 @@
 
     <div class="col-4 h-100 p-2">
       <div class="row">
-        <div class="col-12">
-          <div class="row">
-            <!-- <Network/>-->
-          </div>
-        </div>
+          <Network/>
       </div>
     </div>
   </div>
