@@ -24,3 +24,21 @@ const localePath = useLocalePath()
     
   </div>
 </template>
+
+<style>
+html, body, #__nuxt {
+  height: 100%;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+main {
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;   
+}
+</style>
