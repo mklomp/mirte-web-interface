@@ -147,7 +147,7 @@ export default {
          // return this.$store.getters.getExecution != "paused" || this.$store.getters.getExecution == "disconnected";
        },
        isStopEnabled: function(){
-         // return this.$store.getters.getExecution == "running";
+         return programmingState.value == "running";
        }
     }
 

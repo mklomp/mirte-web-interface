@@ -208,7 +208,7 @@ export default {
       let yaml = this.saveConfiguration()
       yaml = {"/**": {"ros__parameters": yaml }}
 
-      fetch(`http://192.168.0.16/api/settings`, {
+      fetch(`http://192.168.43.1/api/settings`, {
         method: 'POST',
         body: YAML.dump(yaml)
       })
@@ -223,7 +223,7 @@ export default {
       this.busy = true
       const body = { mcu: this.mcu }
 
-      fetch(`http://192.168.0.16/api/upload_telemetrix`, {
+      fetch(`http://192.168.43.1/api/upload_telemetrix`, {
         method: 'POST',
         body: JSON.stringify(body)
       })
@@ -237,7 +237,7 @@ export default {
     setPassword() {
       if (!confirm('Weet je zeker dat je het wachtwoord wilt veranderen?')) return
 
-      fetch(`http://192.168.0.16/api/passwd`, {
+      fetch(`http://192.168.43.1/api/passwd`, {
         method: 'POST',
         headers: {
           'Content-Type': 'text/plain',

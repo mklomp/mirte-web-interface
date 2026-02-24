@@ -1,9 +1,9 @@
 <template>
    <div class="rounded background-tertiary h5 p-3 mb-2">
      {{ $t('actuators.output') }}
-     <div v-show="isLoading" class="float-right">Loading...</div>
+     <div v-show="isLoading" class="float-end">Loading...</div>
      <div>
-        <div :style="{ visibility: isLoading ? 'hidden' : 'visible' }" id="terminal" ref="terminal" class="xterm2"></div>
+       <div id="terminal" ref="terminal" class="xterm2"></div>
      </div>
    </div>
 </template>
@@ -14,19 +14,21 @@ import { ref, onMounted } from 'vue'
 const termContainer = ref(null)
 
 // Get from plugin
-const { $attachShell } = useNuxtApp()
-const { $shellSocket } = useNuxtApp()
+const { $attachContainer } = useNuxtApp()
+let shell
 
 const programmingState = useState('programming-state')
+const ROSState = useState('ros-state')
+const termState = useState('term-state')
 
 export default {
     data: () => ({
         shell_socket: WebSocket,
         linenr_socket: WebSocket,
         //term: Terminal,
-        isLoading: false
+        isLoading: true
     }),
-    activated: function(){
+    activated: function(){ 
        // this.term.focus();
     },
  /*   watch: {
@@ -37,7 +39,7 @@ export default {
     },*/
     methods: {
         waitForSocketConnection(){
-              // TODO: correctly close the connection
+              // TODO: correctly close the connection 
               const protocol = (location.protocol === 'https:') ? 'wss://' : 'ws://';
               const linetrace_socketUrl = `${protocol}${location.hostname}/ws/linetrace`;
               this.linenr_socket = new WebSocket(linetrace_socketUrl);
@@ -68,7 +70,7 @@ export default {
               };
         },
         playCode() {
-            this.term.clear();
+            shell.term.clear();
             const codeStore = useCodeStore();
 
             if (programmingState.value == "paused"){
@@ -76,7 +78,7 @@ export default {
                programmingState.value = "running"
             } else {
                // Not running, so upload code and start executing
-               const pythonUrl = `http://192.168.0.16/api/python`;
+               const pythonUrl = `http://192.168.43.1/api/python`;
 
                fetch(pythonUrl, {
                    method: 'POST',
@@ -86,7 +88,7 @@ export default {
                    },
                    body: codeStore.python,
                }).then(res => {
-                   this.shell_socket.send('run()\n');
+                   shell.sendLine('run()');
                    programmingState.value = "running"
                    //this.linenr_socket.send("c");
                }).catch(err => {
@@ -117,9 +119,9 @@ export default {
         },
         setTerminal(terminal){
            if (terminal){
-              this.term.options.theme = { background: '#fefaf7', foreground: '#000000', cursor: '#fefaf7'}
+              //this.term.options.theme = { background: '#fefaf7', foreground: '#000000', cursor: '#fefaf7'}
               this.shell_socket.send("stty echo && PS1='\\[\\e]0;\\u@\\h: \\w\\a\\]${debian_chroot:+($debian_chroot)}\\[\\033[01;32m\\]\\u@\\h\\[\\033[00m\\]:\\[\\033[01;34m\\]\\w\\[\\033[00m\\]\\$ ' && clear\n");
-              this.term.options.disableStdin = false
+              //this.term.options.disableStdin = false
            } else {
               // TODO: use colors from scss
               this.term.options.theme = { background: '#fefaf7', foreground: '#fefaf7', cursor: '#fefaf7'}
@@ -135,70 +137,92 @@ export default {
         },
     },
     mounted()  {
-        this.term = $attachShell(this.$refs.terminal)
-        this.shell_socket = $shellSocket;
-        this.setTerminal(true);
 
-        const programmingState = useState('programming-state')
-        const ROSState = useState('ros-state')
-        const termState = useState('term-state')
+        termState.value = "disconnected"
+        shell = $attachContainer(this.$refs.terminal)
 
-        // Load env variables
-        this.shell_socket.onmessage = (ev) => {
-           if (termState.value == "disconnected" && ev.data.slice(-2) == "$ ") {
-              termState.value = "initializing";
-              this.shell_socket.send("unset HISTFILE\n");
-              this.shell_socket.send("cd /home/mirte/workdir\n");
-              this.shell_socket.send("ps aux | grep 'python3 -i -c' | awk '{print $2}' | xargs kill -9\n"); // TODO: this should be fixed in the backend
-              this.shell_socket.send("history -c\n");
-              this.shell_socket.send("python3 -i -c 'from mirte_robot import robot; import importlib.util; mirte=robot.createRobot()'\n");
-              console.log("initializeing");
-           }
-           else if (termState.value == "initializing" && ev.data.slice(-4) == ">>> "){
-              this.shell_socket.send('def run():\n');
-              this.shell_socket.send('  print("\\033[38;2;0;0;0m", end="")\n');
-              this.shell_socket.send('  spec = importlib.util.spec_from_file_location("mirte", "/home/mirte/workdir/mirte.py")\n');
-              this.shell_socket.send('  mod = importlib.util.module_from_spec(spec)\n');
-              this.shell_socket.send('  try:\n');
-              this.shell_socket.send('    spec.loader.exec_module(mod)\n');
-              this.shell_socket.send('    print("\\033[38;2;254;250;247m", end="")\n');
-              this.shell_socket.send('  except SystemExit:\n');
-              this.shell_socket.send('    pass\n');
-              this.shell_socket.send('    print("\\r", end="")\n');
-              this.shell_socket.send('    print("\\033[38;2;254;250;247m", end="")\n');
-              this.shell_socket.send('  except Exception as e:\n');
-              this.shell_socket.send('    print(e)\n');
-              this.shell_socket.send('    print("\\r", end="")\n');
-              this.shell_socket.send('    print("\\033[38;2;254;250;247m", end="")\n');
-              this.shell_socket.send('  finally: mirte.stop()\n\n');
-              this.shell_socket.send('print("\\033[38;2;254;250;247m", end="")\n');
-              console.log("initialized11")
-              termState.value = 'initialized';
-           }
-           else if (termState.value == "initialized" && ev.data.slice(-4) == ">>> "){
-              // If python console is started and active
-              console.log("initialized")
-              this.term.clear();
-              termState.value = "python-active";
-              console.log(ROSState.value)
-              if (ROSState.value == "connected"){
-                programmingState.value = "ready";
-              }
-           }
-           else if ((programmingState.value == "stopped" || programmingState.value == "running") && ev.data.slice(-4) == ">>> "){
-              programmingState.value = "ready";
-           }
+        // TODO: edbug version not yet working.....
+        let debug = false; // TODO: make user setting
+        if (debug){
+            shell.attach();
+            shell.term.options.theme = { background: '#fefaf7', foreground: '#000000', cursor: '#000000'}
+            shell.term.options.disableStdin = false;
+        } else {
+            shell.term.options.theme = { background: '#fefaf7', foreground: '#000000', cursor: '#fefaf7'}
+            shell.term.options.disableStdin = true;
         }
 
+        // NOTE: this is async processing of the state of the terminal. Messages from the websocket
+        // will be received, but might be just a few characters. A buffer is used to determine whether
+        // we just received the first command promps ($), or have finished the initialization
+        // (__PYTHON_INITIALIZED__). The termState is used to make sure that the commands are ran
+        // only once.
+        let buffer = ''
+        shell.socket.onmessage = (event) => {
+            buffer += event.data; 
+
+            console.log(JSON.stringify(buffer)) 
+            if (termState.value == "disconnected" && buffer.slice(-2) == "$ "){ 
+                buffer = '';
+                // Initilize the shell
+                shell.sendLine("PS1='$ '") // Use minimalistic bash
+                shell.sendLine("stty echo") // Make sure that not all commands are shown in the terminal
+                shell.sendLine("unset HISTFILE") // Do not add these commands to the histfile
+                shell.sendLine("cd /home/mirte/workdir");
+                shell.sendLine("ps aux | grep 'python3 -i -c' | awk '{print $2}' | xargs kill -9"); // TODO: this should be fixed in the backend
+                shell.sendLine("history -c && clear");
+                shell.sendLine("python3 -i -c 'from mirte_robot import robot; import importlib.util; mirte=robot.createRobot();'");
+                termState.value = "terminal_initialized"
+
+                // Initialize run() function to be able to execute mirte.py and only see print() and errors.
+                shell.sendLine('def run():');
+                shell.sendLine('  print("\\033[1A\\033[2K\\r", end="")');       // remove the previous line in terminal (i.e run())
+                shell.sendLine('  print("\\033[38;2;0;0;0m", end="")');         // show the print statements and errors
+                shell.sendLine('  spec = importlib.util.spec_from_file_location("mirte", "/home/mirte/workdir/mirte.py")');
+                shell.sendLine('  mod = importlib.util.module_from_spec(spec)');
+                shell.sendLine('  try:');
+                shell.sendLine('    spec.loader.exec_module(mod)');
+                shell.sendLine('    print("\\033[38;2;254;250;247m", end="")'); // stop showing text
+                shell.sendLine('  except SystemExit:');
+                shell.sendLine('    pass');                                     // do not print SystemExit
+                shell.sendLine('    print("\\r", end="")');
+                shell.sendLine('    print("\\033[38;2;254;250;247m", end="")'); // stop showing text
+                shell.sendLine('  except Exception as e:');
+                shell.sendLine('    print(e)');                                 // print exception
+                shell.sendLine('    print("\\r", end="")');
+                shell.sendLine('    print("\\033[38;2;254;250;247m", end="")'); // stop showing text
+                shell.sendLine('  finally:');
+                shell.sendLine('    mirte.stop()');
+                shell.sendLine('    print("__STOP__")');
+                shell.sendLine(''); // including final newline of function (TOOD: needed?)
+                //shell.sendLine('print("\\033[38;2;254;250;247m", end="")');     // stop showing text (TODO: prbably not needed?)
+                shell.sendLine('print("__PYTHON_INITIALIZED__")');
+                //shell.sendLine('print("\\033[2J\\033[3J\\033[H", end="")');     // (TODO: prbably not needed?) clear the screen (better than term.clear() since term might still be receiving these commands)
+                termState.value = "python_initialized"
+            } else if (termState.value == "python_initialized" && buffer.includes("\r\n__PYTHON_INITIALIZED__\r\n>>> ")){
+                termState.value = "python-active"; 
+                buffer = ''
+                shell.attach(); // now that everything is done, attach it so it can be visualized
+
+                this.isLoading = false; // TODO: should be connected to termState
+                if (ROSState.value == "connected"){  // TODO: should be done somehere else with wathinng ROSState and termState
+                    programmingState.value = "ready"; 
+                }   
+  
+            }
+            else if ((programmingState.value == "stopped" || programmingState.value == "running") && buffer.includes("__STOP__\r\n>>> ")){
+                buffer = ''
+                programmingState.value = "ready"; 
+            }
+        }
    
 
         watch(programmingState, (newVal, oldVal) => {
-          console.log('Programming state changed:', newVal)
+          console.log('Programming state changed:', newVal) 
           this.isLoading = (newVal === "disconnected" || newVal === "initializing")
           switch(newVal){
 
             case "running":
-                this.term.options.theme = { background: '#fefaf7', foreground: '#000000', cursor: '#fefaf7'}
                 this.playCode()
                 break;
           }

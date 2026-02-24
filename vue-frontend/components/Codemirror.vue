@@ -1,14 +1,10 @@
 <template>
-  <div class="h-100">
-    <div ref="editorContainer" class="editor h-100"></div>
+  <div class="d-flex flex-column h-100">
+    <div ref="editorContainer" class="editor d-flex flex-column h-100"></div>
   </div>
 </template>
 
 <script>
-//import codemirror from 'codemirror'
-//import 'codemirror/mode/python/python.js'
-//import 'codemirror/lib/codemirror.css'
-
 import { ref, onMounted } from 'vue'
 import { EditorView, basicSetup } from "codemirror"
 import { python } from "@codemirror/lang-python"
@@ -50,23 +46,6 @@ export default {
     })
 
   },
-
-
-/*
-    this.editor = codemirror.fromTextArea(this.$refs.codemirror, {
-      mode: "python",
-      lineNumbers: true,
-      autoRefresh: true,
-      gutters: ["linetracer"],
-      viewportMargin: Infinity
-    });
-    this.editor.on('change', editor => {
-      this.$store.dispatch('setCode', editor.getValue())
-    });
-    this.editor.save()
-    this.editor.setValue(this.$store.getters.getCode)
-    */
-  //}
   watch: {
     visible(newVal) {
       if (newVal && this.editor) {
