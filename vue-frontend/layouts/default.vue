@@ -38,6 +38,9 @@ useState('term-state', () => "disconnected") // initializing, initialized, pytho
           </NuxtLink>
         </li>
         <li class="nav-item dropdown">
+          <ShutdownMenu/>
+        </li>
+        <li class="nav-item dropdown">
           <LocaleChanger/>
         </li>
       </ul>
