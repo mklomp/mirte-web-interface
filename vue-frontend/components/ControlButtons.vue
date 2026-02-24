@@ -11,7 +11,7 @@
             :title="$t('programming.redo')"
             @click="control('redo')"
         >
-            <i class="fa fa-redo"></i>
+            <FontAwesomeIcon icon="redo" />
         </button>
 
         <span class="nav-spacer"></span>
@@ -19,7 +19,7 @@
         <span  :title="$t('programming.start')" style="display: inline-block;">
         <button :disabled="!isPlayEnabled" class="btn btn-outline-light mx-2" 
             @click="control('start_initiated')">
-            <i class="fas fa-play"></i>
+            <FontAwesomeIcon icon="play" />
         </button>
         </span>
 
@@ -41,7 +41,7 @@
         <span :title="$t('programming.stop')" style="display: inline-block;">
 	<button :disabled="!isStopEnabled" class="btn btn-outline-light mr-2" 
             @click="control('stop_initiated')">
-            <i class="fa fa-stop"></i>
+            <FontAwesomeIcon icon="stop" />
         </button>
         </span>
 
@@ -52,7 +52,7 @@
             :title="$t('programming.save')" 
             @click="download"
         >
-            <i class="fa fa-save"></i>
+            <FontAwesomeIcon icon="save" />
         </button>
 
         <button class="btn btn-outline-light mr-2" 
@@ -60,7 +60,7 @@
             :title="$t('programming.open')" 
             @click="openFileWindow"
         >
-            <i class="fa fa-folder-open"></i>
+            <FontAwesomeIcon :icon="['fas', 'folder-open']" />
             <input ref="file_input" @change="upload" type="file" name="name" style="display: none;" />
         </button>
 

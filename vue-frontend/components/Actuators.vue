@@ -21,7 +21,7 @@
                    @mouseup="control('forward_up')"
                    @contextmenu.prevent="control('forward_down')"
                  >
-                 <i class="fa fa-arrow-up"></i>
+                 <FontAwesomeIcon :icon="['fas', 'arrow-up']" />
                  </button>
                  </div>
                </div>
@@ -35,7 +35,7 @@
                    @mouseup="control('left_up')"
                    @contextmenu.prevent="control('left_down')"
                  >
-                 <i class="fa fa-arrow-left"></i>
+                 <FontAwesomeIcon :icon="['fas', 'arrow-left']" />
                 </button>
                 </div>
 
@@ -46,7 +46,7 @@
                    @click="control('stop')"
                    @contextmenu.prevent="control('stop')"
                  >
-                 <i class="fa fa-times-circle"></i>
+                 <FontAwesomeIcon :icon="['fas', 'times-circle']" />
                 </button>
                 </div>
 
@@ -58,7 +58,7 @@
                    @mouseup="control('right_up')"
                    @contextmenu.prevent="control('right_down')"
                  >
-                 <i class="fa fa-arrow-right"></i>
+                 <FontAwesomeIcon :icon="['fas', 'arrow-right']" />
                 </button>
                 </div>
 
@@ -76,7 +76,7 @@
                    @mouseup="control('backward_up')"
                    @contextmenu.prevent="control('backward_down')"
                  >
-                 <i class="fa fa-arrow-down"></i>
+                 <FontAwesomeIcon :icon="['fas', 'arrow-down']" />
                  </button>
                  </div>
                </div>
