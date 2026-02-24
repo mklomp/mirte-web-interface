@@ -30,13 +30,13 @@ useState('term-state', () => "disconnected") // initializing, initialized, pytho
     <div class="navbar-collapse"  id="navbarNavDropdown">
       <ul class="navbar-nav ms-auto">
         <li class="nav-item">
+          <NuxtLink :to="localePath({ path: '/' })" class="nav-link"> {{ $t("main.programming") }}
+          </NuxtLink>
+        </li> 
+        <li class="nav-item">
           <NuxtLink :to="localePath({ path: '/settings' })" class="nav-link"> {{ $t("main.settings") }}
           </NuxtLink>
         </li>
-        <li class="nav-item">
-          <NuxtLink :to="localePath({ path: '/programming' })" class="nav-link"> {{ $t("main.programming") }}
-          </NuxtLink>
-        </li> 
         <li class="nav-item dropdown">
           <LocaleChanger/>
         </li>

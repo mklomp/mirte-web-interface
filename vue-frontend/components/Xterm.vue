@@ -11,136 +11,27 @@
 <script>
 
 import { ref, onMounted } from 'vue'
-const termContainer = ref(null)
 
-// Get from plugin
-const { $attachContainer } = useNuxtApp()
-let shell
-
-const programmingState = useState('programming-state')
-const ROSState = useState('ros-state')
-const termState = useState('term-state')
 
 export default {
-    data: () => ({
-        shell_socket: WebSocket,
-        linenr_socket: WebSocket,
-        //term: Terminal,
-        isLoading: true
-    }),
-    activated: function(){ 
-       // this.term.focus();
-    },
- /*   watch: {
-      programmingState: function (newValue, oldVal) {
-            console.log(newValue)
-          //this.isLoading = (newValue == "disconnected" || newValue == "initializing");
-        }
-    },*/
-    methods: {
-        waitForSocketConnection(){
-              // TODO: correctly close the connection 
-              const protocol = (location.protocol === 'https:') ? 'wss://' : 'ws://';
-              const linetrace_socketUrl = `${protocol}${location.hostname}/ws/linetrace`;
-              this.linenr_socket = new WebSocket(linetrace_socketUrl);
+  setup() {
+    const terminal = ref(null) // this replaces ref="terminal"
+    const programmingState = useState('programming-state')
+    const ROSState = useState('ros-state')
+    const termState = useState('term-state')
+    let isLoading = ref(true);
 
-              this.linenr_socket.onerror = (event) => {
-                  setTimeout(function () {
-                     console.log("waiting for connection");
-                     this.waitForSocketConnection();
-                  }.bind(this), 10);
-              };
+    const { $attachContainer } = useNuxtApp()
+    let shell = null
 
-              this.linenr_socket.onmessage = (event) => {
-                if (event.data != 0) {
-                  // Update only when in step/pause mode
-                  if (event.data.substr(0, 4) == "pid:"){
-                     let debugger_pid = String(event.data.substr(4));
-                     let strace_cmd = 'strace -ff -e write=1,2 -s 1024 -p ' + debugger_pid + ' 2>&1 | grep "^ |" --line-buffered | stdbuf -oL cut -b11-60 | stdbuf -oL sed -e "s/ //g" | xxd -r -p';
-                     this.shell_socket.send(strace_cmd + '\n');
-                     this.$store.dispatch('setExecution', 'running');
-                  }
-                  if (this.$store.getters.getExecution == "paused") {
-                     this.$store.dispatch('setLinenumber', event.data);
-                  }
-                } else {
-                  this.$store.dispatch('setLinenumber', null);
-                  this.$store.dispatch('setExecution', 'stopped');
-                }
-              };
-        },
-        playCode() {
-            shell.term.clear();
-            const codeStore = useCodeStore();
+    onMounted(() => {
+      if (terminal.value) {
+        shell = $attachContainer(terminal.value)
+      }
 
-            if (programmingState.value == "paused"){
-               this.linenr_socket.send("c");
-               programmingState.value = "running"
-            } else {
-               // Not running, so upload code and start executing
-               const pythonUrl = `http://192.168.43.1/api/python`;
 
-               fetch(pythonUrl, {
-                   method: 'POST',
-                   headers: {
-                       'Content-Type': 'text/plain',
-                       'CORS': 'Access-Control-Allow-Origin'
-                   },
-                   body: codeStore.python,
-               }).then(res => {
-                   shell.sendLine('run()');
-                   programmingState.value = "running"
-                   //this.linenr_socket.send("c");
-               }).catch(err => {
-                   console.log("sending failed")
-                   console.log(err)
-               })
-               }
-        },
-        stopCode() {
-            console.log("stoppppp")
-            shell.send("\x03");
-            //this.linenr_socket.send("e");
-            //this.$store.dispatch('setLinenumber', null)
-            //this.$store.dispatch('setExecution', 'stopped');
-        },
-        pauseCode() {
-            this.linenr_socket.send("b");
-            this.$store.dispatch('setExecution', 'paused');
-        },
-        stepCode() {
-            this.linenr_socket.send("s");
-        },
-        clearOutput() {
-            // stop running program, clear terminal, remove step indicator
-            this.linenr_socket.send("e");
-            this.$store.dispatch('setExecution', 'stopped');
-            this.shell_socket.send("clear\n");
-            this.$store.dispatch('setLinenumber', null)
-        },
-        setTerminal(terminal){
-           if (terminal){
-              //this.term.options.theme = { background: '#fefaf7', foreground: '#000000', cursor: '#fefaf7'}
-              this.shell_socket.send("stty echo && PS1='\\[\\e]0;\\u@\\h: \\w\\a\\]${debian_chroot:+($debian_chroot)}\\[\\033[01;32m\\]\\u@\\h\\[\\033[00m\\]:\\[\\033[01;34m\\]\\w\\[\\033[00m\\]\\$ ' && clear\n");
-              //this.term.options.disableStdin = false
-           } else {
-              // TODO: use colors from scss
-              this.term.options.theme = { background: '#fefaf7', foreground: '#fefaf7', cursor: '#fefaf7'}
-              this.shell_socket.send("stty -echo && PS1='' && clear\n");
-              this.shell_socket.send("clear\n");
-              this.term.options.disableStdin = true
-              // TODO: use colors from scss
-              this.term.options.theme = { background: '#fefaf7', foreground: '#000000', cursor: '#fefaf7'}
-           }
-        },
-        toggleTerminal() {
-            this.setTerminal(this.term.getOption('disableStdin'));
-        },
-    },
-    mounted()  {
 
-        termState.value = "disconnected"
-        shell = $attachContainer(this.$refs.terminal)
+
 
         // TODO: edbug version not yet working.....
         let debug = false; // TODO: make user setting
@@ -205,7 +96,7 @@ export default {
                 buffer = ''
                 shell.attach(); // now that everything is done, attach it so it can be visualized
 
-                this.isLoading = false; // TODO: should be connected to termState
+                isLoading.value = false; // TODO: should be connected to termState
                 if (ROSState.value == "connected"){  // TODO: should be done somehere else with wathinng ROSState and termState
                     programmingState.value = "idle"; 
                 }   
@@ -215,21 +106,190 @@ export default {
                 programmingState.value = "idle"; 
             }
         }
+
+    })
+
+
+    function playCode() {
+            shell.term.clear();
+            const codeStore = useCodeStore();
+
+            if (programmingState.value == "paused"){
+               this.linenr_socket.send("c");
+               programmingState.value = "running"
+            } else {
+               // Not running, so upload code and start executing
+               const pythonUrl = `http://192.168.43.1/api/python`;
+
+               fetch(pythonUrl, {
+                   method: 'POST',
+                   headers: {
+                       'Content-Type': 'text/plain',
+                       'CORS': 'Access-Control-Allow-Origin'
+                   },
+                   body: codeStore.python,
+               }).then(res => {
+                   shell.sendLine('run()');
+                   programmingState.value = "running"
+                   //this.linenr_socket.send("c");
+               }).catch(err => {
+                   console.log("sending failed")
+                   console.log(err)
+               })
+               }
+    }
+
+    function stopCode() {
+      shell.send("\x03"); // CTRL-C
+    }
+
+    watch(programmingState, (newVal) => {
+      console.log('Programming state changed:', newVal)
+      isLoading = (newVal === 'disconnected' || newVal === 'initializing')
+
+      switch(newVal) {
+        case 'start_initiated':
+          playCode()
+          break
+        case 'stop_initiated':
+          stopCode()
+          break
+      }
+    })
+
+
+    return {
+      terminal,
+      programmingState,
+      ROSState,
+      termState,
+      shell,
+      isLoading
+    }
+  },
+
+
+
+    data: () => ({
+        shell_socket: WebSocket,
+        linenr_socket: WebSocket,
+        //term: Terminal,
+        //isLoading: true
+    }),
+    activated: function(){ 
+       // this.term.focus();
+    },
+ /*   watch: {
+      programmingState: function (newValue, oldVal) {
+            console.log(newValue)
+          //this.isLoading = (newValue == "disconnected" || newValue == "initializing");
+        }
+    },*/
+    methods: {
+        waitForSocketConnection(){
+              // TODO: correctly close the connection 
+              const protocol = (location.protocol === 'https:') ? 'wss://' : 'ws://';
+              const linetrace_socketUrl = `${protocol}${location.hostname}/ws/linetrace`;
+              this.linenr_socket = new WebSocket(linetrace_socketUrl);
+
+              this.linenr_socket.onerror = (event) => {
+                  setTimeout(function () {
+                     console.log("waiting for connection");
+                     this.waitForSocketConnection();
+                  }.bind(this), 10);
+              };
+
+              this.linenr_socket.onmessage = (event) => {
+                if (event.data != 0) {
+                  // Update only when in step/pause mode
+                  if (event.data.substr(0, 4) == "pid:"){
+                     let debugger_pid = String(event.data.substr(4));
+                     let strace_cmd = 'strace -ff -e write=1,2 -s 1024 -p ' + debugger_pid + ' 2>&1 | grep "^ |" --line-buffered | stdbuf -oL cut -b11-60 | stdbuf -oL sed -e "s/ //g" | xxd -r -p';
+                     this.shell_socket.send(strace_cmd + '\n');
+                     this.$store.dispatch('setExecution', 'running');
+                  }
+                  if (this.$store.getters.getExecution == "paused") {
+                     this.$store.dispatch('setLinenumber', event.data);
+                  }
+                } else {
+                  this.$store.dispatch('setLinenumber', null);
+                  this.$store.dispatch('setExecution', 'stopped');
+                }
+              };
+        },
+   /*     playCode() {
+            this.shell.term.clear();
+            const codeStore = useCodeStore();
+
+            if (programmingState.value == "paused"){
+               this.linenr_socket.send("c");
+               programmingState.value = "running"
+            } else {
+               // Not running, so upload code and start executing
+               const pythonUrl = `http://192.168.43.1/api/python`;
+
+               fetch(pythonUrl, {
+                   method: 'POST',
+                   headers: {
+                       'Content-Type': 'text/plain',
+                       'CORS': 'Access-Control-Allow-Origin'
+                   },
+                   body: codeStore.python,
+               }).then(res => {
+                   this.shell.sendLine('run()');
+                   programmingState.value = "running"
+                   //this.linenr_socket.send("c");
+               }).catch(err => {
+                   console.log("sending failed")
+                   console.log(err)
+               })
+               }
+        },
+        stopCode() {
+            console.log("stoppppp")
+            shell.send("\x03");
+            //this.linenr_socket.send("e");
+            //this.$store.dispatch('setLinenumber', null)
+            //this.$store.dispatch('setExecution', 'stopped');
+        },*/
+        pauseCode() {
+            this.linenr_socket.send("b");
+            this.$store.dispatch('setExecution', 'paused');
+        },
+        stepCode() {
+            this.linenr_socket.send("s");
+        },
+        clearOutput() {
+            // stop running program, clear terminal, remove step indicator
+            this.linenr_socket.send("e");
+            this.$store.dispatch('setExecution', 'stopped');
+            this.shell_socket.send("clear\n");
+            this.$store.dispatch('setLinenumber', null)
+        },
+        setTerminal(terminal){
+           if (terminal){
+              //this.term.options.theme = { background: '#fefaf7', foreground: '#000000', cursor: '#fefaf7'}
+              this.shell_socket.send("stty echo && PS1='\\[\\e]0;\\u@\\h: \\w\\a\\]${debian_chroot:+($debian_chroot)}\\[\\033[01;32m\\]\\u@\\h\\[\\033[00m\\]:\\[\\033[01;34m\\]\\w\\[\\033[00m\\]\\$ ' && clear\n");
+              //this.term.options.disableStdin = false
+           } else {
+              // TODO: use colors from scss
+              this.term.options.theme = { background: '#fefaf7', foreground: '#fefaf7', cursor: '#fefaf7'}
+              this.shell_socket.send("stty -echo && PS1='' && clear\n");
+              this.shell_socket.send("clear\n");
+              this.term.options.disableStdin = true
+              // TODO: use colors from scss
+              this.term.options.theme = { background: '#fefaf7', foreground: '#000000', cursor: '#fefaf7'}
+           }
+        },
+        toggleTerminal() {
+            this.setTerminal(this.term.getOption('disableStdin'));
+        },
+    },
+
    
 
-        watch(programmingState, (newVal, oldVal) => {
-          console.log('Programming state changed:', newVal) 
-          this.isLoading = (newVal === "disconnected" || newVal === "initializing")
-          switch(newVal){
 
-            case "start_initiated":
-                this.playCode()
-                break;
-            case "stop_initiated":
-                this.stopCode()
-                break;
-          }
-        })
+          
 
         /*
         // event bus for control functions
@@ -259,7 +319,7 @@ export default {
             }
         }); 
         */
-    }
+    //}
 
 }
 </script>
