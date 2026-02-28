@@ -57,7 +57,17 @@ export default defineNuxtConfig({
 
   vue: {
     compilerOptions: {
-      hydrationMismatchDetails: true
+      hydrationMismatchDetails: true,
+      isCustomElement: (tag) => {
+        return [
+          'xml',
+          'block',
+          'category',
+          'field',
+          'mutation',
+          'value'
+        ].includes(tag)
+      }
     }
   },
 

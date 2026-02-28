@@ -53,7 +53,7 @@ export default {
         shell.socket.onmessage = (event) => {
             buffer += event.data; 
 
-            console.log(JSON.stringify(buffer)) 
+            //console.log(JSON.stringify(buffer)) 
             if (termState.value == "disconnected" && buffer.slice(-2) == "$ "){ 
                 buffer = '';
                 // Initilize the shell

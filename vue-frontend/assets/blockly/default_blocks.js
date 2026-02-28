@@ -1,4 +1,7 @@
-export function load(Blockly) {
+export function load(Blockly, pythonGenerator) {
+
+    console.log("hier" );
+    console.log(Blockly);
 
     Blockly.Blocks['set_analog_pin_value'] = {
         init: function () {
@@ -25,13 +28,13 @@ export function load(Blockly) {
         }
     };
 
-    Blockly.Python['set_analog_pin_value'] = function (block) {
+    pythonGenerator.forBlock['set_analog_pin_value'] = function (block) {
         Blockly.Python.definitions_['import_mirte'] = 'from mirte_robot import robot\nmirte=robot.createRobot()';
         var pin = block.getFieldValue('PIN');
         var value = Blockly.Python.valueToCode(block, 'VALUE', Blockly.Python.ORDER_ATOMIC);
         return `mirte.setAnalogPinValue('${pin}', ${value})\n`;
     };
-
+/*
     Blockly.Blocks['set_digital_pin_value'] = {
         init: function () {
             this.jsonInit({
@@ -198,4 +201,6 @@ export function load(Blockly) {
         }
         return [code, Blockly.Python.ORDER_NONE];
     };
+
+    */
 }

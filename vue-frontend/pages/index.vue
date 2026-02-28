@@ -65,12 +65,12 @@ const localePath = useLocalePath()
                      
                 </div>
                   
-           <!--
+           
                 <div v-show="isBlockly" class="h-100">
                     <Blockly :visible="isBlockly"/>
                 </div>
 
-               -->
+               
                 <div v-show="!isBlockly" class="h-100">
                     <Codemirror :visible="!isBlockly"/>
                 </div>
