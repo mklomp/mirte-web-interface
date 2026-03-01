@@ -6,7 +6,7 @@
 
     <xml id="toolbox" ref="toolbox" style="display: none">
 
-<!--
+
       <category name="%{BKY_SENSORS}" colour="%{BKY_SENSORS_RGB}" expanded=true>
 
          <category name="%{BKY_ROBOT}" colour="%{BKY_SENSORS_RGB}">
@@ -22,7 +22,7 @@
           </block>
         </category>
       </category>
-    -->
+
 
 
       <category name="%{BKY_FLOW}" colour="%{BKY_FLOW_RGB}" expanded="true">
@@ -178,7 +178,7 @@
         </category>
 
       </category>
-<!--
+
       <category name="%{BKY_ACTIONS}" colour="%{BKY_ACTIONS_RGB}" expanded=true>
 
          <category name="%{BKY_ROBOT}" colour="%{BKY_ACTIONS_RGB}">
@@ -223,7 +223,6 @@
           </block>
         </category>
      </category>
-    -->
 
     </xml>
 </div>
@@ -361,22 +360,22 @@ export default {
     // Load the interpreter now, and upon future changes.
     //generateCodeAndLoadIntoInterpreter();
        this.workspace.addChangeListener((event) => {
-         //if (event instanceof Blockly.Events.Move || event instanceof Blockly.Events.Delete || event instanceof Blockly.Events.Change) {
+         if (event instanceof Blockly.Events.Move || event instanceof Blockly.Events.Delete || event instanceof Blockly.Events.Change) {
            // Something changed. Parser needs to be reloaded.
 
-           var code = "";//Blockly.Python.workspaceToCode(this.workspace);
+           var code = Blockly.Python.workspaceToCode(this.workspace);
 
            code = this.prefix + code;
            // cmEditor.setValue(code);
 
            var xml = Blockly.Xml.workspaceToDom(this.workspace);
-           var xml_text = Blockly.utils.xml.domToText(xml);
+           var xml_text = Blockly.Xml.domToText(xml);
            localStorage.setItem("blockly", xml_text);
 
            // update the store
-           //this.$store.dispatch('setCode', code)
+           this.$store.dispatch('setCode', code)
            // this.$store.dispatch('setBlockly', xml_text)
-         //}
+         }
        });
     },
     //separates peripheral items into sensors and actuators
@@ -428,7 +427,7 @@ export default {
        this.workspace.dispose();
        this.workspace = Blockly.inject(blocklyDiv,
          {toolbox: this.$refs.toolbox,
-          //media: 'blockly-media/',
+          media: 'blockly-media/',
          zoom: {
          controls: true,
          wheel: true,
@@ -479,7 +478,7 @@ export default {
       const blocklyDiv = this.$refs.blocklyDiv
       this.workspace = Blockly.inject(blocklyDiv, {
         toolbox: this.$refs.toolbox,
-        //media: 'blockly-media/',
+        media: 'blockly-media/',
         zoom: {
           controls: true,
           wheel: true,
@@ -492,7 +491,7 @@ export default {
       })
 
       // workspace configuration
-      //this.workspace.toolbox_.flyout_.autoClose = true
+      this.workspace.toolbox_.flyout_.autoClose = true
   
       window.addEventListener('resize', this.resize_listener, false)
       this.resize_listener();
@@ -501,7 +500,7 @@ export default {
 
 
       // Undo/Redo
-    /*  EventBus.$on('control', (payload) => {
+  /*    EventBus.$on('control', (payload) => {
         switch (payload) {
           case "undo":
             this.workspace.undo(false)
@@ -510,8 +509,8 @@ export default {
             this.workspace.undo(true)
             break
         }
-      })*/
-  
+      })
+  */
       // Recolor predefined Blocks
       for (const [key, value] of Object.entries(predefined_blocks)) {
         //https://groups.google.com/forum/#!topic/blockly/yUBEymLKBbk
@@ -524,13 +523,13 @@ export default {
       }
 
       if (!isRegistered) {
-        //this.load_blockly_modules()
+        this.load_blockly_modules()
         isRegistered = true
       }
 
       const storage = localStorage.getItem("blockly")
       if (storage !== null) {
-        Blockly.Xml.domToWorkspace(Blockly.utils.xml.textToDom(storage), this.workspace)
+        Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(storage), this.workspace)
       }
 
     }
@@ -539,9 +538,9 @@ export default {
   mounted() {
     // Needs to be loaded when re-mounted
     // (ie. switching between python-blockly)
-    //if (isRegistered) {
+    if (isRegistered) {
       this.load_blockly();
-    //}
+    }
   },
   watch: {
      visible(newVal) {
@@ -568,7 +567,7 @@ export default {
         function (newVal, oldVal) {
           if (newVal != ""){
             Blockly.mainWorkspace.clear()
-            Blockly.Xml.domToWorkspace(Blockly.utils.xml.textToDom(newVal), this.workspace)
+            Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(newVal), this.workspace)
             Blockly.mainWorkspace.zoomToFit()
             this.$store.dispatch('setBlockly', "")
           }
