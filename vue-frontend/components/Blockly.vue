@@ -9,6 +9,7 @@
 
       <category name="%{BKY_SENSORS}" colour="%{BKY_SENSORS_RGB}" expanded=true>
 
+        <!--
          <category name="%{BKY_ROBOT}" colour="%{BKY_SENSORS_RGB}">
             <block type="get_analog_pin_value"></block>
             <block type="get_digital_pin_value"></block>
@@ -21,7 +22,10 @@
                  :type="func.concat('_').concat(sensor)">
           </block>
         </category>
+      -->
       </category>
+
+
 
 
 
@@ -188,8 +192,8 @@
                 <block type="text"></block>
               </value>
             </block> 
-
-            <block type="set_analog_pin_value">
+<!--
+                        <block type="set_analog_pin_value">
               <value name="VALUE">
                 <block type="math_number">
                   <field name="NUM">0</field>
@@ -205,9 +209,9 @@
               </value>
 
             </block>
-
+          -->
          </category>
-
+<!--
         <category v-for="actuator in getActuators()" :name="'%{BKY_' + peripherals[actuator].text.toUpperCase() + '_TB}'"
                   colour="%{BKY_ACTIONS_RGB}">
           <block v-for="func in peripherals[actuator].functions"
@@ -222,7 +226,10 @@
 
           </block>
         </category>
+      -->
      </category>
+    
+
 
     </xml>
 </div>
@@ -317,6 +324,7 @@ export default {
     workspace: Object,
     prefix: "",
     params: {"sensors": {}, "actuators": {}},
+    flyout_visibility: false,
   }),
 
   methods: {
@@ -421,13 +429,13 @@ export default {
 
         // Get current values
         var xml = Blockly.Xml.workspaceToDom(this.workspace);
-        var toolbox_item = this.workspace.toolbox_.getSelectedItem();
+        var toolbox_item = this.workspace.getToolbox().getSelectedItem();
 
        // Reint workspace
        this.workspace.dispose();
        this.workspace = Blockly.inject(blocklyDiv,
          {toolbox: this.$refs.toolbox,
-          media: 'blockly-media/',
+          //media: 'blockly-media/',
          zoom: {
          controls: true,
          wheel: true,
@@ -441,12 +449,12 @@ export default {
 
         // Reinit saved values
         Blockly.Xml.domToWorkspace(xml, this.workspace);
-        this.workspace.toolbox_.setSelectedItem(toolbox_item);
+        this.workspace.getToolbox().setSelectedItem(toolbox_item);
         this.refresh();
     },
     resize_listener(){
         // Compute the absolute coordinates and dimensions of blocklyArea.
-        let element = blocklyArea
+      /*  let element = blocklyArea
         let x = 0
         let y = 0
         // Sums over all the elements' parents offsets
@@ -459,8 +467,13 @@ export default {
         blocklyDiv.style.left = x + 'px'
         blocklyDiv.style.top = y + 'px'
         blocklyDiv.style.width = blocklyArea.offsetWidth + 'px'
-        blocklyDiv.style.height = blocklyArea.offsetHeight + 'px'
+        blocklyDiv.style.height = blocklyArea.offsetHeight + 'px'  */ 
+        
+
         Blockly.svgResize(this.workspace)
+        
+        console.log("doing svgResize")
+        // TODO: make sure the flyout statsu is kept
     },
     load_blockly(){
 
@@ -474,11 +487,11 @@ export default {
       Blockly.Msg.ACTIONS_RGB = "#f1be45"
   
       // workspace initialization
-      const blocklyArea = this.$refs.blocklyArea
+      //const blocklyArea = this.$refs.blocklyArea
       const blocklyDiv = this.$refs.blocklyDiv
       this.workspace = Blockly.inject(blocklyDiv, {
         toolbox: this.$refs.toolbox,
-        media: 'blockly-media/',
+        //media: 'blockly-media/',
         zoom: {
           controls: true,
           wheel: true,
@@ -490,13 +503,15 @@ export default {
         renderer: 'zelos'
       })
 
+
+      
       // workspace configuration
-      this.workspace.toolbox_.flyout_.autoClose = true
+      this.workspace.getToolbox().getFlyout().autoClose = true
   
-      window.addEventListener('resize', this.resize_listener, false)
-      this.resize_listener();
+      //window.addEventListener('resize', this.resize_listener, false)
+      //this.resize_listener();
   
-      this.refresh();
+      //this.refresh();
 
 
       // Undo/Redo
@@ -512,7 +527,7 @@ export default {
       })
   */
       // Recolor predefined Blocks
-      for (const [key, value] of Object.entries(predefined_blocks)) {
+/*      for (const [key, value] of Object.entries(predefined_blocks)) {
         //https://groups.google.com/forum/#!topic/blockly/yUBEymLKBbk
         const blk = Blockly.Blocks[key]
         const oldInit = blk.init
@@ -521,16 +536,16 @@ export default {
           this.setColour(value)
         }
       }
-
-      if (!isRegistered) {
+*/
+     /* if (!isRegistered) {
         this.load_blockly_modules()
         isRegistered = true
-      }
+      } */
 
-      const storage = localStorage.getItem("blockly")
-      if (storage !== null) {
-        Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(storage), this.workspace)
-      }
+     // const storage = localStorage.getItem("blockly")
+     // if (storage !== null) {
+     //   Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(storage), this.workspace)
+     // }
 
     }
    
@@ -538,18 +553,42 @@ export default {
   mounted() {
     // Needs to be loaded when re-mounted
     // (ie. switching between python-blockly)
-    if (isRegistered) {
+    //if (isRegistered) {
       this.load_blockly();
-    }
+      //this.resize_listener(); //only svgResize()
+    //}
   },
   watch: {
      visible(newVal) {
-       if (newVal) {
+        this.$nextTick(() => {
+          // this will enable blockly as soon as it gets focus, but it will also
+          // change blockl location. So for now the solution is to always load
+          // blockly focussed first.
+         // Blockly.svgResize(this.workspace)
+
+        })
+
+
+        //console.log(toolbox.getSelectedItem())
+   /*    if (newVal) {
+         this.workspace.setVisible(newVal);
          this.$nextTick(() => {
-           this.resize_listener();
+           Blockly.svgResize(this.workspace);
+           const toolbox = this.workspace.getToolbox()
+            if (toolbox) {
+              toolbox.refreshSelection()
+            }
+           //this.resize_listener();
+           //this.workspace.getToolbox().setSelectedItem(this.toolbox_item);
+           console.log("toggle visitbility")
+           //this.workspace.setVisible(newVal);
          });
-       }
-     },
+       } else {
+          this.workspace.setVisible(newVal);
+        // this.flyout_visibility = this.workspace.getToolbox().getFlyout().isVisible();
+         console.log(this.flyout_visibility)
+       }*/
+     },/*
      '$i18n.locale': function(newVal, oldVal){
         Blockly.setLocale(locales[newVal]);
         this.refresh_blockly();
@@ -581,7 +620,7 @@ export default {
           this.params = newVal; 
           setTimeout(this.load_blockly, 10); // Why?, also not reactive with Vue.set
 
-        },     
+        },    */
   }
 }
 

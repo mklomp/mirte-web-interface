@@ -66,11 +66,13 @@ const localePath = useLocalePath()
                 </div>
                   
            
-                <div v-show="isBlockly" class="h-100">
+                <div id="blocklyItem" v-show="isBlockly" class="h-100">
                     <Blockly :visible="isBlockly"/>
                 </div>
 
+                
                
+
                 <div v-show="!isBlockly" class="h-100">
                     <Codemirror :visible="!isBlockly"/>
                 </div>
@@ -119,7 +121,7 @@ const localePath = useLocalePath()
 export default {
 
   data: () => ({
-        language: "blockly1",
+        language: "blockly", //currently we should start with blockly
   }),
   methods: {
         setLanguage(language) {

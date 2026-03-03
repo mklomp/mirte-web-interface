@@ -50,7 +50,7 @@ export default {
     visible(newVal) {
       if (newVal && this.editor) {
         this.$nextTick(() => {
-          this.editor.refresh();
+          //this.editor.refresh();
         });
       }
     },
