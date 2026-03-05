@@ -1,628 +1,90 @@
 <template>
-  <div class="h-100">
-    <div id="blocklyArea" ref="blocklyArea" class="blocklyArea h-100">
-      <div id="blocklyDiv" ref="blocklyDiv" style="height: 100%; width: 100%;"></div>
-    </div>
-
-    <xml id="toolbox" ref="toolbox" style="display: none">
-
-
-      <category name="%{BKY_SENSORS}" colour="%{BKY_SENSORS_RGB}" expanded=true>
-
-        <!--
-         <category name="%{BKY_ROBOT}" colour="%{BKY_SENSORS_RGB}">
-            <block type="get_analog_pin_value"></block>
-            <block type="get_digital_pin_value"></block>
-         </category>
-
-
-        <category v-for="sensor in getSensors()" :name="'%{BKY_' + peripherals[sensor].text.toUpperCase() + '_TB}'"
-                  colour="%{BKY_SENSORS_RGB}">
-          <block v-for="func in peripherals[sensor].functions"
-                 :type="func.concat('_').concat(sensor)">
-          </block>
-        </category>
-      -->
-      </category>
-
-
-
-
-
-      <category name="%{BKY_FLOW}" colour="%{BKY_FLOW_RGB}" expanded="true">
-
-        <category name="%{BKY_LOOPS}" colour="%{BKY_FLOW_RGB}">
-          <block type="controls_repeat_ext">
-            <value name="TIMES">
-              <block type="math_number">
-                <field name="NUM">10</field>
-              </block>
-            </value>
-          </block>
-          <block type="controls_whileUntil">
-            <value name="BOOL">
-              <block type="logic_boolean">
-                <field name="BOOL">TRUE</field>
-              </block>
-            </value>
-          </block>
-          <block type="controls_for">
-            <field name="VAR">i</field>
-            <value name="FROM">
-              <block type="math_number">
-                <field name="NUM">1</field>
-              </block>
-            </value>
-            <value name="TO">
-              <block type="math_number">
-                <field name="NUM">10</field>
-              </block>
-            </value>
-            <value name="BY">
-              <block type="math_number">
-                <field name="NUM">1</field>
-              </block>
-            </value>
-          </block>
-          <block type="controls_forEach"></block>
-          <block type="controls_flow_statements"></block>
-        </category>
-
-        <category name="%{BKY_TIME}" colour="%{BKY_FLOW_RGB}">
-          <block type="wait">
-            <value name="VALUE">
-              <block type="math_number">
-                <field name="NUM">1</field>
-              </block>
-            </value>
-          </block>
-          <block type="wait_until"></block>
-<!--          <block type="get_timestamp"></block>  -->
-        </category>
-
-        <category name="%{BKY_CONDITIONS}" colour="%{BKY_FLOW_RGB}">
-          <block type="controls_if"></block>
-          <block type="controls_if">
-            <mutation else="1"></mutation>
-          </block>
-          <block type="controls_if">
-            <mutation elseif="1" else="1"></mutation>
-          </block>
-        </category>
-
-        <category name="%{BKY_FUNCTIONS}" custom="PROCEDURE" colour="%{BKY_FLOW_RGB}">
-        </category>
-
-      </category>
-
-      <category name="%{BKY_DATA}" colour="%{BKY_DATA_RGB}" expanded="true">
-
-        <category name="%{BKY_LOGIC}" colour="%{BKY_DATA_RGB}">
-          <block type="logic_compare"></block>
-          <block type="logic_operation"></block>
-          <block type="logic_negate"></block>
-          <block type="logic_boolean"></block>
-          <block type="logic_null"></block>
-          <block type="logic_ternary"></block>
-        </category>
-
-        <category name="%{BKY_MATH}" colour="%{BKY_DATA_RGB}">
-          <block type="math_number">
-            <field name="NUM">123</field>
-          </block>
-          <block type="math_arithmetic"></block>
-          <block type="math_single"></block>
-          <block type="math_trig"></block>
-          <block type="math_constant"></block>
-          <block type="math_number_property"></block>
-          <block type="math_round"></block>
-          <block type="math_on_list"></block>
-          <block type="math_modulo"></block>
-          <block type="math_constrain">
-            <value name="LOW">
-              <block type="math_number">
-                <field name="NUM">1</field>
-              </block>
-            </value>
-            <value name="HIGH">
-              <block type="math_number">
-                <field name="NUM">100</field>
-              </block>
-            </value>
-          </block>
-          <block type="math_random_int">
-            <value name="FROM">
-              <block type="math_number">
-                <field name="NUM">1</field>
-              </block>
-            </value>
-            <value name="TO">
-              <block type="math_number">
-                <field name="NUM">100</field>
-              </block>
-            </value>
-          </block>
-          <block type="math_random_float"></block>
-          <block type="math_atan2"></block>
-        </category>
-
-        <category name="%{BKY_CATTEXT}" colour="%{BKY_DATA_RGB}">
-          <block type="text"></block>
-          <block type="text_join"></block>
-          <block type="text_append"></block>
-          <block type="text_length"></block>
-          <block type="text_isEmpty"></block>
-          <block type="text_indexOf"></block>
-          <block type="text_charAt"></block>
-          <block type="text_getSubstring"></block>
-          <block type="text_changeCase"></block>
-          <block type="text_trim"></block>
-          <block type="text_prompt_ext"></block>
-        </category>
-
-
-        <category name="%{BKY_LISTS}" colour="%{BKY_DATA_RGB}">
-          <block type="lists_create_empty"></block>
-          <block type="lists_create_with"></block>
-          <block type="lists_repeat">
-            <value name="NUM">
-              <block type="math_number">
-                <field name="NUM">5</field>
-              </block>
-            </value>
-          </block>
-          <block type="lists_length"></block>
-          <block type="lists_isEmpty"></block>
-          <block type="lists_indexOf"></block>
-          <block type="lists_getIndex"></block>
-          <block type="lists_setIndex"></block>
-        </category>
-
-        <category name="%{BKY_VARIABLES}" custom="VARIABLE" colour="%{BKY_DATA_RGB}">
-        </category>
-
-      </category>
-
-      <category name="%{BKY_ACTIONS}" colour="%{BKY_ACTIONS_RGB}" expanded=true>
-
-         <category name="%{BKY_ROBOT}" colour="%{BKY_ACTIONS_RGB}">
-
-            <block type="text_print">
-              <value name="TEXT">
-                <block type="text"></block>
-              </value>
-            </block> 
-<!--
-                        <block type="set_analog_pin_value">
-              <value name="VALUE">
-                <block type="math_number">
-                  <field name="NUM">0</field>
-                </block>
-              </value>
-            </block>
-
-            <block type="set_digital_pin_value">
-              <value name="VALUE">
-                <block type="logic_boolean">
-                  <field name="BOOL">TRUE</field>
-                </block>
-              </value>
-
-            </block>
-          -->
-         </category>
-<!--
-        <category v-for="actuator in getActuators()" :name="'%{BKY_' + peripherals[actuator].text.toUpperCase() + '_TB}'"
-                  colour="%{BKY_ACTIONS_RGB}">
-          <block v-for="func in peripherals[actuator].functions"
-                 :type="func.concat('_').concat(actuator)">
-             <value v-if="peripherals[actuator].default_value" :name="peripherals[actuator].default_value.name">
-                <block :type="peripherals[actuator].default_value.type">
-                  <field :name="peripherals[actuator].default_value.field">{{peripherals[actuator].default_value.value}}</field>
-                </block>
-              </value>
-
-
-
-          </block>
-        </category>
-      -->
-     </category>
-    
-
-
-    </xml>
-</div>
+  <div ref="blocklyDiv" style="width: 100%; height: 400px;"></div>
 </template>
 
-<script>
-//import Vue from 'vue'
-//import * as ROSLIB from 'roslib'
-//import ros from '../ws-connection/ROS-connection.js'
+<script setup>
+import { ref, onMounted, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import * as Blockly from 'blockly'
-import 'blockly/python'
-//import EventBus from '../event-bus'
-import * as NL from 'blockly/msg/nl'
-import CustomNL from "../../locales/nl.json"
-import * as EN from 'blockly/msg/en'
-import CustomEN from "../../locales/en.json"
+import { pythonGenerator } from "blockly/python"
 
-var CombinedNL = { ...(JSON.parse(JSON.stringify(CustomNL.blockly))),  ...NL} ;
-var CombinedEN = { ...(JSON.parse(JSON.stringify(CustomEN.blockly))),  ...EN} ;
+import { useCodeStore } from "@/stores/user_code"
 
-var locales = { "nl": CombinedNL, "en": CombinedEN};
+// Blockly languages
+import * as En from 'blockly/msg/en'
+import * as Nl from 'blockly/msg/nl'
 
-import properties_ph from "../assets/json/properties_ph.json"
+const blocklyDiv = ref(null)
+let workspace = null
 
-//Peripheral Blockly Modules imports
-const PBM = {}
-let isRegistered = false;
-/*PBM.default = require(`../assets/blockly/default_blocks.js`)
-for (let type of Object.keys(properties_ph)) {
-  PBM[type] = require(`../assets/blockly/${type}.js`)
-}*/
+const { locale } = useI18n()
+const store = useCodeStore()
 
-const predefined_blocks = {
-  controls_repeat_ext: "%{BKY_FLOW_RGB}",
-  controls_whileUntil: "%{BKY_FLOW_RGB}",
-  controls_for: "%{BKY_FLOW_RGB}",
-  controls_forEach: "%{BKY_FLOW_RGB}",
-  controls_flow_statements: "%{BKY_FLOW_RGB}",
-  controls_if: "%{BKY_FLOW_RGB}",
-  procedures_defnoreturn: "%{BKY_FLOW_RGB}",
-  procedures_defreturn: "%{BKY_FLOW_RGB}",
-  procedures_ifreturn: "%{BKY_FLOW_RGB}",
-  variables_set: "%{BKY_DATA_RGB}",
-  variables_get: "%{BKY_DATA_RGB}",
-  math_change: "%{BKY_DATA_RGB}",
-  text: "%{BKY_DATA_RGB}",
-  logic_compare: "%{BKY_DATA_RGB}",
-  logic_operation: "%{BKY_DATA_RGB}",
-  logic_negate: "%{BKY_DATA_RGB}",
-  logic_boolean: "%{BKY_DATA_RGB}",
-  logic_null: "%{BKY_DATA_RGB}",
-  logic_ternary: "%{BKY_DATA_RGB}",
-  math_number: "%{BKY_DATA_RGB}",
-  math_arithmetic: "%{BKY_DATA_RGB}",
-  math_single: "%{BKY_DATA_RGB}",
-  math_trig: "%{BKY_DATA_RGB}",
-  math_constant: "%{BKY_DATA_RGB}",
-  math_number_property: "%{BKY_DATA_RGB}",
-  math_round: "%{BKY_DATA_RGB}",
-  math_on_list: "%{BKY_DATA_RGB}",
-  math_modulo: "%{BKY_DATA_RGB}",
-  math_constrain: "%{BKY_DATA_RGB}",
-  math_random_int: "%{BKY_DATA_RGB}",
-  math_random_float: "%{BKY_DATA_RGB}",
-  math_atan2: "%{BKY_DATA_RGB}",
-  text_join: "%{BKY_DATA_RGB}",
-  text_append: "%{BKY_DATA_RGB}",
-  text_length: "%{BKY_DATA_RGB}",
-  text_isEmpty: "%{BKY_DATA_RGB}",
-  text_indexOf: "%{BKY_DATA_RGB}",
-  text_charAt: "%{BKY_DATA_RGB}",
-  text_getSubstring: "%{BKY_DATA_RGB}",
-  text_changeCase: "%{BKY_DATA_RGB}",
-  text_trim: "%{BKY_DATA_RGB}",
-  text_prompt_ext: "%{BKY_DATA_RGB}",
-  lists_create_empty: "%{BKY_DATA_RGB}",
-  lists_create_with: "%{BKY_DATA_RGB}",
-  lists_repeat: "%{BKY_DATA_RGB}",
-  lists_length: "%{BKY_DATA_RGB}",
-  lists_isEmpty: "%{BKY_DATA_RGB}",
-  lists_indexOf: "%{BKY_DATA_RGB}",
-  lists_getIndex: "%{BKY_DATA_RGB}",
-  lists_setIndex: "%{BKY_DATA_RGB}",
-  text_print: "%{BKY_ACTIONS_RGB}",
+function loadBlocklyMessages(lang) {
+  if (lang === 'nl') Blockly.setLocale(Nl)
+  else Blockly.setLocale(En)
 }
 
-export default {
-  props: ['visible'],
 
-  data: () => ({
-    peripherals: properties_ph,
-    workspace: Object,
-    prefix: "",
-    params: {"sensors": {}, "actuators": {}},
-    flyout_visibility: false,
-  }),
+function saveWorkspace() {
+  if (!workspace) return
 
-  methods: {
-    // highlightBlockLine and getBlockToLineMap are methods which are used in marking
-    // the blocks where the execution is currently at (the line number of it).
-    getBlockToLineMap: function () {
-      const blockMap = {}
-      const offset = (this.prefix.match(/\n/g) || []).length + 1
-      Blockly.Python.STATEMENT_PREFIX = "blockID: %1"
-      const code = Blockly.Python.workspaceToCode(this.workspace)
-      let codeLines = code.split("\n")
-      for (let i = 0; i < codeLines.length; i++) {
-        let line = codeLines[i].trim()
-        let blockIdStr = line.lastIndexOf("blockID: ")
-        if (blockIdStr >= 0) {
-          line = line.substr(blockIdStr)
-          blockMap[i + offset] = line.substr(10, 20)
-        }
-      }
-      Blockly.Python.STATEMENT_PREFIX = ""
-      return blockMap
-    },
-    highlightBlockLine: function (blockId, isParent) {
-      if (isParent) {
-        this.workspace.highlightBlock(blockId)
-      } else {
-        this.workspace.highlightBlock(blockId, true)
-      }
-      let curBlock = this.workspace.getBlockById(blockId)
-      if (curBlock) {
-        let children = curBlock.getChildren()
-        let blockMap = this.getBlockToLineMap() // TODO: this should only be generated when the block change. Not while running.
-        for (let child = 0; child < children.length; child++) {
-          if (Object.values(blockMap).indexOf(children[child].id) === -1) {
-            this.highlightBlockLine(children[child].id, false)
-          }
-        }
-      }
-    },
-    refresh: function(){
-    // Load the interpreter now, and upon future changes.
-    //generateCodeAndLoadIntoInterpreter();
-       this.workspace.addChangeListener((event) => {
-         if (event instanceof Blockly.Events.Move || event instanceof Blockly.Events.Delete || event instanceof Blockly.Events.Change) {
-           // Something changed. Parser needs to be reloaded.
+  const dom = Blockly.Xml.workspaceToDom(workspace)
+  store.setBlockly(Blockly.Xml.domToText(dom))
+  store.setBlocklyDOM(dom)
+  store.setPython(pythonGenerator.workspaceToCode(workspace))
 
-           var code = Blockly.Python.workspaceToCode(this.workspace);
+  /*const toolbox = workspace.getToolbox()
+  if (toolbox) {
+    const item = toolbox.getSelectedItem()
+    if (item) selectedCategory = item.id_
+  }*/
+}
 
-           code = this.prefix + code;
-           // cmEditor.setValue(code);
+function restoreWorkspace() {
+  if (!store.blockly_dom) return
 
-           var xml = Blockly.Xml.workspaceToDom(this.workspace);
-           var xml_text = Blockly.Xml.domToText(xml);
-           localStorage.setItem("blockly", xml_text);
-
-           // update the store
-           this.$store.dispatch('setCode', code)
-           // this.$store.dispatch('setBlockly', xml_text)
-         }
-       });
-    },
-    //separates peripheral items into sensors and actuators
-    getSensors(){
-      return this.params.sensors ? Object.keys(this.params.sensors) : [];
-    },
-    getActuators(){
-      return this.params.actuators ? Object.keys(this.params.actuators) : [];
-    },
-    // Loads in imported blockly modules block definitions
-    load_blockly_modules() {
-
-      // Load default blocks
-      PBM["default"].load(Blockly, []);
-
-      for (let pbm of Object.keys(PBM)) {
-
-        // Load sensors
-        if (this.params.sensors.hasOwnProperty(pbm)){
-           let items = []
-           for (const [key, value] of Object.entries(this.params.sensors[pbm])) {
-              // We use [T.name, T.name] here because the dropdown menu generator
-              // of blockly requires an array as [showSelectOption, resultValue].
-              items.push([value.name, value.name]);
-           }
-           PBM[pbm].load(Blockly, items )
-        }
-       
-        // Load actuators
-        if (this.params.actuators.hasOwnProperty(pbm)){
-           let items = []
-           for (const [key, value] of Object.entries(this.params.actuators[pbm])) {
-              // We use [T.name, T.name] here because the dropdown menu generator
-              // of blockly requires an array as [showSelectOption, resultValue].
-              items.push([value.name, value.name]);
-           }
-           PBM[pbm].load(Blockly, items )
-        }
-
-      }
-    },
-    refresh_blockly(){
-
-        // Get current values
-        var xml = Blockly.Xml.workspaceToDom(this.workspace);
-        var toolbox_item = this.workspace.getToolbox().getSelectedItem();
-
-       // Reint workspace
-       this.workspace.dispose();
-       this.workspace = Blockly.inject(blocklyDiv,
-         {toolbox: this.$refs.toolbox,
-          //media: 'blockly-media/',
-         zoom: {
-         controls: true,
-         wheel: true,
-         startScale: 0.8,
-         maxScale: 3,
-         minScale: 0.3,
-         scaleSpeed: 1.2
-         },
-         renderer: 'zelos'
-        });
-
-        // Reinit saved values
-        Blockly.Xml.domToWorkspace(xml, this.workspace);
-        this.workspace.getToolbox().setSelectedItem(toolbox_item);
-        this.refresh();
-    },
-    resize_listener(){
-        // Compute the absolute coordinates and dimensions of blocklyArea.
-      /*  let element = blocklyArea
-        let x = 0
-        let y = 0
-        // Sums over all the elements' parents offsets
-        do {
-          x += element.offsetLeft
-          y += element.offsetTop
-          element = element.offsetParent
-        } while (element)
-        // Position blocklyDiv over blocklyArea.
-        blocklyDiv.style.left = x + 'px'
-        blocklyDiv.style.top = y + 'px'
-        blocklyDiv.style.width = blocklyArea.offsetWidth + 'px'
-        blocklyDiv.style.height = blocklyArea.offsetHeight + 'px'  */ 
-        
-
-        Blockly.svgResize(this.workspace)
-        
-        console.log("doing svgResize")
-        // TODO: make sure the flyout statsu is kept
-    },
-    load_blockly(){
-
-      // Blockly configuration
-      Blockly.setLocale(locales[this.$i18n.locale])
-      // TODO: use colors from scss
-      Blockly.Msg.FLOW_RGB = "#cee6ed"
-      Blockly.Msg.DATA_RGB = "#9b372a"
-      Blockly.Msg.MODULES_RGB = "#cf0000"
-      Blockly.Msg.SENSORS_RGB = "#9db7be"
-      Blockly.Msg.ACTIONS_RGB = "#f1be45"
-  
-      // workspace initialization
-      //const blocklyArea = this.$refs.blocklyArea
-      const blocklyDiv = this.$refs.blocklyDiv
-      this.workspace = Blockly.inject(blocklyDiv, {
-        toolbox: this.$refs.toolbox,
-        //media: 'blockly-media/',
-        zoom: {
-          controls: true,
-          wheel: true,
-          startScale: 0.8,
-          maxScale: 3,
-          minScale: 0.3,
-          scaleSpeed: 1.2
-        },
-        renderer: 'zelos'
-      })
+  Blockly.Xml.domToWorkspace(store.blockly_dom, workspace)
+}
 
 
-      
-      // workspace configuration
-      this.workspace.getToolbox().getFlyout().autoClose = true
-  
-      //window.addEventListener('resize', this.resize_listener, false)
-      //this.resize_listener();
-  
-      //this.refresh();
+function initBlockly() {
 
-
-      // Undo/Redo
-  /*    EventBus.$on('control', (payload) => {
-        switch (payload) {
-          case "undo":
-            this.workspace.undo(false)
-            break
-          case "redo":
-            this.workspace.undo(true)
-            break
-        }
-      })
-  */
-      // Recolor predefined Blocks
-/*      for (const [key, value] of Object.entries(predefined_blocks)) {
-        //https://groups.google.com/forum/#!topic/blockly/yUBEymLKBbk
-        const blk = Blockly.Blocks[key]
-        const oldInit = blk.init
-        blk.init = function () {
-          oldInit.call(this)
-          this.setColour(value)
-        }
-      }
-*/
-     /* if (!isRegistered) {
-        this.load_blockly_modules()
-        isRegistered = true
-      } */
-
-     // const storage = localStorage.getItem("blockly")
-     // if (storage !== null) {
-     //   Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(storage), this.workspace)
-     // }
-
-    }
-   
-  },
-  mounted() {
-    // Needs to be loaded when re-mounted
-    // (ie. switching between python-blockly)
-    //if (isRegistered) {
-      this.load_blockly();
-      //this.resize_listener(); //only svgResize()
-    //}
-  },
-  watch: {
-     visible(newVal) {
-        this.$nextTick(() => {
-          // this will enable blockly as soon as it gets focus, but it will also
-          // change blockl location. So for now the solution is to always load
-          // blockly focussed first.
-         // Blockly.svgResize(this.workspace)
-
-        })
-
-
-        //console.log(toolbox.getSelectedItem())
-   /*    if (newVal) {
-         this.workspace.setVisible(newVal);
-         this.$nextTick(() => {
-           Blockly.svgResize(this.workspace);
-           const toolbox = this.workspace.getToolbox()
-            if (toolbox) {
-              toolbox.refreshSelection()
-            }
-           //this.resize_listener();
-           //this.workspace.getToolbox().setSelectedItem(this.toolbox_item);
-           console.log("toggle visitbility")
-           //this.workspace.setVisible(newVal);
-         });
-       } else {
-          this.workspace.setVisible(newVal);
-        // this.flyout_visibility = this.workspace.getToolbox().getFlyout().isVisible();
-         console.log(this.flyout_visibility)
-       }*/
-     },/*
-     '$i18n.locale': function(newVal, oldVal){
-        Blockly.setLocale(locales[newVal]);
-        this.refresh_blockly();
-     },
-    '$store.getters.getLinenumber':
-        function (newVal, oldVal) {
-          let blockMap = this.getBlockToLineMap() // TODO: this should only be generated when the block change. Not while running.
-          this.highlightBlockLine(blockMap[newVal], true)
-        },
-    '$store.getters.getPConfig':
-        function (newVal, oldVal) {
-          window.location.reload()
-        },
-    '$store.getters.getBlockly':
-        function (newVal, oldVal) {
-          if (newVal != ""){
-            Blockly.mainWorkspace.clear()
-            Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(newVal), this.workspace)
-            Blockly.mainWorkspace.zoomToFit()
-            this.$store.dispatch('setBlockly', "")
-          }
-        },
-    '$store.getters.getPeripherals':
-        function (newVal, oldVal) {
-          // NOTE: this one should only be called once after
-          // the app is loaded and the ROS paramters have
-          // been set.
-
-          this.params = newVal; 
-          setTimeout(this.load_blockly, 10); // Why?, also not reactive with Vue.set
-
-        },    */
+  var toolbox_item = null
+  if (workspace) {
+    workspace.dispose()
+    toolbox_item = workspace.getToolbox().getSelectedItem()
   }
+
+  loadBlocklyMessages(locale.value)
+
+  workspace = Blockly.inject(blocklyDiv.value, {
+    toolbox: `<xml>
+    <category name="Logic" categorystyle="logic_category">
+      <block type="controls_if"></block>
+    </category>
+
+    <category name="Loops">
+      <block type="controls_repeat_ext"></block>
+    </category>
+  </xml>
+  `
+  })
+
+  restoreWorkspace()
+  if (toolbox_item) workspace.setToolbox().setSelectedItem(toolbox_item)
+
+  workspace.addChangeListener(() => {
+    saveWorkspace()
+  })
+
 }
 
+onMounted(() => {
+  initBlockly()
+})
 
+watch(locale, () => {
+  initBlockly()
+})
 </script>

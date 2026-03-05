@@ -5,7 +5,10 @@ import nlFlag from 'flag-icons/flags/4x3/nl.svg?url'
 import gbFlag from 'flag-icons/flags/4x3/gb.svg?url'
 
 const { locale } = useI18n()
-const switchLocalePath = useSwitchLocalePath()
+
+function changeLocale(code) {
+  locale.value = code
+}
 
 const langs = [
   { code: "en", text: "English", flag: gbFlag },
@@ -24,10 +27,10 @@ const langs = [
   </a>
   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="localeDropdown">
     <li v-for="lang in langs" :key="lang.code">
-      <NuxtLink class="dropdown-item" :to="switchLocalePath(lang.code)">
-        <img class="fi" :src="`${lang.flag}`" alt="flag">
+      <button class="dropdown-item" @click="changeLocale(lang.code)">
+        <img class="fi" :src="lang.flag" alt="flag">
         {{ lang.text }}
-      </NuxtLink>
+      </button>
     </li>
   </ul>
 </template>
