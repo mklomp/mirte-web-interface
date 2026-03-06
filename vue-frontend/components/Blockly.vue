@@ -107,9 +107,19 @@ function initBlockly(lang_changed = false) {
   if (workspaceDOM) restoreWorkspace()
   if (!lang_changed) workspace.scrollCenter()
 
-  workspace.addChangeListener(() => {
-    // todo: only on certin events.
-    storeCode()
+  workspace.addChangeListener((event) => {
+    // Ignore UI events (scroll, selection, toolbox open, etc.)
+    if (event.isUiEvent) return
+
+    // Only store meaningful changes
+    if (
+      event.type === Blockly.Events.BLOCK_CREATE ||
+      event.type === Blockly.Events.BLOCK_DELETE ||
+      event.type === Blockly.Events.BLOCK_CHANGE ||
+      event.type === Blockly.Events.BLOCK_MOVE
+    ) {
+      storeCode()
+    }
   })
 
 }
