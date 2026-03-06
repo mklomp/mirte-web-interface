@@ -1,5 +1,5 @@
 <template>
-  <div ref="blocklyDiv" style="width: 100%; height: 400px;"></div>
+  <div ref="blocklyDiv" style="width: 100%; height: 100%;"></div>
 </template>
 
 <script setup>
@@ -20,40 +20,63 @@ let workspace = null
 const { locale } = useI18n()
 const store = useCodeStore()
 
+// Blockly state
+let workspaceDOM = null
+let flyout_visible = false
+let scale = 1
+let scrollX = 0
+let scrollY = 0
+
 function loadBlocklyMessages(lang) {
   if (lang === 'nl') Blockly.setLocale(Nl)
   else Blockly.setLocale(En)
 }
 
+// Store code to Pinia store (which saves it to localStorage)
+function storeCode(){
+  if (!workspace) return
 
+  workspaceDOM = Blockly.Xml.workspaceToDom(workspace)
+  store.setBlockly(Blockly.Xml.domToText(workspaceDOM))
+  store.setPython(pythonGenerator.workspaceToCode(workspace))
+}
+
+// Save workspace elements for language reset
 function saveWorkspace() {
   if (!workspace) return
 
-  const dom = Blockly.Xml.workspaceToDom(workspace)
-  store.setBlockly(Blockly.Xml.domToText(dom))
-  store.setBlocklyDOM(dom)
-  store.setPython(pythonGenerator.workspaceToCode(workspace))
-
-  /*const toolbox = workspace.getToolbox()
-  if (toolbox) {
-    const item = toolbox.getSelectedItem()
-    if (item) selectedCategory = item.id_
-  }*/
+  workspaceDOM = Blockly.Xml.workspaceToDom(workspace)
+  flyout_visible = workspace.getToolbox().getSelectedItem()
+  scale = workspace.getScale()
+  scrollX = workspace.scrollX
+  scrollY = workspace.scrollY
 }
 
+// Restore workspace elements after language reset
 function restoreWorkspace() {
-  if (!store.blockly_dom) return
+  if (!workspaceDOM) return
 
-  Blockly.Xml.domToWorkspace(store.blockly_dom, workspace)
+  Blockly.Xml.domToWorkspace(workspaceDOM, workspace)
+  workspace.setScale(scale)
+  workspace.scroll(scrollX, scrollY)
+  workspace.getToolbox().setSelectedItem(flyout_visible)
 }
 
+// There are three options that this function can be called:
+// - First time (with nothing in localStorage)
+// - At a language change
+// - After refresh (or any revisit, so with something in localStorage)
+function initBlockly(lang_changed = false) {
 
-function initBlockly() {
+  // Set workspaceDOM from previous session
+  if (store.blockly){
+    workspaceDOM = Blockly.utils.xml.textToDom(store.blockly)
+  }
 
-  var toolbox_item = null
-  if (workspace) {
+  // Save and clear workspace if called on language change
+  if (lang_changed) {
+    saveWorkspace()
     workspace.dispose()
-    toolbox_item = workspace.getToolbox().getSelectedItem()
   }
 
   loadBlocklyMessages(locale.value)
@@ -68,23 +91,35 @@ function initBlockly() {
       <block type="controls_repeat_ext"></block>
     </category>
   </xml>
-  `
+  `,
+    zoom: {  
+      controls: true,
+      wheel: true,
+      startScale: 0.8,
+      maxScale: 3,
+      minScale: 0.3,
+      scaleSpeed: 1.2
+    },
+    renderer: 'zelos'
   })
 
-  restoreWorkspace()
-  if (toolbox_item) workspace.setToolbox().setSelectedItem(toolbox_item)
+  // Restore workspace (including location), or scroll to center
+  if (workspaceDOM) restoreWorkspace()
+  if (!lang_changed) workspace.scrollCenter()
 
   workspace.addChangeListener(() => {
-    saveWorkspace()
+    // todo: only on certin events.
+    storeCode()
   })
 
 }
 
 onMounted(() => {
+  store.loadFromLocalStorage()
   initBlockly()
 })
 
 watch(locale, () => {
-  initBlockly()
+  initBlockly(true)
 })
 </script>
