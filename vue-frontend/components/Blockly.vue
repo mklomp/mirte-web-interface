@@ -8,7 +8,11 @@ import { useI18n } from 'vue-i18n'
 import * as Blockly from 'blockly'
 import { pythonGenerator } from "blockly/python"
 
+// Import custom items
+import { getToolbox } from '@/assets/blockly/toolbox'
 import { useCodeStore } from "@/stores/user_code"
+import CustomNl from "@/locales/nl.json"
+import CustomEn from "@/locales/en.json"
 
 // Blockly languages
 import * as En from 'blockly/msg/en'
@@ -28,8 +32,13 @@ let scrollX = 0
 let scrollY = 0
 
 function loadBlocklyMessages(lang) {
-  if (lang === 'nl') Blockly.setLocale(Nl)
-  else Blockly.setLocale(En)
+  if (lang === 'nl') {
+    Blockly.setLocale(Nl)
+    Blockly.setLocale(CustomNl.blockly)
+  } else {
+    Blockly.setLocale(En)
+    Blockly.setLocale(CustomEn.blockly)
+  }
 }
 
 // Store code to Pinia store (which saves it to localStorage)
@@ -82,16 +91,7 @@ function initBlockly(lang_changed = false) {
   loadBlocklyMessages(locale.value)
 
   workspace = Blockly.inject(blocklyDiv.value, {
-    toolbox: `<xml>
-    <category name="Logic" categorystyle="logic_category">
-      <block type="controls_if"></block>
-    </category>
-
-    <category name="Loops">
-      <block type="controls_repeat_ext"></block>
-    </category>
-  </xml>
-  `,
+    toolbox: getToolbox(),
     zoom: {  
       controls: true,
       wheel: true,
