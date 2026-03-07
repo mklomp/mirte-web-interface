@@ -13,7 +13,6 @@ export const useCodeStore = defineStore('user_code', {
     },
     setBlockly(value) {
       this.blockly = value
-      console.log("Setting blockly")
       localStorage.setItem('blockly', value)
     },
     setPython(value) {
