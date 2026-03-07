@@ -11,6 +11,7 @@ import { pythonGenerator } from "blockly/python"
 // Import custom items
 import { getToolbox } from '@/assets/blockly/toolbox'
 import { useCodeStore } from "@/stores/user_code"
+import { useRosStore } from '~/stores/ros_params'
 import CustomNl from "@/locales/nl.json"
 import CustomEn from "@/locales/en.json"
 
@@ -20,9 +21,12 @@ import * as Nl from 'blockly/msg/nl'
 
 const blocklyDiv = ref(null)
 let workspace = null
+let toolBox = getToolbox()
+const customBlockModules = import.meta.glob('@/assets/blockly/*.js', { eager: true })
 
 const { locale } = useI18n()
 const store = useCodeStore()
+const rosStore = useRosStore()
 
 // Blockly state
 let workspaceDOM = null
@@ -30,6 +34,38 @@ let flyout_visible = false
 let scale = 1
 let scrollX = 0
 let scrollY = 0
+
+// TODO: use colors from scss
+Blockly.Msg.FLOW_RGB = "#cee6ed"
+Blockly.Msg.DATA_RGB = "#9b372a"
+Blockly.Msg.MODULES_RGB = "#cf0000"
+Blockly.Msg.SENSORS_RGB = "#9db7be"
+Blockly.Msg.ACTIONS_RGB = "#f1be45"
+
+function addToToolbox(type, item) {
+  const category = toolBox.contents.find(c => c.id === type)
+  if (!category) return
+
+  category.contents.push(item)
+}
+
+function loadCustomModules() {
+  if (Object.keys(rosStore.peripherals).length == 0) return
+
+  for (const module of Object.values(customBlockModules)) {
+    const module_type = module.getType()
+    let dropdown_instances = []
+    if (module_type) {
+      const instances = Object.keys(rosStore.peripherals[module_type?.category][module_type?.type] || {})
+      dropdown_instances = instances.map(n => [n, n])
+    }
+
+    const custom_module = module.load(Blockly, pythonGenerator, dropdown_instances)
+    if (custom_module) { // default_blocks are already in the toolbox
+      addToToolbox(custom_module.type, custom_module.contents)
+    }
+  }
+}
 
 function loadBlocklyMessages(lang) {
   if (lang === 'nl') {
@@ -42,7 +78,7 @@ function loadBlocklyMessages(lang) {
 }
 
 // Store code to Pinia store (which saves it to localStorage)
-function storeCode(){
+function storeCode() {
   if (!workspace) return
 
   workspaceDOM = Blockly.Xml.workspaceToDom(workspace)
@@ -73,17 +109,17 @@ function restoreWorkspace() {
 
 // There are three options that this function can be called:
 // - First time (with nothing in localStorage)
-// - At a language change
+// - At a language/rosstate change
 // - After refresh (or any revisit, so with something in localStorage)
-function initBlockly(lang_changed = false) {
+function initBlockly(changed = false) {
 
   // Set workspaceDOM from previous session
-  if (store.blockly){
+  if (store.blockly && Object.keys(rosStore.peripherals).length != 0) {
     workspaceDOM = Blockly.utils.xml.textToDom(store.blockly)
   }
 
   // Save and clear workspace if called on language change
-  if (lang_changed) {
+  if (changed) {
     saveWorkspace()
     workspace.dispose()
   }
@@ -91,8 +127,8 @@ function initBlockly(lang_changed = false) {
   loadBlocklyMessages(locale.value)
 
   workspace = Blockly.inject(blocklyDiv.value, {
-    toolbox: getToolbox(),
-    zoom: {  
+    toolbox: toolBox,
+    zoom: {
       controls: true,
       wheel: true,
       startScale: 0.8,
@@ -100,12 +136,30 @@ function initBlockly(lang_changed = false) {
       minScale: 0.3,
       scaleSpeed: 1.2
     },
+    theme: Blockly.Theme.defineTheme("customTheme", {
+      base: Blockly.Themes.Zelos,
+      blockStyles: {
+        loop_blocks: { colourPrimary: Blockly.Msg.FLOW_RGB, colourSecondary:"", colourTertiary: "" },
+        procedure_blocks: { colourPrimary: Blockly.Msg.FLOW_RGB, colourSecondary:"", colourTertiary: "" },
+        logic_blocks: { colourPrimary: Blockly.Msg.DATA_RGB, colourSecondary:"", colourTertiary: "" },
+        math_blocks: { colourPrimary: Blockly.Msg.DATA_RGB, colourSecondary:"", colourTertiary: "" },
+        text_blocks: { colourPrimary: Blockly.Msg.DATA_RGB, colourSecondary:"", colourTertiary: "" },
+        list_blocks: { colourPrimary: Blockly.Msg.DATA_RGB, colourSecondary:"", colourTertiary: "" },
+        variable_blocks: { colourPrimary: Blockly.Msg.DATA_RGB, colourSecondary:"", colourTertiary: "" },
+      },
+    }),
     renderer: 'zelos'
   })
 
+  // Set color of control_if, since it is part of the logic_blocks
+  const i = Blockly.Blocks['controls_if'].init;
+  Blockly.Blocks['controls_if'].init = function(){ i.call(this); this.setColour(Blockly.Msg.FLOW_RGB); };
+  const j = Blockly.Blocks['text_print'].init;
+  Blockly.Blocks['text_print'].init = function(){ j.call(this); this.setColour(Blockly.Msg.ACTIONS_RGB); };
+
   // Restore workspace (including location), or scroll to center
   if (workspaceDOM) restoreWorkspace()
-  if (!lang_changed) workspace.scrollCenter()
+  if (!changed) workspace.scrollCenter()
 
   workspace.addChangeListener((event) => {
     // Ignore UI events (scroll, selection, toolbox open, etc.)
@@ -130,6 +184,11 @@ onMounted(() => {
 })
 
 watch(locale, () => {
+  initBlockly(true)
+})
+
+watch(() => rosStore.peripherals, () => {
+  loadCustomModules()
   initBlockly(true)
 })
 </script>
