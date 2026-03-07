@@ -52,16 +52,18 @@ function addToToolbox(type, item) {
 function loadCustomModules() {
   if (Object.keys(rosStore.peripherals).length == 0) return
 
+  console.log(rosStore.peripherals)
+
   for (const module of Object.values(customBlockModules)) {
     const module_type = module.getType()
     let dropdown_instances = []
+    let instances = []
     if (module_type) {
-      const instances = Object.keys(rosStore.peripherals[module_type?.category][module_type?.type] || {})
+      instances = Object.keys(rosStore.peripherals[module_type?.category][module_type?.type] || {})
       dropdown_instances = instances.map(n => [n, n])
     }
-
     const custom_module = module.load(Blockly, pythonGenerator, dropdown_instances)
-    if (custom_module) { // default_blocks are already in the toolbox
+    if (custom_module && instances.length != 0) { // default_blocks are already in the toolbox
       addToToolbox(custom_module.type, custom_module.contents)
     }
   }
