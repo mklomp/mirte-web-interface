@@ -114,7 +114,7 @@ export function load(Blockly, pythonGenerator, instances) {
       name: "%{BKY_PP_MOTOR_TB}",
       colour: "%{BKY_ACTIONS_RGB}",
       contents: [
-        { kind: "block", type: "set_speed_pp_motor" },
+        { kind: "block", type: "set_speed_pp_motor", inputs: { SPEED: { block: { type: "math_number", fields: { NUM: 0 } } } } },
         { kind: "block", type: "stop_pp_motor" },
         { kind: "block", type: "set_control_pp_motor" },
       ]

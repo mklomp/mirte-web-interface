@@ -80,7 +80,7 @@ export function load(Blockly, pythonGenerator, instances) {
       name: "%{BKY_OLED_TB}",
       colour: "%{BKY_ACTIONS_RGB}",
       contents: [
-        { kind: "block", type: "set_oled_oled" },
+        { kind: "block", type: "set_oled_oled", inputs: { VALUE: { block: { type: "text", fields: { TEXT: "" } } } } },
       ]
     }
   }

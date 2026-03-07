@@ -49,7 +49,7 @@ export function load(Blockly, pythonGenerator, instances) {
       name: "%{BKY_SERVO_TB}",
       colour: "%{BKY_ACTIONS_RGB}",
       contents: [
-        { kind: "block", type: "set_angle_servo" },
+        { kind: "block", type: "set_angle_servo", inputs: { ANGLE: { block: { type: "math_number", fields: { NUM: 0 } } } } },
       ]
     }
   }

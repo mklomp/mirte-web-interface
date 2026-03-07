@@ -80,7 +80,7 @@ export function load(Blockly, pythonGenerator, instances) {
       name: "%{BKY_DP_MOTOR_TB}",
       colour: "%{BKY_ACTIONS_RGB}",
       contents: [
-        { kind: "block", type: "set_speed_dp_motor" },
+        { kind: "block", type: "set_speed_dp_motor", inputs: { SPEED: { block: { type: "math_number", fields: { NUM: 0 } } } } },
         { kind: "block", type: "stop_dp_motor" },
       ]
     }
