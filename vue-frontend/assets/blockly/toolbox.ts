@@ -90,8 +90,8 @@ export const toolboxJson = {
           colour: "%{BKY_FLOW_RGB}",
           contents: [
             { kind: "block", type: "controls_if" },
-            { kind: "block", type: "controls_if", mutation: { else: 1 } },
-            { kind: "block", type: "controls_if", mutation: { elseif: 1, else: 1 } }
+            { kind: "block", type: "controls_if", extraState: { elseIfCount: 0, hasElse: true } },
+            { kind: "block", type: "controls_if", extraState: { elseIfCount: 1, hasElse: true } }
           ]
         },
         {
