@@ -178,7 +178,6 @@ function initBlockly(reason = "") {
 
   // Restore workspace (including location), or scroll to center
   if (workspaceDOM) restoreWorkspace()
-  console.log(reason)
   if (reason != "lang_change" && reason != "tab_change") workspace.scrollCenter()
 
   workspace.addChangeListener((event) => {

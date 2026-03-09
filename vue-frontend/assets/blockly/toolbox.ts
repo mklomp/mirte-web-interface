@@ -222,7 +222,7 @@ export const toolboxJson = {
             {
               kind: "block",
               type: "set_digital_pin_value",
-              inputs: { VALUE: { block: { type: "logic_boolean", fields: { BOOL: true } } } }
+              inputs: { VALUE: { block: { type: "logic_boolean", fields: { BOOL: "TRUE" } } } }
             }
           ]
         }
