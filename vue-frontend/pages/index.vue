@@ -9,27 +9,35 @@ useHead({
    ]
 })
 
-import { useLocalePath } from '#i18n'
-const localePath = useLocalePath()
+import { useCodeStore } from "@/stores/user_code"
+const codeStore = useCodeStore()
 
 const isBlockly = ref(true)
 const blocklyEditor = ref(null)
 const pythonEditor = ref(null)
 
+onMounted(() => {
+   isBlockly.value = codeStore.active == "blockly"
+})
+
+watch(() => codeStore.active, (newVal) => {
+   isBlockly.value = newVal == "blockly"
+})
+
 function undo() {
-  if (isBlockly.value) {
-    blocklyEditor.value.undo()
-  } else {
-    pythonEditor.value.undoAction()
-  }
+   if (isBlockly.value) {
+      blocklyEditor.value.undo()
+   } else {
+      pythonEditor.value.undoAction()
+   }
 }
 
 function redo() {
-  if (isBlockly.value) {
-    blocklyEditor.value.redo()
-  } else {
-    pythonEditor.value.redoAction()
-  }
+   if (isBlockly.value) {
+      blocklyEditor.value.redo()
+   } else {
+      pythonEditor.value.redoAction()
+   }
 }
 
 
@@ -66,12 +74,12 @@ function redo() {
                {{ $t('main.programming') }}
 
                <button v-bind:class="isBlockly ? 'code-active' : ''" class="btn btn-outline-light mr-2"
-                  @click="isBlockly = true;">
+                  @click="codeStore.setActive('blockly')">
                   {{ $t('programming.blockly') }}
                </button>
 
                <button v-bind:class="!isBlockly ? 'code-active' : ''" class="btn btn-outline-light mr-2"
-                  @click="isBlockly = false;">
+                  @click="codeStore.setActive('python')">
                   {{ $t('programming.python') }}
                </button>
 
@@ -86,14 +94,14 @@ function redo() {
 
 
             <div v-show="isBlockly" class="h-100">
-               <Blockly :active="isBlockly" ref="blocklyEditor"/>
+               <Blockly ref="blocklyEditor" />
             </div>
 
 
 
 
             <div v-show="!isBlockly" class="h-100">
-               <Codemirror :active="!isBlockly" ref="pythonEditor" />
+               <Codemirror ref="pythonEditor" />
             </div>
 
 

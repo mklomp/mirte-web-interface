@@ -11,13 +11,8 @@ import { undo, redo } from "@codemirror/commands"
 import { python } from "@codemirror/lang-python"
 import { useCodeStore } from "@/stores/user_code"
 
-const props = defineProps({
-  active: Boolean
-})
-
 const editorContainer = ref(null)
 let editor = null // could not be ref due to undo/redo
-
 const codeStore = useCodeStore()
 
 function undoAction() {
@@ -38,7 +33,7 @@ onMounted(() => {
       basicSetup,
       python(),
       EditorView.updateListener.of(update => {
-        if (update.docChanged && props.active) {
+        if (update.docChanged && codeStore.active == "python") {
           codeStore.setPython(update.state.doc.toString())
         }
       })
@@ -51,7 +46,7 @@ watch(
   () => codeStore.python,
   (newCode) => {
 
-    if (!editor || props.active) return
+    if (!editor || codeStore.active == "python") return
 
     const current = editor.state.doc.toString()
 

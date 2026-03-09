@@ -11,7 +11,7 @@ import { pythonGenerator } from "blockly/python"
 // Import custom items
 import { getToolbox } from '@/assets/blockly/toolbox'
 import { useCodeStore } from "@/stores/user_code"
-import { useRosStore } from '~/stores/ros_params'
+import { useRosStore } from '@/stores/ros_params'
 import CustomNl from "@/locales/nl.json"
 import CustomEn from "@/locales/en.json"
 
@@ -25,12 +25,8 @@ let toolBox = getToolbox()
 const customBlockModules = import.meta.glob('@/assets/blockly/*.js', { eager: true })
 
 const { locale } = useI18n()
-const store = useCodeStore()
+const codeStore = useCodeStore()
 const rosStore = useRosStore()
-
-const props = defineProps({
-  active: Boolean
-})
 
 // Blockly state
 let workspaceDOM = null
@@ -98,8 +94,8 @@ function storeCode() {
   if (!workspace) return
 
   workspaceDOM = Blockly.Xml.workspaceToDom(workspace)
-  store.setBlockly(Blockly.Xml.domToText(workspaceDOM))
-  store.setPython(pythonGenerator.workspaceToCode(workspace))
+  codeStore.setBlockly(Blockly.Xml.domToText(workspaceDOM))
+  codeStore.setPython(pythonGenerator.workspaceToCode(workspace))
 }
 
 // Save workspace elements for language reset
@@ -128,13 +124,14 @@ function restoreWorkspace() {
 // - At a language/rosstate change
 // - After refresh (or any revisit, so with something in localStorage)
 function initBlockly(reason = "") {
+
   // Set workspaceDOM from previous session
-  if (store.blockly && Object.keys(rosStore.peripherals).length != 0) {
-    workspaceDOM = Blockly.utils.xml.textToDom(store.blockly)
+  if (codeStore.blockly && Object.keys(rosStore.peripherals).length != 0) {
+    workspaceDOM = Blockly.utils.xml.textToDom(codeStore.blockly)
   }
 
   // Save workspace if language changed
-  if (reason == "lang_change") {
+  if (reason == "lang_change" || reason == "tab_change") {
     saveWorkspace()
   }
 
@@ -198,12 +195,24 @@ function initBlockly(reason = "") {
 }
 
 onMounted(() => {
-  store.loadFromLocalStorage()
+  codeStore.loadFromLocalStorage()
   initBlockly()
 })
 
 watch(locale, () => {
   initBlockly("lang_change")
+})
+
+// TODO: we could rewrite initBlockly in a way that we only
+// need to do Blockly.resizeSvg() in these two watches.
+// Only teh lang_change, really needs a re-init of the
+// whole blockly workspace.
+watch(() => codeStore.active, (newVal) => {
+  if (newVal == "blockly") {
+    nextTick(() => {
+      initBlockly("tab_change")
+    })
+  }
 })
 
 watch(() => rosStore.peripherals, () => {

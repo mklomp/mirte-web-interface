@@ -63,15 +63,6 @@ const isStopEnabled = computed(() => programmingState.value === 'running')
 function control(command) {
     programmingState.value = command;
 }
-
-/*
-return {
-    programmingState,
-    isPlayEnabled,
-    isStopEnabled
-}
-*/
-
 </script>
 
 
