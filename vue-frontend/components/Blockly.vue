@@ -28,6 +28,10 @@ const { locale } = useI18n()
 const store = useCodeStore()
 const rosStore = useRosStore()
 
+const props = defineProps({
+  active: Boolean
+})
+
 // Blockly state
 let workspaceDOM = null
 let flyout_visible = false
@@ -77,6 +81,16 @@ function loadBlocklyMessages(lang) {
     Blockly.setLocale(En)
     Blockly.setLocale(CustomEn.blockly)
   }
+}
+
+function undo() {
+  if (!workspace) return
+  workspace.undo(false)
+}
+
+function redo() {
+  if (!workspace) return
+  workspace.undo(true)
 }
 
 // Store code to Pinia store (which saves it to localStorage)
@@ -196,4 +210,10 @@ watch(() => rosStore.peripherals, () => {
   loadCustomModules()
   initBlockly("ros_change")
 })
+
+defineExpose({
+  undo,
+  redo
+})
+
 </script>
