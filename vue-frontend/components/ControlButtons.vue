@@ -1,14 +1,12 @@
 <template>
     <div>
-        <button :disabled="isUndoDisabled" class="btn btn-outline-light mr-2" :title="$t('programming.undo')"
-            @click="$emit('undo')">
+        <button class="btn btn-outline-light mr-2" :title="$t('programming.undo')" @click="$emit('undo')">
             <ClientOnly>
                 <FontAwesomeIcon icon="undo" />
             </ClientOnly>
         </button>
 
-        <button :disabled="isRedoDisabled" class="btn btn-outline-light mr-2" :title="$t('programming.redo')"
-            @click="$emit('redo')">
+        <button class="btn btn-outline-light mr-2" :title="$t('programming.redo')" @click="$emit('redo')">
             <ClientOnly>
                 <FontAwesomeIcon icon="redo" />
             </ClientOnly>
@@ -34,7 +32,7 @@
 
         <span class="nav-spacer"></span>
 
-        <button href="#" class="btn btn-outline-light mx-2" :title="$t('programming.save')" @click="download">
+        <button href="#" class="btn btn-outline-light mx-2" :title="$t('programming.save')" @click="save">
             <ClientOnly>
                 <FontAwesomeIcon icon="save" />
             </ClientOnly>
@@ -52,6 +50,12 @@
 
 
 <script setup>
+
+import { useCodeStore } from "@/stores/user_code"
+const codeStore = useCodeStore()
+
+const file_input = ref(null)
+
 const emit = defineEmits(['undo', 'redo'])
 
 const programmingState = useState('programming-state')
@@ -63,80 +67,58 @@ const isStopEnabled = computed(() => programmingState.value === 'running')
 function control(command) {
     programmingState.value = command;
 }
-</script>
 
 
-<script>
+function save() {
+    if (codeStore.active == 'blockly') {
+        var text = codeStore.blockly;
+        var filename = "mirte.xml";
+    } else {
+        var text = codeStore.python;
+        var filename = "mirte.py";
+    }
 
-export default {
+    var element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+    element.setAttribute('download', filename);
 
-    methods: {
+    element.style.display = 'none';
+    document.body.appendChild(element);
 
-        openFileWindow() {
-            this.$refs.file_input.value = null;
-            if (this.$parent.language == 'blockly') {
-                this.$refs.file_input.accept = ".xml";
-            } else {
-                this.$refs.file_input.accept = ".py";
-            }
-            this.$refs.file_input.click()
-        },
+    element.click();
 
-        upload() {
-            var fr = new FileReader();
+    document.body.removeChild(element);
 
-            fr.onload = () => {
-                if (this.$parent.language == 'blockly') {
-                    // this.$store.dispatch('setBlockly', fr.result)
-                } else {
-                    // this.$store.dispatch('setCode', fr.result)
-                }
-            }
-
-            if (this.$refs.file_input.files.length > 0) {
-                fr.readAsText(this.$refs.file_input.files[0]);
-            }
-
-        },
-
-        download() {
-            if (this.$parent.language == 'blockly') {
-                var text = localStorage.getItem("blockly");
-                var filename = "mirte.xml";
-            } else {
-                //var text = this.$store.getters.getCode;
-                var filename = "mirte.py";
-            }
-
-            var element = document.createElement('a');
-            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-            element.setAttribute('download', filename);
-
-            element.style.display = 'none';
-            document.body.appendChild(element);
-
-            element.click();
-
-            document.body.removeChild(element);
-
-        },
+}
 
 
-    },
-    computed: {
-        isUndoDisabled: function () {
-            return false; // TODO: determine strategy 
-        },
-        isRedoDisabled: function () {
-            return false; // TODO: determine strategy
-        },
-        isPauseDisabled: function () {
-            // return this.$store.getters.getExecution != "running" || this.$store.getters.getExecution == "disconnected";
-        },
-        isStepDisabled: function () {
-            // return this.$store.getters.getExecution != "paused" || this.$store.getters.getExecution == "disconnected";
+
+function openFileWindow() {
+    if (!file_input.value) return
+
+    file_input.value.value = ""
+
+    file_input.value.accept = codeStore.active === "blockly" ? ".xml" : ".py"
+    file_input.value.click()
+}
+
+function upload(event) {
+    const input = event.target
+    const files = input.files
+
+    if (!files || files.length === 0) return
+
+    const fr = new FileReader()
+
+    fr.onload = () => {
+        if (codeStore.active === 'blockly') {
+            codeStore.setBlockly(fr.result, true)
+        } else {
+            codeStore.setPython(fr.result)
         }
     }
 
+    fr.readAsText(files[0])
 }
+
 </script>

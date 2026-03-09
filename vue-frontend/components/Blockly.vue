@@ -94,8 +94,11 @@ function storeCode() {
   if (!workspace) return
 
   workspaceDOM = Blockly.Xml.workspaceToDom(workspace)
-  codeStore.setBlockly(Blockly.Xml.domToText(workspaceDOM))
-  codeStore.setPython(pythonGenerator.workspaceToCode(workspace))
+  const newCode = Blockly.Xml.domToText(workspaceDOM)
+  if (newCode != codeStore.python) {
+    codeStore.setBlockly(newCode)
+    codeStore.setPython(pythonGenerator.workspaceToCode(workspace))
+  }
 }
 
 // Save workspace elements for language reset
@@ -175,7 +178,8 @@ function initBlockly(reason = "") {
 
   // Restore workspace (including location), or scroll to center
   if (workspaceDOM) restoreWorkspace()
-  if (reason != "lang_change") workspace.scrollCenter()
+  console.log(reason)
+  if (reason != "lang_change" && reason != "tab_change") workspace.scrollCenter()
 
   workspace.addChangeListener((event) => {
     // Ignore UI events (scroll, selection, toolbox open, etc.)
@@ -218,6 +222,13 @@ watch(() => codeStore.active, (newVal) => {
 watch(() => rosStore.peripherals, () => {
   loadCustomModules()
   initBlockly("ros_change")
+})
+
+watch(() => codeStore.reinit_blockly, () => {
+    nextTick(() => {
+      initBlockly("xml_loaded")
+      codeStore.reinit_blockly = false
+    })
 })
 
 defineExpose({

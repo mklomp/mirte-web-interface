@@ -33,8 +33,11 @@ onMounted(() => {
       basicSetup,
       python(),
       EditorView.updateListener.of(update => {
-        if (update.docChanged && codeStore.active == "python") {
-          codeStore.setPython(update.state.doc.toString())
+        const newCode = update.state.doc.toString()
+        if (update.docChanged && 
+            codeStore.active == "python" &&
+            newCode != codeStore.python) {
+          codeStore.setPython(newCode)
         }
       })
     ]
@@ -46,7 +49,7 @@ watch(
   () => codeStore.python,
   (newCode) => {
 
-    if (!editor || codeStore.active == "python") return
+    if (!editor) return
 
     const current = editor.state.doc.toString()
 
