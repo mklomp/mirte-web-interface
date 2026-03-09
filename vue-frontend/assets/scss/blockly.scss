@@ -1,0 +1,11 @@
+@use "@/assets/scss/colors.scss" as c;
+
+.blocklyToolboxDiv {
+    background-color: c.$light-grey;
+    color: c.$black;
+}
+
+.blocklyFlyoutBackground {
+  fill: c.$light-grey;
+  fill-opacity: 0.6;
+}
