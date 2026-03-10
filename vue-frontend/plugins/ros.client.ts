@@ -25,7 +25,6 @@ export default defineNuxtPlugin(() => {
   
 
   ros.on('connection', () => {
-    console.log('Connected to ROS2')
     getPeripherals();
     ROSState.value = "connected"
     if (termState.value == "python-active"){

@@ -52,8 +52,6 @@ function addToToolbox(type, item) {
 function loadCustomModules() {
   if (Object.keys(rosStore.peripherals).length == 0) return
 
-  console.log(rosStore.peripherals)
-
   for (const module of Object.values(customBlockModules)) {
     const module_type = module.getType()
     let dropdown_instances = []

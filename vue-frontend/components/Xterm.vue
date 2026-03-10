@@ -144,7 +144,6 @@ export default {
     }
 
     watch(programmingState, (newVal) => {
-      console.log('Programming state changed:', newVal)
       isLoading = (newVal === 'disconnected' || newVal === 'initializing')
 
       switch(newVal) {
