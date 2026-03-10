@@ -132,7 +132,7 @@
                          </div>
 -->
                          <div class="col-10">
-                             <input class="form-range" v-model="actuator_values[actuator][instance].text" @change="set_oled(actuator, instance)" placeholder=""></input>
+                             <input class="form-text" v-model="actuator_values[actuator][instance].text" @change="set_oled(actuator, instance)" placeholder=""></input>
                          </div>
                        </div>
                      </div>

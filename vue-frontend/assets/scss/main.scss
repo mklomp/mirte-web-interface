@@ -309,3 +309,16 @@ $custom-control-indicator-checked-bg: $grey-blue;
     width: 100%;
     height: auto;
 }
+
+// These can be added to Actuators? Or do we also use them in for example settings?
+.form-range::-webkit-slider-thumb {
+  background-color: $dark-grey;
+}
+
+.form-range::-moz-range-thumb {
+  background-color: $dark-grey;
+}
+
+.form-text {
+  width: 100%;
+}
