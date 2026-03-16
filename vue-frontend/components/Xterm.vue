@@ -168,11 +168,14 @@ function playCode() {
 async function playCodeSerial() {
   const codeStore = useCodeStore();
   await connection.uploadFile('/mirte.py', codeStore.python)
+  programmingState.value = "running";
   await connection.sendLine('\x04') // soft reboot
+  console.log(programmingState.value)
 }
 
-function stopCode() {
-  shell.send("\x03"); // CTRL-C
+async function stopCode() {
+  await connection.sendLine("\x03"); // CTRL-C
+  programmingState.value = "idle";
 }
 
 async function uploadMIRTEapi() {
@@ -190,7 +193,7 @@ watch(programmingState, async (newVal) => {
       await playCodeSerial();
       break;
     case "stop_initiated":
-      stopCode();
+      await stopCode();
       break;
   }
 });

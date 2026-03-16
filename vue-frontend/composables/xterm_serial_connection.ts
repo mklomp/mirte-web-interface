@@ -28,7 +28,6 @@ export function useXTermSerialConnection(term) {
           buffer += value
 
           while (buffer.includes("__STOP__")) {
-            console.log("stopped detected")
             buffer = buffer.replace("__STOP__", "")
             programmingState.value = "idle"
           }

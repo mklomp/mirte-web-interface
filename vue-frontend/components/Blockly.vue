@@ -54,28 +54,21 @@ function addToToolbox(type, item) {
 }
 
 function loadCustomModules() {
-  console.log("locading custom blocks")
-
-  console.log(connectionStore.compute_type)
-  console.log(connectionState.value)
+ 
   if (connectionStore.compute_type == "sbc" && Object.keys(rosStore.peripherals).length == 0) return
   if (connectionStore.compute_type == "mcu" && connectionState.value != "connected" ) return
 
-
-  console.log("actually doing it")
   for (const module of Object.values(customBlockModules)) {
     const module_type = module.getType()
     let dropdown_instances = []
     let instances = []
-    console.log(module_type)
-    console.log(rosStore.peripherals)
+
     if (module_type && rosStore.peripherals.value) {
       instances = Object.keys(rosStore.peripherals[module_type?.category][module_type?.type] || {})
       dropdown_instances = instances.map(n => [n, n])
     }
     const custom_module = module.load(Blockly, pythonGenerator, dropdown_instances)
     if (custom_module && instances.length != 0) { // default_blocks are already in the toolbox
-      console.log("adding to toolbox")
       addToToolbox(custom_module.type, custom_module.contents)
     }
   }
