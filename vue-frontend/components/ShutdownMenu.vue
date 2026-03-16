@@ -1,6 +1,10 @@
 <script setup>
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useConnectionStore } from "@/stores/connection"
+
+const connectionState = useState("connection-state");
+const connectionStore = useConnectionStore()
 
 const { t } = useI18n()
 const busy = ref(false)
@@ -17,25 +21,36 @@ function shutdown() {
       })
   }
 }
+
+function connect(compute, connection) {
+  connectionStore.setConnection(compute, connection)
+}
 </script>
 
 <template>
-  <a
-    class="nav-link dropdown-toggle"
-    href="#"
-    id="localeDropdown"
-    role="button"
-    data-bs-toggle="dropdown"
-    aria-expanded="false"
-  >
-    <ClientOnly>
-      <FontAwesomeIcon icon="power-off" />
-    </ClientOnly>
+  <a class="nav-link dropdown-toggle" href="#" id="localeDropdown" role="button" data-bs-toggle="dropdown"
+    aria-expanded="false">
+    {{ connectionState }}
   </a>
 
   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="localeDropdown">
     <li>
-      <!-- Use button instead of NuxtLink -->
+      <button class="dropdown-item" @click="connect('mcu', 'usb')">
+        MIRTE Basic
+      </button>
+    </li>
+
+    <li>
+      <button class="dropdown-item" @click="connect('sbc', 'usb')">
+        MIRTE Pioneer
+      </button>
+    </li>
+
+    <li>
+      <hr class="dropdown-divider">
+    </li>
+
+    <li>
       <button class="dropdown-item" @click="shutdown">
         <ClientOnly>
           <FontAwesomeIcon icon="power-off" />

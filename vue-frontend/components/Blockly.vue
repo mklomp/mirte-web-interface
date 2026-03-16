@@ -12,6 +12,8 @@ import { pythonGenerator } from "blockly/python"
 import { getToolbox } from '@/assets/blockly/toolbox'
 import { useCodeStore } from "@/stores/user_code"
 import { useRosStore } from '@/stores/ros_params'
+import { useConnectionStore } from "@/stores/connection"
+
 import CustomNl from "@/locales/nl.json"
 import CustomEn from "@/locales/en.json"
 
@@ -27,6 +29,8 @@ const customBlockModules = import.meta.glob('@/assets/blockly/*.js', { eager: tr
 const { locale } = useI18n()
 const codeStore = useCodeStore()
 const rosStore = useRosStore()
+const connectionStore = useConnectionStore()
+const connectionState = useState("connection-state");
 
 // Blockly state
 let workspaceDOM = null
@@ -50,18 +54,28 @@ function addToToolbox(type, item) {
 }
 
 function loadCustomModules() {
-  if (Object.keys(rosStore.peripherals).length == 0) return
+  console.log("locading custom blocks")
 
+  console.log(connectionStore.compute_type)
+  console.log(connectionState.value)
+  if (connectionStore.compute_type == "sbc" && Object.keys(rosStore.peripherals).length == 0) return
+  if (connectionStore.compute_type == "mcu" && connectionState.value != "connected" ) return
+
+
+  console.log("actually doing it")
   for (const module of Object.values(customBlockModules)) {
     const module_type = module.getType()
     let dropdown_instances = []
     let instances = []
-    if (module_type) {
+    console.log(module_type)
+    console.log(rosStore.peripherals)
+    if (module_type && rosStore.peripherals.value) {
       instances = Object.keys(rosStore.peripherals[module_type?.category][module_type?.type] || {})
       dropdown_instances = instances.map(n => [n, n])
     }
     const custom_module = module.load(Blockly, pythonGenerator, dropdown_instances)
     if (custom_module && instances.length != 0) { // default_blocks are already in the toolbox
+      console.log("adding to toolbox")
       addToToolbox(custom_module.type, custom_module.contents)
     }
   }
@@ -211,9 +225,15 @@ watch(locale, () => {
 watch(() => codeStore.active, (newVal) => {
   if (newVal == "blockly") {
     nextTick(() => {
+      console.log("tab_change")
       initBlockly("tab_change")
     })
   }
+})
+
+watch(connectionState, () => {
+  loadCustomModules()
+  initBlockly("serial_connection")
 })
 
 watch(() => rosStore.peripherals, () => {

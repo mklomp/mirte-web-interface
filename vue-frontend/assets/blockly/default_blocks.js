@@ -1,5 +1,7 @@
 export function load(Blockly, pythonGenerator) {
 
+
+    console.log("loadedd........ default blocks")
     // set_analog_pin_value
     Blockly.Blocks['set_analog_pin_value'] = {
         init: function () {
@@ -148,7 +150,7 @@ export function load(Blockly, pythonGenerator) {
 
     pythonGenerator.forBlock['wait'] = function (block) {
         pythonGenerator.definitions_['import_time'] = 'import time';
-        let value_wait = pythonGenerator.valueToCode(block, 'VALUE', Blockly.Python.ORDER_ATOMIC);
+        let value_wait = pythonGenerator.valueToCode(block, 'VALUE', pythonGenerator.ORDER_ATOMIC);
         return 'time.sleep(' + value_wait + ')\n';
     };
 

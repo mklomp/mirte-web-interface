@@ -9,19 +9,38 @@
 </template>
 
 <script setup>
+import pythonMainCode from '@/assets/python/main.py?raw'
+import pythonRobotCode from '@/assets/python/robot.py?raw'
+
+import { useConnectionStore } from "@/stores/connection"
+const { attachContainer, term } = useXTermBase()
+let connection = null
+
 const terminal = ref(null);
 const programmingState = useState("programming-state");
+const connectionState = useState("connection-state");
 const ROSState = useState("ros-state");
 const termState = useState("term-state");
+const connectionStore = useConnectionStore()
 let isLoading = ref(true);
 
-const { $attachContainer } = useNuxtApp();
+//const { $attachContainer, $connect, $connectMCU } = useNuxtApp();
 let shell = null;
+
+connectionState.value = "disconnected"
 
 onMounted(() => {
   if (terminal.value) {
-    shell = $attachContainer(terminal.value);
+    shell = attachContainer(terminal.value);
+    console.log("attached sheell")
   }
+})
+
+
+function connectSBC() {
+
+  shell = $connect();
+  console.log("connecting sheell")
 
   // TODO: edbug version not yet working.....
   let debug = false; // TODO: make user setting
@@ -105,13 +124,15 @@ onMounted(() => {
       if (ROSState.value == "connected") {
         // TODO: should be done somehere else with wathinng ROSState and termState
         programmingState.value = "idle";
+        connectionState.value = "connected"
       }
     } else if (buffer.includes("__STOP__\r\n>>> ")) {
       buffer = "";
       programmingState.value = "idle";
+      console.log("sertting progrmmingState to idle")
     }
   };
-});
+};
 
 function playCode() {
   shell.term.clear();
@@ -144,21 +165,60 @@ function playCode() {
   }
 }
 
+async function playCodeSerial() {
+  const codeStore = useCodeStore();
+  await connection.uploadFile('/mirte.py', codeStore.python)
+  await connection.sendLine('\x04') // soft reboot
+}
+
 function stopCode() {
   shell.send("\x03"); // CTRL-C
 }
 
-watch(programmingState, (newVal) => {
+async function uploadMIRTEapi() {
+  await connection.uploadFile("/main.py", pythonMainCode)
+  await connection.mkdir("mirte_robot")
+  await connection.uploadFile("/mirte_robot/robot.py", pythonRobotCode)
+  await connection.uploadFile("/mirte_robot/__main__.py", "") // make class
+}
+
+watch(programmingState, async (newVal) => {
   isLoading = newVal === "disconnected" || newVal === "initializing";
 
   switch (newVal) {
     case "start_initiated":
-      playCode();
+      await playCodeSerial();
       break;
     case "stop_initiated":
       stopCode();
       break;
   }
 });
+
+// TODO: as soon as wifi is supported (needs cookie login)
+// we should change the store
+watch(() => connectionStore.compute_type, async (type) => {
+  connectionState.value = "connecting"
+  connection?.disconnect()
+
+  if (type === "mcu") {
+    console.log("trying to serial connect xterm)")
+    connection = useXTermSerialConnection(term)
+    await connection.connect()
+    await uploadMIRTEapi()
+    programmingState.value = "idle";
+    connectionState.value = "connected"
+
+
+  }
+
+  if (type === "sbc") {
+    connection = useXTermUSBConnection(term)
+    connection.connect()
+  }
+
+
+})
+
 
 </script>

@@ -1,34 +1,15 @@
-import { Terminal } from '@xterm/xterm'
-import '@xterm/xterm/css/xterm.css'
 import { AttachAddon } from '@xterm/addon-attach'
-import { FitAddon } from '@xterm/addon-fit'
 
-export default defineNuxtPlugin(() => {
+export function useXTermUSBConnection(term) {
 
-
-
-  function attachContainer(container) {
-    
+  function connect2() {
     let attach_req = false;
-    const term = new Terminal()
-
-
-
-    term.options.theme = { background: '#fefaf7', foreground: '#000000', cursor: '#000000'}
-    const fitAddon = new FitAddon()
-
-    term.loadAddon(fitAddon)
-    term.open(container)
-    fitAddon.fit()
-
-    const resizeObserver = new ResizeObserver(() => fitAddon.fit())
-    resizeObserver.observe(container)
-
     const socketUrl = `ws://192.168.43.1/ws/shell`
     const socket = new WebSocket(socketUrl)
 
     socket.addEventListener('open', () => {
-      if (attach_req){
+      console.log("websocket connected to terminal")
+      if (attach_req) {
         const attachAddon = new AttachAddon(socket)
         term.loadAddon(attachAddon)
         term.focus()
@@ -42,7 +23,7 @@ export default defineNuxtPlugin(() => {
       socket,
       resizeObserver,
 
-      attach(){
+      attach() {
         if (socket.readyState === WebSocket.OPEN) {
           const attachAddon = new AttachAddon(socket)
           term.loadAddon(attachAddon)
@@ -55,18 +36,17 @@ export default defineNuxtPlugin(() => {
         return socket.readyState === WebSocket.OPEN
       },
 
-send(data) {
-    if (socket.readyState === WebSocket.OPEN) {
-      socket.send(data)
-    }
-  },
+      send(data) {
+        if (socket.readyState === WebSocket.OPEN) {
+          socket.send(data)
+        }
+      },
 
-sendLine(command) {
-    if (socket.readyState === WebSocket.OPEN) {
-      socket.send(command + '\n')
-    } 
-  },
-
+      sendLine(command) {
+        if (socket.readyState === WebSocket.OPEN) {
+          socket.send(command + '\n')
+        }
+      },
 
       toggle() {
         if (socket.readyState === WebSocket.OPEN) {
@@ -87,9 +67,17 @@ sendLine(command) {
     return controller
   }
 
-  return {
-    provide: {
-      attachContainer
-    }
+
+  function connect() {
+
   }
-})
+
+  function disconnect() {
+
+  }
+
+  return {
+    connect,
+    disconnect
+  }
+}
