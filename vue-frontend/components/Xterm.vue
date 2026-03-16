@@ -28,13 +28,38 @@ let isLoading = ref(true);
 let shell = null;
 
 connectionState.value = "disconnected"
+connectionStore.loadFromLocalStorage()
 
-onMounted(() => {
+onMounted(async () => {
   if (terminal.value) {
     shell = attachContainer(terminal.value);
-    console.log("attached sheell")
+    await connect()
   }
 })
+
+async function connect() {
+
+  console.log("trying to connect")
+  connectionState.value = "connecting"
+  const type = connectionStore.compute_type
+  connection?.disconnect()
+  console.log(type)
+
+  if (type == "mcu") {
+    console.log("trying to serial connect xterm)")
+    connection = useXTermSerialConnection(term)
+    await connection.connect()
+    await uploadMIRTEapi()
+    programmingState.value = "idle";
+    connectionState.value = "connected"
+  }
+
+  if (type == "sbc") {
+    connection = useXTermUSBConnection(term)
+    connection.connect()
+  }
+
+}
 
 
 function connectSBC() {
@@ -200,27 +225,9 @@ watch(programmingState, async (newVal) => {
 
 // TODO: as soon as wifi is supported (needs cookie login)
 // we should change the store
-watch(() => connectionStore.compute_type, async (type) => {
-  connectionState.value = "connecting"
-  connection?.disconnect()
-
-  if (type === "mcu") {
-    console.log("trying to serial connect xterm)")
-    connection = useXTermSerialConnection(term)
-    await connection.connect()
-    await uploadMIRTEapi()
-    programmingState.value = "idle";
-    connectionState.value = "connected"
-
-
-  }
-
-  if (type === "sbc") {
-    connection = useXTermUSBConnection(term)
-    connection.connect()
-  }
-
-
+watch(() => connectionStore.compute_type, async () => {
+  console.log("connect")
+  await connect()
 })
 
 

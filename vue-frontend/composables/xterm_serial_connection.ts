@@ -12,7 +12,7 @@ export function useXTermSerialConnection(term) {
   // resolver for waiting on >>> prompt
   let replResolver: (() => void) | null = null
   const programmingState = useState("programming-state");
-  
+
   async function startReaderLoop() {
 
     try {
@@ -51,7 +51,12 @@ export function useXTermSerialConnection(term) {
 
   async function connect() {
 
-    port = await navigator.serial.requestPort()
+    const ports = await navigator.serial.getPorts()
+    if (ports.length > 0) {
+      port = ports[0]
+    } else {
+      port = await navigator.serial.requestPort()
+    }
     await port.open({ baudRate: 115200 })
 
     port.addEventListener("disconnect", () => {
@@ -80,7 +85,6 @@ export function useXTermSerialConnection(term) {
     writer.write('\x03') // CTRL-C (stop main)
 
     await waitForPrompt()
-
   }
 
   async function waitForPrompt() {

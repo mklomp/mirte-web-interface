@@ -54,7 +54,7 @@ function addToToolbox(type, item) {
 }
 
 function loadCustomModules() {
- 
+
   if (connectionStore.compute_type == "sbc" && Object.keys(rosStore.peripherals).length == 0) return
   if (connectionStore.compute_type == "mcu" && connectionState.value != "connected" ) return
 
@@ -134,7 +134,7 @@ function restoreWorkspace() {
 function initBlockly(reason = "") {
 
   // Set workspaceDOM from previous session
-  if (codeStore.blockly && Object.keys(rosStore.peripherals).length != 0) {
+  if (codeStore.blockly && (Object.keys(rosStore.peripherals).length != 0 || connectionState.value == "connected")) {
     workspaceDOM = Blockly.utils.xml.textToDom(codeStore.blockly)
   }
 
@@ -224,9 +224,11 @@ watch(() => codeStore.active, (newVal) => {
   }
 })
 
-watch(connectionState, () => {
-  loadCustomModules()
-  initBlockly("serial_connection")
+watch(connectionState, (newState) => {
+  if (newState == "connected") {
+    loadCustomModules()
+    initBlockly("serial_connection")
+  }
 })
 
 watch(() => rosStore.peripherals, () => {
@@ -235,10 +237,10 @@ watch(() => rosStore.peripherals, () => {
 })
 
 watch(() => codeStore.reinit_blockly, () => {
-    nextTick(() => {
-      initBlockly("xml_loaded")
-      codeStore.reinit_blockly = false
-    })
+  nextTick(() => {
+    initBlockly("xml_loaded")
+    codeStore.reinit_blockly = false
+  })
 })
 
 defineExpose({
