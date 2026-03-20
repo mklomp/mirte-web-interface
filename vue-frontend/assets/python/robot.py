@@ -1,5 +1,6 @@
 from machine import Pin, ADC, PWM
-import ujson 
+import ujson
+
 mirte = {}
 max_pwm = 65535
 
@@ -8,6 +9,8 @@ class Robot():
     with open(".settings.json", "r") as f:
       data = f.read()
     self.config = ujson.loads(data)
+    # TODO: this is where I can already set pins for
+    # everything in the config
     
   # HELPER FUNTIONS
   def stripGP(self, s):
@@ -48,6 +51,26 @@ class Robot():
     pin = self.config['servo'][instance]['pins']['pin']
     duty = self.map_value(angle, 0, 180, 1800, 7800) # https://randomnerdtutorials.com/raspberry-pi-pico-servo-motor-micropython/
     self.setAnalogPinValue(pin, duty)
+
+  def getIntensity(self, instance):
+    pin = self.config['intensity'][instance]['pins']['analog']
+    return self.getAnalogPinValue(pin)
+
+  def getKeypad(self, instance):
+    pin = self.config['keypad'][instance]['pins']['pin']
+    value = self.getAnalogPinValue(pin)
+
+    scale = 1024.0 / max_pwm
+    if (value < 70 / scale):
+      return "left"
+    if (value < 230 / scale):
+      return "up"
+    if (value < 410 / scale):
+      return "down"
+    if (value < 620 / scale):
+      return "right"
+    if (value < 880 / scale):
+      return "enter"
 
 def createRobot():
   global mirte
