@@ -2,8 +2,8 @@ import { defineStore } from 'pinia'
 
 export const useConnectionStore = defineStore('connection', {
   state: () => ({
-    compute_type: "",
-    connection_type: "",
+    transport: "",
+    device: "",
     ip_address: "192.168.43.1"
   }),
 
@@ -11,14 +11,14 @@ export const useConnectionStore = defineStore('connection', {
     loadFromLocalStorage() {
       if (process.client) {
         let full_state = JSON.parse(localStorage.getItem('connection'))
-        this.compute_type = full_state.compute || ""
-        this.connection_Type = full_state.connection || ""
+        this.transport = full_state.transport || ""
+        this.device = full_state.device || ""
       }
     },
-    setConnection(compute, connection) {
-      this.compute_type = compute
-      this.connection_type = connection
-      let full_state = { compute: this.compute_type, connection: this.connection_type }
+    setConnection(transport, device) {
+      this.transport = transport
+      this.device = device
+      let full_state = { transport: this.transport, device: this.device }
       localStorage.setItem('connection', JSON.stringify(full_state))
     }
   }

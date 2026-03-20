@@ -56,7 +56,7 @@ function addToToolbox(type, item) {
 function loadCustomModules() {
 
   if (connectionStore.compute_type == "sbc" && Object.keys(rosStore.peripherals).length == 0) return
-  if (connectionStore.compute_type == "mcu" && connectionState.value != "connected" ) return
+  if (connectionStore.compute_type == "mcu" && connectionState.value != "connected") return
 
   for (const module of Object.values(customBlockModules)) {
     const module_type = module.getType()
@@ -67,9 +67,11 @@ function loadCustomModules() {
       instances = Object.keys(rosStore.peripherals[module_type?.category][module_type?.type] || {})
       dropdown_instances = instances.map(n => [n, n])
     }
-    const custom_module = module.load(Blockly, pythonGenerator, dropdown_instances)
-    if (custom_module && instances.length != 0) { // default_blocks are already in the toolbox
-      addToToolbox(custom_module.type, custom_module.contents)
+    if (!Blockly.Extensions.isRegistered('dynamic_instances_extension_' + module_type?.type)) {
+      const custom_module = module.load(Blockly, pythonGenerator, dropdown_instances)
+      if (custom_module && instances.length != 0) { // default_blocks are already in the toolbox
+        addToToolbox(custom_module.type, custom_module.contents)
+      }
     }
   }
 }

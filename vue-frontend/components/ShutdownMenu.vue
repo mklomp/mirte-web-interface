@@ -5,6 +5,7 @@ import { useConnectionStore } from "@/stores/connection"
 
 const connectionState = useState("connection-state");
 const connectionStore = useConnectionStore()
+const { connect, disconnect } = useConnection()
 
 const { t } = useI18n()
 const busy = ref(false)
@@ -22,9 +23,6 @@ function shutdown() {
   }
 }
 
-function connect(compute, connection) {
-  connectionStore.setConnection(compute, connection)
-}
 </script>
 
 <template>
@@ -35,7 +33,7 @@ function connect(compute, connection) {
 
   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="localeDropdown">
     <li>
-      <button class="dropdown-item" @click="connect('mcu', 'usb')">
+      <button class="dropdown-item" @click="connect('mcu')">
         MIRTE Basic
       </button>
     </li>
@@ -51,12 +49,22 @@ function connect(compute, connection) {
     </li>
 
     <li>
+      <button class="dropdown-item" @click="disconnect">
+        Disconnect
+      </button>
+    </li>
+
+    <li>
       <button class="dropdown-item" @click="shutdown">
-        <ClientOnly>
-          <FontAwesomeIcon icon="power-off" />
-        </ClientOnly>
         Shutdown
       </button>
     </li>
+<!--
+    <li>
+      <button class="dropdown-item" @click="shutdown">
+        Reboot
+      </button>
+    </li>
+    -->
   </ul>
 </template>

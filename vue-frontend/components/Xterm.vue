@@ -1,7 +1,6 @@
 <template>
   <div class="rounded background-tertiary h5 p-3 mb-2">
     {{ $t("actuators.output") }}
-    <div v-show="isLoading" class="float-end">Loading...</div>
     <div>
       <div id="terminal" ref="terminal" class="xterm2"></div>
     </div>
@@ -14,6 +13,8 @@ import pythonRobotCode from '@/assets/python/robot.py?raw'
 
 import { useConnectionStore } from "@/stores/connection"
 const { attachContainer, term } = useXTermBase()
+const { attachTerminal, connect, uploadFile, runCommand } = useConnection()
+
 let connection = null
 
 const terminal = ref(null);
@@ -33,10 +34,19 @@ connectionStore.loadFromLocalStorage()
 onMounted(async () => {
   if (terminal.value) {
     shell = attachContainer(terminal.value);
-    await connect()
+
+    // Attach terminal to transport output
+    attachTerminal(term)
+
+    // autoconnect if there are existing connections
+    const ports = await navigator.serial.getPorts()
+    if (ports.length > 0) {
+      await connect("mcu", true)
+    }
   }
 })
 
+/*
 async function connect() {
 
   console.log("trying to connect")
@@ -60,7 +70,7 @@ async function connect() {
   }
 
 }
-
+*/
 
 function connectSBC() {
 
@@ -192,14 +202,14 @@ function playCode() {
 
 async function playCodeSerial() {
   const codeStore = useCodeStore();
-  await connection.uploadFile('/mirte.py', codeStore.python)
+  await uploadFile('/mirte.py', codeStore.python)
   programmingState.value = "running";
-  await connection.sendLine('\x04') // soft reboot
+  await runCommand('\x04') // soft reboot
   console.log(programmingState.value)
 }
 
 async function stopCode() {
-  await connection.sendLine("\x03"); // CTRL-C
+  await runCommand("\x03"); // CTRL-C
   programmingState.value = "idle";
 }
 

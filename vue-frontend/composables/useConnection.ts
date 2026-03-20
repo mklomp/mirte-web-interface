@@ -1,0 +1,34 @@
+import { ConnectionManager } from "@/services/connectionManager"
+
+const manager = new ConnectionManager()
+
+export function useConnection() {
+
+  async function connect(type: "mcu" | "sbc", autoconnect = false) {
+    await manager.connect(type, autoconnect)
+  }
+
+  async function disconnect() {
+    manager.disconnect()
+  }
+
+  function attachTerminal(term) {
+    manager.attachTerminal(term)
+  }
+
+  async function uploadFile(path: string, content: string) {
+    await manager.uploadFile(path, content)
+  }
+
+  async function runCommand(cmd: string) {
+    await manager.runCommand?.(cmd)
+  }
+
+  return {
+    connect,
+    disconnect,
+    attachTerminal,
+    uploadFile,
+    runCommand
+  }
+}
