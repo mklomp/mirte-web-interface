@@ -2,13 +2,39 @@ export class MicroPythonFS {
   replResolver: (() => void) | null = null
   private buffer = ""
 
+  private captureResolver: ((data: string) => void) | null = null
+  private captureBuffer = ""
+  private capturing = false
+
   constructor(private transport) {
     transport.onData((data: string) => this.parseData(data))
   }
 
   parseData(data: string) {
-
     this.buffer += data
+
+    if (this.buffer.includes("__BEGIN__\r\n")) {
+      this.capturing = true
+      this.captureBuffer = ""
+      this.buffer = this.buffer.split("__BEGIN__\r\n")[1]
+    }
+
+    if (this.capturing) {
+      this.captureBuffer += data
+    }
+
+    if (this.captureBuffer.includes("__END__\r\n")) {
+      const result = this.captureBuffer.split("__END__\r\n")[0]
+
+      this.capturing = false
+
+      if (this.captureResolver) {
+        this.captureResolver(result)
+        this.captureResolver = null
+      }
+
+      this.captureBuffer = ""
+    }
 
     if (this.buffer.includes("__STOP__")) {
       this.buffer = this.buffer.replace("__STOP__", "")
@@ -28,12 +54,19 @@ export class MicroPythonFS {
     return new Promise<void>((resolve) => {
       this.replResolver = resolve
     })
-
   }
 
-  // TODO: could use the raw REPL?
-  async writeFile(path: string, content: string) {
+  async readFile(path: string): Promise<string> {
+    return new Promise(async (resolve) => {
+      this.captureResolver = resolve
+      this.capturing = false
 
+      // Needs to be one line, in order to correctly capture the __BEGIN__
+      await this.writeLine(`import sys; f = open('${path}'); print('__BEGIN__'); _ = sys.stdout.write(f.read()); print('__END__'); f.close()`)
+    })
+  }
+  
+  async writeFile(path: string, content: string) {
     const cleaned = content.replace(/\r/g, '')
 
     await this.writeLine(`f = open('${path}', 'w')`)
@@ -49,38 +82,8 @@ export class MicroPythonFS {
     await this.writeLine(`os.mkdir("${path}") if "${path}" not in os.listdir() else None`)
   }
 
-  async writeLine(line: string){
+  async writeLine(line: string) {
     await this.transport.write(line + "\r\n")
     await this.waitForPrompt()
   }
-
-
- /* async readFile(path: string): Promise<string> {
-    await this.enterRawREPL()
-
-    await this.transport.write(`
-with open('${path}') as f:
-    print(f.read())
-`)
-    // You’ll need to capture output from transport
-  }
-
-  async deleteFile(path: string) {
-    await this.enterRawREPL()
-
-    await this.transport.write(`
-import os
-os.remove('${path}')
-`)
-  }
-
-  async listFiles(): Promise<string[]> {
-    await this.enterRawREPL()
-
-    await this.transport.write(`
-import os
-print(os.listdir())
-`)
-  }
-*/
 }

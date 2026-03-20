@@ -25,6 +25,7 @@ export class ConnectionManager {
 
       // make sure the terminal is in a determined state
       // by killing (possibly running) main. 
+      // TODO: should we also stop raw-REPL (eg if you were conncted to thonny)
       await this.transport.write('\x03') // CTRL-C (kill main)
       this.term.clear()
       await new Promise(r => setTimeout(r, 200))

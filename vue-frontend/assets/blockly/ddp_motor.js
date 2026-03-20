@@ -93,6 +93,6 @@ export function load(Blockly, pythonGenerator, instances) {
 export function getType() {
   return {
     category: "actuators",
-    type: "ddp_motor"
+    type: "ddp_motor",
   }
 }

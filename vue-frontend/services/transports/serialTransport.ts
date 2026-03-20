@@ -1,3 +1,6 @@
+//https://developer.mozilla.org/en-US/docs/Web/API/Web_Serial_API
+//https://developer.chrome.com/docs/capabilities/serial
+
 export class SerialTransport {
   port: SerialPort | null = null
   reader: ReadableStreamDefaultReader<Uint8Array> | null = null
@@ -15,7 +18,6 @@ export class SerialTransport {
       { usbVendorId: 0x2E8A, usbProductId: 0x0005 }  // Raspberry Pi Pico 2040
     ];
 
-    console.log("trying to connet")
     if (autoconnect) {
       const ports = await navigator.serial.getPorts()
       if (ports.length > 0) {

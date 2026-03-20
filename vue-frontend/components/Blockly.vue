@@ -31,6 +31,7 @@ const codeStore = useCodeStore()
 const rosStore = useRosStore()
 const connectionStore = useConnectionStore()
 const connectionState = useState("connection-state");
+const settingsState = useState("peripheral-settings");
 
 // Blockly state
 let workspaceDOM = null
@@ -53,7 +54,7 @@ function addToToolbox(type, item) {
   category.contents.push(item)
 }
 
-function loadCustomModules() {
+function loadCustomModules(settings) {
 
   if (connectionStore.compute_type == "sbc" && Object.keys(rosStore.peripherals).length == 0) return
   if (connectionStore.compute_type == "mcu" && connectionState.value != "connected") return
@@ -63,10 +64,17 @@ function loadCustomModules() {
     let dropdown_instances = []
     let instances = []
 
-    if (module_type && rosStore.peripherals.value) {
-      instances = Object.keys(rosStore.peripherals[module_type?.category][module_type?.type] || {})
+    if (module_type && settings) {
+      // temporary fix for motors (we need to make this one module with a type, not differen types)
+      const type = module_type.type.includes("motor") ? "motor" : module_type.type
+
+      instances = Object.keys(settings[type] || {})
       dropdown_instances = instances.map(n => [n, n])
+
+      // temporary fix for motors
+      if (type == "motor" && settings[type][instances[0]].type + "_motor" != module_type.type){ instances = [] }
     }
+
     if (!Blockly.Extensions.isRegistered('dynamic_instances_extension_' + module_type?.type)) {
       const custom_module = module.load(Blockly, pythonGenerator, dropdown_instances)
       if (custom_module && instances.length != 0) { // default_blocks are already in the toolbox
@@ -226,11 +234,9 @@ watch(() => codeStore.active, (newVal) => {
   }
 })
 
-watch(connectionState, (newState) => {
-  if (newState == "connected") {
-    loadCustomModules()
-    initBlockly("serial_connection")
-  }
+watch(settingsState, (newState) => {
+  loadCustomModules( newState )
+  initBlockly("serial_connection") 
 })
 
 watch(() => rosStore.peripherals, () => {
