@@ -1,6 +1,6 @@
 {
-  "pp_motor": {
-    "text": "pp_motor",
+  "motor": {
+    "text": "motor",
     "pins": {
       "p1": "pwm",
       "p2": "pwm"
@@ -12,35 +12,8 @@
     "service_value": "speed",
     "service_name": "set_speed"
   },
-  "ddp_motor": {
-    "text": "ddp_motor",
-    "pins": {
-      "d1": "digital",
-      "d2": "digital",
-      "p1": "pwm"
-    },
-    "functions": ["set_speed", "stop"],
-    "default_value": {"name": "SPEED", "type": "math_number", "field": "NUM", "value": 0},
-    "rel_path": "Actuators\\Motor\\pwm_motor\\pwm_motor.py",
-    "service_type": "mirte_msgs/SetMotorSpeed",
-    "service_value": "speed",
-    "service_name": "set_speed"
-  },
-  "dp_motor": {
-    "text": "dp_motor",
-    "pins": {
-      "d1": "digital",
-      "p1": "pwm"
-    },
-    "functions": ["set_speed", "stop"],
-    "default_value": {"name": "SPEED", "type": "math_number", "field": "NUM", "value": 0},
-    "rel_path": "Actuators\\Motor\\pwm_motor\\pwm_motor.py",
-    "service_type": "mirte_msgs/SetMotorSpeed",
-    "service_value": "speed",
-    "service_name": "set_speed"
-  },
   "intensity": {
-    "text": "ir_sensor",
+    "text": "intensity",
     "pins": {
       "digital": "digital",
       "analog": "analog"
@@ -51,7 +24,7 @@
     "message_value": "value"
   },
   "color": {
-    "text": "color_sensor",
+    "text": "color",
     "pins": {
       "scl": "digital",
       "sda": "digital"
@@ -62,7 +35,7 @@
     "message_value": "color"
   },
   "distance": {
-    "text": "ultrasonic_sensor",
+    "text": "distance",
     "pins": {
       "trigger": "digital",
       "echo": "digital"
@@ -97,7 +70,7 @@
     "service_name": "set_text"
   },
   "keypad": {
-    "text": "keypad_sensor",
+    "text": "keypad",
     "pins": {
        "pin": "analog"
     },

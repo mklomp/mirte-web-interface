@@ -7,7 +7,12 @@
     "control": "Besturen",
     "shutdown": "afsluiten",
     "shutdown_confirm": "Weet je zeker dat je wilt afsluiten?",
-    "shutdown_success": "Wacht nu totdat de lampjes op de computer van de robot uit is. Daarna kan je de schakelaar op de PCB uitzetten."
+    "shutdown_success": "Wacht nu totdat de lampjes op de computer van de robot uit is. Daarna kan je de schakelaar op de PCB uitzetten.",
+    "connection": {
+      "disconnected": "Niet verbonden",
+      "connecting": "Verbinding maken...",
+      "connected": "Verbonden"
+    }
   },
   "settings": {
     "hardware_settings": "Hardware Instellingen",
@@ -33,7 +38,7 @@
     "output": "Output",
     "control": "Besturen",
     "speed": "Snelheid",
-    "angular_speed":  "Draaisnelheid",
+    "angular_speed": "Draaisnelheid",
     "move_forward": "Naar voren",
     "move_backward": "Naar achteren",
     "move_left": "Draai naar links",
@@ -53,14 +58,12 @@
     "open": "openen"
   },
   "peripherals": {
-    "ultrasonic_sensor": "Afstand sensor (m)",
-    "ir_sensor": "IR sensor",
-    "color_sensor": "Kleuren sensor",
-    "keypad_sensor": "Toetsen",
+    "distance": "Afstand sensor (m)",
+    "intensity": "IR sensor",
+    "color": "Kleuren sensor",
+    "keypad": "Toetsen",
     "wheel_encoder": "Encoder",
-    "pp_motor": "Motor (pp)",
-    "dp_motor": "Motor (dp)",
-    "ddp_motor": "Motor (ddp)",
+    "motor": "Motor",
     "servo": "Servo",
     "oled": "OLED Scherm",
     "oled_text": "tekst",

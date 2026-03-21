@@ -102,14 +102,14 @@ export default {
   },
   mounted(){
     
-    fetch(`http://192.168.43.1/wifi-connect/networks`, {
+   /* fetch(`http://192.168.43.1/wifi-connect/networks`, {
         "method": "GET",
         "mode": "cors"})
     .then(res => res.json())
     .then(data => {
 		this.networks = data.filter(v=>v.ssid!="");
         });
-
+*/
 	this.hostname = location.hostname
 
   }

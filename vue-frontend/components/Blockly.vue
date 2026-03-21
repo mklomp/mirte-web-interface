@@ -65,14 +65,8 @@ function loadCustomModules(settings) {
     let instances = []
 
     if (module_type && settings) {
-      // temporary fix for motors (we need to make this one module with a type, not differen types)
-      const type = module_type.type.includes("motor") ? "motor" : module_type.type
-
-      instances = Object.keys(settings[type] || {})
+      instances = Object.keys(settings[module_type.type] || {})
       dropdown_instances = instances.map(n => [n, n])
-
-      // temporary fix for motors
-      if (type == "motor" && settings[type][instances[0]].type + "_motor" != module_type.type){ instances = [] }
     }
 
     if (!Blockly.Extensions.isRegistered('dynamic_instances_extension_' + module_type?.type)) {

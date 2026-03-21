@@ -27,7 +27,7 @@ export class ConnectionManager {
       // by killing (possibly running) main. 
       // TODO: should we also stop raw-REPL (eg if you were conncted to thonny)
       await this.transport.write('\x03') // CTRL-C (kill main)
-      this.term.clear()
+      if (this.term) { this.term.clear() }
       await new Promise(r => setTimeout(r, 200))
       await this.transport.write('\x04') // CTRL-D (soft reboot)
       await new Promise(r => setTimeout(r, 200))
@@ -61,17 +61,19 @@ export class ConnectionManager {
   }
 
   async uploadFile(path, content) {
-    return this.device.uploadFile(path, content)
+    console.log(path)
+    console.log(content)
+    await this.device.uploadFile(path, content)
   }
 
   async runCommand(cmd) {
-    return this.device.runCommand?.(cmd)
+    await this.device.runCommand?.(cmd)
   }
 
   disconnect() {
     this.transport?.disconnect?.()
     this.transport = null
     this.device = null
-    this.term.clear()
+    if (this.term) { this.term.clear() }
   }
 }

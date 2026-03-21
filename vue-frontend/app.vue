@@ -1,6 +1,9 @@
 <script setup>
 import { useLocalePath } from '#i18n'
 const localePath = useLocalePath()
+
+useState("connection-state").value = "disconnected"
+
 </script>
 
 <template>

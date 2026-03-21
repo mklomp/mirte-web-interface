@@ -28,7 +28,7 @@ function shutdown() {
 <template>
   <a class="nav-link dropdown-toggle" href="#" id="localeDropdown" role="button" data-bs-toggle="dropdown"
     aria-expanded="false">
-    {{ connectionState }}
+    {{ $t("main.connection." + connectionState) }}
   </a>
 
   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="localeDropdown">

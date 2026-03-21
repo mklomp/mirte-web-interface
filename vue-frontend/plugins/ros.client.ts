@@ -20,7 +20,7 @@ export default defineNuxtPlugin(() => {
     ROSState.value = "connecting"
     if (connected) return
     connected = true
-    ros.connect('ws://192.168.43.1/ws/ros')
+    //ros.connect('ws://192.168.43.1/ws/ros')
   }
   
 

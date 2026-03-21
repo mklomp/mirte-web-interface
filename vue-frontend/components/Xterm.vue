@@ -2,7 +2,7 @@
   <div class="rounded background-tertiary h5 p-3 mb-2">
     {{ $t("actuators.output") }}
     <div>
-      <div id="terminal" ref="terminal" class="xterm2"></div>
+      <div id="terminal" ref="terminal" class="xterm"></div>
     </div>
   </div>
 </template>
@@ -38,11 +38,12 @@ onMounted(async () => {
     // Attach terminal to transport output
     attachTerminal(term)
 
+    // TODO: this should be goin to app.vue
     // autoconnect if there are existing connections
-    const ports = await navigator.serial.getPorts()
+    /*const ports = await navigator.serial.getPorts()
     if (ports.length > 0) {
       await connect("mcu", true)
-    }
+    }*/
   }
 })
 

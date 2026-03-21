@@ -9,14 +9,14 @@ export function useConnection() {
   }
 
   async function disconnect() {
-    manager.disconnect()
+    await manager.disconnect()
   }
 
   function attachTerminal(term) {
     manager.attachTerminal(term)
   }
 
-  async function uploadFile(path: string, content: string) {
+  async function uploadFile(path: string, content) {
     await manager.uploadFile(path, content)
   }
 
