@@ -1,6 +1,4 @@
 <script setup>
-import { useLocalePath } from '#i18n'
-const localePath = useLocalePath()
 
 useState("connection-state").value = "disconnected"
 
@@ -24,12 +22,14 @@ useState("connection-state").value = "disconnected"
       <NuxtLink :to="localePath({ path: '/privacy' })" >privacy</NuxtLink>
     </footer>
   -->
-    
+
   </div>
 </template>
 
 <style>
-html, body, #__nuxt {
+html,
+body,
+#__nuxt {
   height: 100%;
 }
 
@@ -42,6 +42,6 @@ html, body, #__nuxt {
 main {
   flex: 1;
   overflow: hidden;
-  min-height: 0;   
+  min-height: 0;
 }
 </style>

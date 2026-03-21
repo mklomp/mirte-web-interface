@@ -61,8 +61,6 @@ export class ConnectionManager {
   }
 
   async uploadFile(path, content) {
-    console.log(path)
-    console.log(content)
     await this.device.uploadFile(path, content)
   }
 

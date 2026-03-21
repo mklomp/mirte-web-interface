@@ -82,13 +82,11 @@
 
 <script setup>
 import { ref, watch } from "vue"
-import { storeToRefs } from "pinia"
 
 import properties_ph from "~/assets/json/properties_ph.json"
 import properties_mc from "~/assets/json/properties_mc.json"
 
 import { useWiring } from "~/composables/useWiring"
-import { useRosStore } from "~/stores/ros_params"
 
 import PeripheralRow from "~/components/PeripheralRow.vue"
 
@@ -104,15 +102,15 @@ const {
   saveYAML
 } = useWiring(peripheralsDef, microcontrollers)
 
-const rosStore = useRosStore()
-const { peripherals } = storeToRefs(rosStore)
 const peripheralsSetting = useState("peripheral-settings")
+
+onMounted(() =>{
+  loadFromYAML(peripheralsSetting.value)
+})
 
 watch(
   peripheralsSetting,
   (val) => {
-    console.log("--------------")
-    console.log(val)
     if (val) loadFromYAML(val)
   }
 )

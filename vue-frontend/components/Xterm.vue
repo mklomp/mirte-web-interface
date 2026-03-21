@@ -28,7 +28,6 @@ let isLoading = ref(true);
 //const { $attachContainer, $connect, $connectMCU } = useNuxtApp();
 let shell = null;
 
-connectionState.value = "disconnected"
 connectionStore.loadFromLocalStorage()
 
 onMounted(async () => {
@@ -37,13 +36,6 @@ onMounted(async () => {
 
     // Attach terminal to transport output
     attachTerminal(term)
-
-    // TODO: this should be goin to app.vue
-    // autoconnect if there are existing connections
-    /*const ports = await navigator.serial.getPorts()
-    if (ports.length > 0) {
-      await connect("mcu", true)
-    }*/
   }
 })
 
