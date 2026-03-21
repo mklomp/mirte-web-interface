@@ -48,7 +48,7 @@ function redo() {
 
    <div class="row p-4 h-100">
 
-      <div class="col-3 p-2 h-100" style="overflow: hidden;">
+      <div v-if="false" class="col-3 p-2 h-100" style="overflow: hidden;">
          <div class="layoutbox rounded h-100" style="overflow: hidden; display: flex; flex-flow: column;">
 
             <div class="text-black p-2 h3 m-0 layoutbox-title w-100 background-secondary">
@@ -67,7 +67,7 @@ function redo() {
 
 
 
-      <div class="col-6 p-2 h-100" style="overflow: hidden;">
+      <div class="col-9 p-2 h-100" style="overflow: hidden;">
          <div class="layoutbox rounded h-100" style="overflow: hidden; display: flex; flex-flow: column;">
 
             <div class="text-black p-2 h3 m-0 layoutbox-title w-100 background-secondary">

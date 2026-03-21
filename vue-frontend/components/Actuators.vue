@@ -8,7 +8,7 @@
       </div>
   
 
-           <div class="rounded background-tertiary p-3 mb-2"  @contextmenu.prevent >
+           <div v-if="false" class="rounded background-tertiary p-3 mb-2"  @contextmenu.prevent >
               <h5>{{ $t('actuators.control') }}</h5> 
 
                <div class="row mb-4">

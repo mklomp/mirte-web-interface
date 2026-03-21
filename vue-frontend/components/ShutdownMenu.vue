@@ -1,14 +1,16 @@
 <script setup>
-import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useConnectionStore } from "@/stores/connection"
+import { computed } from "vue"
 
 const connectionState = useState("connection-state");
-const connectionStore = useConnectionStore()
 const { connect, disconnect } = useConnection()
 
+const isConnected = computed(() => connectionState.value === "connected")
+const isDisconnected = computed(() => connectionState.value === "disconnected")
+const isConnecting = computed(() => connectionState.value === "connecting")
+
+
 const { t } = useI18n()
-const busy = ref(false)
 
 function shutdown() {
   if (confirm(t('main.shutdown_confirm'))) {
@@ -33,33 +35,34 @@ function shutdown() {
 
   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="localeDropdown">
     <li>
-      <button class="dropdown-item" @click="connect('mcu')">
+      <button class="dropdown-item" @click="connect('mcu')" :disabled="!isDisconnected">
         MIRTE Basic
       </button>
     </li>
 
+<!--
     <li>
       <button class="dropdown-item" @click="connect('sbc', 'usb')">
         MIRTE Pioneer
       </button>
     </li>
-
+-->
     <li>
       <hr class="dropdown-divider">
     </li>
 
     <li>
-      <button class="dropdown-item" @click="disconnect">
+      <button class="dropdown-item" @click="disconnect" :disabled="!isConnected">
         Disconnect
       </button>
     </li>
-
+<!--
     <li>
       <button class="dropdown-item" @click="shutdown">
         Shutdown
       </button>
     </li>
-<!--
+
     <li>
       <button class="dropdown-item" @click="shutdown">
         Reboot
