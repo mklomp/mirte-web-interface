@@ -4,10 +4,12 @@
       <TelemetrixSettings />
     </div>
 
+<!--
     <div class="col-4 h-100 p-2">
       <div class="row">
-        <v-if="false" NetworkSettings />
+        < NetworkSettings />
       </div>
     </div>
+    -->
   </div>
 </template>

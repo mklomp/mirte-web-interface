@@ -6,8 +6,7 @@ export class SerialTransport {
   reader: ReadableStreamDefaultReader<Uint8Array> | null = null
   writer: WritableStreamDefaultWriter<Uint8Array> | null = null
 
-  readableStreamClosed: null
-  writableStreamClosed: null
+  private encoder = new TextEncoder()
 
   listeners: ((data: string) => void)[] = []
 
@@ -33,27 +32,23 @@ export class SerialTransport {
       this.disconnect()
     })
 
-    const encoderStream = new TextEncoderStream()
-    const decoderStream = new TextDecoderStream()
-
-    this.writableStreamClosed = encoderStream.readable.pipeTo(this.port.writable)
-    this.writer = encoderStream.writable?.getWriter() ?? null
-
-    this.readableStreamClosed = this.port.readable.pipeTo(decoderStream.writable)
-    this.reader = decoderStream.readable.getReader()
+    this.reader = this.port.readable.getReader()
+    this.writer = this.port.writable.getWriter()
 
     console.log('connected')
     connectionState.value = "connected"
     this.startReaderLoop()
   }
 
-  async write(data) {
+  async write(data: string) {
     if (!this.writer) throw new Error("Not connected")
-    await this.writer.write(data)
+    await this.writer.write(this.encoder.encode(data))
   }
 
   async startReaderLoop() {
     if (!this.reader) return
+
+    const decoder = new TextDecoder()
 
     try {
       while (true) {
@@ -61,13 +56,14 @@ export class SerialTransport {
         if (done) break
 
         if (value) {
+          const text = decoder.decode(value)
           for (const cb of this.listeners) {
-            cb(value)
+            cb(text)
           }
         }
       }
     } catch (err) {
-      // disconnect is already catched in event listener
+      console.log("Reader stopped")
     }
   }
 
@@ -76,21 +72,36 @@ export class SerialTransport {
   }
 
   async disconnect() {
+    console.log("disconnecting")
+
     try {
-      this.reader?.cancel()
-      await this.readableStreamClosed
-      this.writer?.close()
-      await this.writableStreamClosed
-      await this.port?.close()
+      // Cancel reader
+      if (this.reader) {
+        await this.reader.cancel()
+        this.reader.releaseLock()
+      }
+
+      // Close writer
+      if (this.writer) {
+        await this.writer.close()
+        this.writer.releaseLock()
+      }
+
+      // Close port
+      if (this.port) {
+        await this.port.close()
+      }
+
     } catch (err) {
-      // nop
+      console.warn("Disconnect error:", err)
     }
 
-
+    // Cleanup state
     this.port = null
     this.reader = null
     this.writer = null
     this.listeners = []
+
     useState("connection-state").value = "disconnected"
   }
 }
