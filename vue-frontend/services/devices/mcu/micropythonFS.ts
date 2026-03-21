@@ -16,7 +16,7 @@ export class MicroPythonFS {
     if (this.buffer.includes("__BEGIN__\r\n")) {
       this.capturing = true
       this.captureBuffer = ""
-      this.buffer = this.buffer.split("__BEGIN__\r\n")[1]
+      this.captureBuffer = this.buffer.split("__BEGIN__\r\n")[1]
     }
 
     if (this.capturing) {
