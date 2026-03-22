@@ -26,6 +26,8 @@ let workspace = null
 let toolBox = getToolbox()
 const customBlockModules = import.meta.glob('@/assets/blockly/*.js', { eager: true })
 
+console.log(customBlockModules)
+
 const { locale } = useI18n()
 const codeStore = useCodeStore()
 const rosStore = useRosStore()
@@ -60,6 +62,7 @@ function loadCustomModules(settings) {
   if (connectionStore.compute_type == "mcu" && connectionState.value != "connected") return
 
   for (const module of Object.values(customBlockModules)) {
+    
     const module_type = module.getType()
     let dropdown_instances = []
     let instances = []
@@ -70,8 +73,8 @@ function loadCustomModules(settings) {
     }
 
     if (!Blockly.Extensions.isRegistered('dynamic_instances_extension_' + module_type?.type)) {
-      const custom_module = module.load(Blockly, pythonGenerator, dropdown_instances)
-      if (custom_module && instances.length != 0) { // default_blocks are already in the toolbox
+      if (instances.length != 0) { // default_blocks are already in the toolbox
+        const custom_module = module.load(Blockly, pythonGenerator, dropdown_instances)
         addToToolbox(custom_module.type, custom_module.contents)
       }
     }
@@ -153,6 +156,9 @@ function initBlockly(reason = "") {
   }
 
   loadBlocklyMessages(locale.value)
+
+  // Load default_blocks.js
+  customBlockModules['/assets/blockly/default_blocks.js'].load(Blockly, pythonGenerator, [])
 
   workspace = Blockly.inject(blocklyDiv.value, {
     toolbox: toolBox,

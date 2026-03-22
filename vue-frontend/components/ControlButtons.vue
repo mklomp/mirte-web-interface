@@ -60,10 +60,11 @@ const file_input = ref(null)
 const emit = defineEmits(['undo', 'redo'])
 
 const programmingState = useState('programming-state')
+const connectionState = useState('connection-state')
 
 
-const isPlayEnabled = computed(() => programmingState.value === 'idle')
-const isStopEnabled = computed(() => programmingState.value === 'running')
+const isPlayEnabled = computed(() => programmingState.value === 'idle' && connectionState == "connected")
+const isStopEnabled = computed(() => programmingState.value === 'running' && connectionState == "connected")
 
 function control(command) {
     programmingState.value = command;
