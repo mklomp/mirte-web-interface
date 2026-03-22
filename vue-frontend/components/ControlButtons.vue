@@ -1,6 +1,6 @@
 <template>
     <div>
-        <button class="btn btn-outline-light mr-2" :title="$t('programming.undo')" @click="$emit('undo')">
+        <button class="btn btn-outline-light mx-2" :title="$t('programming.undo')" @click="$emit('undo')">
             <ClientOnly>
                 <FontAwesomeIcon icon="undo" />
             </ClientOnly>

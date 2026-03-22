@@ -73,7 +73,7 @@ function redo() {
             <div class="text-black p-2 h3 m-0 layoutbox-title w-100 background-secondary">
                {{ $t('main.programming') }}
 
-               <button v-bind:class="isBlockly ? 'code-active' : ''" class="btn btn-outline-light mr-2"
+               <button v-bind:class="isBlockly ? 'code-active' : ''" class="btn btn-outline-light mx-2"
                   @click="codeStore.setActive('blockly')">
                   {{ $t('programming.blockly') }}
                </button>
