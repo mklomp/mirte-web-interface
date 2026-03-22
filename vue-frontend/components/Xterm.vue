@@ -12,7 +12,7 @@ import pythonMainCode from '@/assets/python/main.py?raw'
 import pythonRobotCode from '@/assets/python/robot.py?raw'
 
 import { useConnectionStore } from "@/stores/connection"
-const { attachContainer, term } = useXTermBase()
+const { attachContainer, init } = useXTermBase()
 const { attachTerminal, connect, uploadFile, runCommand } = useConnection()
 
 let connection = null
@@ -32,6 +32,7 @@ connectionStore.loadFromLocalStorage()
 
 onMounted(async () => {
   if (terminal.value) {
+    const term = await init()
     shell = attachContainer(terminal.value);
 
     // Attach terminal to transport output

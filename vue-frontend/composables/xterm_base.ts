@@ -1,30 +1,50 @@
-import { Terminal } from '@xterm/xterm'
-import { FitAddon } from '@xterm/addon-fit'
-import '@xterm/xterm/css/xterm.css'
-
 export function useXTermBase(debug = false) {
+  let term: any = null
+  let fitAddon: any = null
+  let resizeObserver: ResizeObserver | null = null
 
-  let resizeObserver: ResizeObserver
-  const fitAddon = new FitAddon()
-  const term = new Terminal()
-  term.options.theme = { background: '#fefaf7', foreground: '#000000', cursor: '#000000' }
-  term.loadAddon(fitAddon)
+  async function init() {
+    // 🔹 dynamic import (client only)
+    const { Terminal } = await import('@xterm/xterm')
+    const { FitAddon } = await import('@xterm/addon-fit')
+    await import('@xterm/xterm/css/xterm.css')
 
-  function attachContainer(container) {
-    term.open(container)
-    fitAddon.fit()
-    resizeObserver = new ResizeObserver(() => fitAddon.fit())
-    resizeObserver.observe(container)
+    fitAddon = new FitAddon()
+    term = new Terminal()
+
+    term.options.theme = {
+      background: '#fefaf7',
+      foreground: '#000000',
+      cursor: '#000000',
+    }
+
+    term.loadAddon(fitAddon)
+
     return term
   }
 
-  function toggleDebug() {
-    //TODO: toggle the input option and visibility of the terminal
+  function attachContainer(container: HTMLElement) {
+    if (!term) return
+
+    term.open(container)
+    fitAddon.fit()
+
+    resizeObserver = new ResizeObserver(() => fitAddon.fit())
+    resizeObserver.observe(container)
+  }
+
+  function dispose() {
+    resizeObserver?.disconnect()
+    term?.dispose()
+    term = null
   }
 
   return {
-    term,
+    init,
     attachContainer,
-    toggleDebug
+    dispose,
+    get term() {
+      return term
+    },
   }
 }
