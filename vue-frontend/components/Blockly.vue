@@ -207,6 +207,9 @@ function initBlockly(reason = "") {
 }
 
 onMounted(() => {
+  if (useState("connection-state").value == "connected") {
+    loadCustomModules()
+  }
   codeStore.loadFromLocalStorage()
   initBlockly()
 })
@@ -222,15 +225,14 @@ watch(locale, () => {
 watch(() => codeStore.active, (newVal) => {
   if (newVal == "blockly") {
     nextTick(() => {
-      console.log("tab_change")
       initBlockly("tab_change")
     })
   }
 })
 
 watch(settingsState, (newState) => {
-  loadCustomModules( newState )
-  initBlockly("serial_connection") 
+  loadCustomModules(newState)
+  initBlockly("serial_connection")
 })
 
 watch(() => rosStore.peripherals, () => {

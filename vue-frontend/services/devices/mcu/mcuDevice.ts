@@ -40,7 +40,18 @@ export class MCUDevice {
     await this.fs.writeLine(cmd)
   }
 
-  async uploadMIRTEapi(){
+  async startCode() {
+    await this.uploadFile('/mirte.py', useCodeStore().python)
+    useState("programming-state").value = "running";
+    await this.runCommand('\x04') // soft reboot
+  }
+
+  async stopCode() {
+    await this.runCommand("\x03"); // CTRL-C
+    useState("programming-state").value = "idle";
+  }
+
+  async uploadMIRTEapi() {
     // adding main.py, and mirte_robot files
     await this.uploadFile("/main.py", pythonMainCode)
     await this.fs.mkdir("mirte_robot")

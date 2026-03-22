@@ -10,6 +10,11 @@ export class MicroPythonFS {
     transport.onData((data: string) => this.parseData(data))
   }
 
+  // We get the REPL data, which should be parsed on:
+  //
+  // ">>> ": detecting whether a new command can be sent
+  // "__BEGIN__": detecting when file-data is being sent
+  // "__END__": detecting when file-data ended
   parseData(data: string) {
     this.buffer += data
 
@@ -19,6 +24,7 @@ export class MicroPythonFS {
       this.captureBuffer = this.buffer.split("__BEGIN__\r\n")[1]
     }
 
+    // TODO: gaat dit goed? hij heeft hem hier net op true gezet
     if (this.capturing) {
       this.captureBuffer += data
     }
@@ -34,11 +40,6 @@ export class MicroPythonFS {
       }
 
       this.captureBuffer = ""
-    }
-
-    if (this.buffer.includes("__STOP__")) {
-      this.buffer = this.buffer.replace("__STOP__", "")
-      useState("programming-state").value = "idle"
     }
 
     if (this.buffer.includes(">>> ")) {
@@ -61,7 +62,7 @@ export class MicroPythonFS {
       this.captureResolver = resolve
       this.capturing = false
 
-      // Needs to be one line, in order to correctly capture the __BEGIN__
+      // Needs to be one line, in order to correctly capture the __BEGIN__ (TODO: is this true?)
       await this.writeLine(`import sys; f = open('${path}'); print('__BEGIN__'); _ = sys.stdout.write(f.read()); print('__END__'); f.close()`)
     })
   }

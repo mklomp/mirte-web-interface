@@ -7,7 +7,7 @@ export function useXTermBase(debug = false) {
   let resizeObserver: ResizeObserver
   const fitAddon = new FitAddon()
   const term = new Terminal()
-  //term.options.theme = { background: '#fefaf7', foreground: '#000000', cursor: '#000000' }
+  term.options.theme = { background: '#fefaf7', foreground: '#000000', cursor: '#000000' }
   term.loadAddon(fitAddon)
 
   function attachContainer(container) {

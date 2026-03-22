@@ -1,7 +1,5 @@
 export function load(Blockly, pythonGenerator) {
 
-
-    console.log("loadedd........ default blocks")
     // set_analog_pin_value
     Blockly.Blocks['set_analog_pin_value'] = {
         init: function () {

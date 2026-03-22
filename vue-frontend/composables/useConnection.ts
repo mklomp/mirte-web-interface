@@ -24,11 +24,21 @@ export function useConnection() {
     await manager.runCommand?.(cmd)
   }
 
+  async function startCode() {
+    await manager.startCode()
+  }
+
+  async function stopCode() {
+    await manager.stopCode()
+  }
+
   return {
     connect,
     disconnect,
     attachTerminal,
     uploadFile,
-    runCommand
+    runCommand,
+    startCode,
+    stopCode
   }
 }

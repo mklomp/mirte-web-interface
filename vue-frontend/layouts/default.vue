@@ -5,10 +5,10 @@ const head = useLocaleHead()
 
 onMounted(async () => {
   // autoconnect if there are existing connections
-  const ports = await navigator.serial.getPorts()
+  /*const ports = await navigator.serial.getPorts()
   if (ports.length > 0) {
     await useConnection().connect("mcu", true)
-  }
+  }*/
 })
 
 useState('programming-state', () => "initializing") // ready (todo: rename idle), running, paused

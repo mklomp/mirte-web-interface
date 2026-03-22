@@ -7,7 +7,7 @@
         <div class="text-white p-2 h3 layoutbox-title background-secondary">
           {{ $t("settings.wiring") }}
 
-          <button @click="save" class="btn btn-mirte float-end">
+          <button @click="save" class="btn btn-mirte float-end" :disabled="!isConnected">
             {{ $t("settings.save") }}
           </button>
         </div>
@@ -17,11 +17,7 @@
           Microcontroller:
           <div class="float-end">
             <select v-model="state.board" class="form-control">
-              <option
-                v-for="(mc, name) in microcontrollers"
-                :key="name"
-                :value="name"
-              >
+              <option v-for="(mc, name) in microcontrollers" :key="name" :value="name">
                 {{ mc.text }}
               </option>
             </select>
@@ -36,19 +32,13 @@
               <tr>
                 <th>
                   <div class="dropdown">
-                    <button
-                      class="btn btn-secondary dropdown-toggle"
-                      data-bs-toggle="dropdown"
-                    >
+                    <button class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
                       {{ $t("settings.add") }}
                     </button>
 
                     <ul class="dropdown-menu">
                       <li v-for="(p, key) in peripheralsDef" :key="key">
-                        <button
-                          class="dropdown-item"
-                          @click="addPeripheral(key)"
-                        >
+                        <button class="dropdown-item" @click="addPeripheral(key)">
                           {{ $t("peripherals." + p.text) }}
                         </button>
                       </li>
@@ -62,14 +52,8 @@
             </thead>
 
             <tbody>
-              <PeripheralRow
-                v-for="item in state.peripherals"
-                :key="item.id"
-                :item="item"
-                :peripheralsDef="peripheralsDef"
-                :getValidPins="getValidPins"
-                @remove="removePeripheral"
-              />
+              <PeripheralRow v-for="item in state.peripherals" :key="item.id" :item="item"
+                :peripheralsDef="peripheralsDef" :getValidPins="getValidPins" @remove="removePeripheral" />
             </tbody>
 
           </table>
@@ -103,9 +87,13 @@ const {
 } = useWiring(peripheralsDef, microcontrollers)
 
 const peripheralsSetting = useState("peripheral-settings")
+const connectionState = useState("connection-state");
+const isConnected = computed(() => connectionState.value === "connected")
 
-onMounted(() =>{
-  loadFromYAML(peripheralsSetting.value)
+onMounted(() => {
+  if (useState("connection-state").value == "connected") {
+    loadFromYAML(peripheralsSetting.value)
+  }
 })
 
 watch(

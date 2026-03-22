@@ -15,7 +15,7 @@
         <span class="nav-spacer"></span>
 
         <span :title="$t('programming.start')" style="display: inline-block;">
-            <button :disabled="!isPlayEnabled" class="btn btn-outline-light mx-2" @click="control('start_initiated')">
+            <button :disabled="!isPlayEnabled" class="btn btn-outline-light mx-2" @click="startCode">
                 <ClientOnly>
                     <FontAwesomeIcon icon="play" />
                 </ClientOnly>
@@ -23,7 +23,7 @@
         </span>
 
         <span :title="$t('programming.stop')" style="display: inline-block;">
-            <button :disabled="!isStopEnabled" class="btn btn-outline-light mr-2" @click="control('stop_initiated')">
+            <button :disabled="!isStopEnabled" class="btn btn-outline-light mr-2" @click="stopCode">
                 <ClientOnly>
                     <FontAwesomeIcon icon="stop" />
                 </ClientOnly>
@@ -53,6 +53,7 @@
 
 import { useCodeStore } from "@/stores/user_code"
 const codeStore = useCodeStore()
+const { startCode, stopCode } = useConnection()
 
 const file_input = ref(null)
 
