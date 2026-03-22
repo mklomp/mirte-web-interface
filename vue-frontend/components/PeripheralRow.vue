@@ -3,7 +3,9 @@
     <!-- TYPE + DELETE -->
     <td>
       <button @click="$emit('remove', item.id)" class="btn">
-        <span class="fa fa-trash"></span>
+        <ClientOnly>
+          <FontAwesomeIcon icon="trash" />
+        </ClientOnly>
       </button>
 
       {{ $t("peripherals." + item.type) }}
@@ -16,21 +18,13 @@
 
     <!-- PINS -->
     <td>
-      <div
-        v-for="(pinType, pinName) in peripheralsDef[item.type].pins"
-        :key="pinName"
-        class="mb-2"
-      >
+      <div v-for="(pinType, pinName) in peripheralsDef[item.type].pins" :key="pinName" class="mb-2">
         <select v-model="item.pins[pinName]" class="form-select">
           <option :value="null" disabled>
             {{ pinName }}
           </option>
 
-          <option
-            v-for="opt in getValidPins(item.type, pinName)"
-            :key="opt.value"
-            :value="opt.value"
-          >
+          <option v-for="opt in getValidPins(item.type, pinName)" :key="opt.value" :value="opt.value">
             {{ opt.text }}
           </option>
         </select>
