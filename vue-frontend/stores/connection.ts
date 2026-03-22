@@ -9,10 +9,18 @@ export const useConnectionStore = defineStore('connection', {
 
   actions: {
     loadFromLocalStorage() {
-      if (process.client) {
-        let full_state = JSON.parse(localStorage.getItem('connection'))
-        this.transport = full_state.transport || ""
-        this.device = full_state.device || ""
+      if (!process.client) return
+
+      try {
+        const stored = localStorage.getItem('connection')
+        if (!stored) return
+
+        const full_state = JSON.parse(stored)
+
+        this.transport = full_state?.transport ?? ""
+        this.device = full_state?.device ?? ""
+      } catch (e) {
+        console.warn("Failed to parse connection from localStorage", e)
       }
     },
     setConnection(transport, device) {
