@@ -21,11 +21,11 @@ jobs:
         with:
           name: dist
           path: |
-            vue-frontend/dist
+            vue-frontend/.output/public
       - name: Upload as a github-pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: vue-frontend/dist
+          path: vue-frontend/.output/public
 
   deploy:
     needs: build
