@@ -63,8 +63,8 @@ const programmingState = useState('programming-state')
 const connectionState = useState('connection-state')
 
 
-const isPlayEnabled = computed(() => programmingState.value === 'idle' && connectionState == "connected")
-const isStopEnabled = computed(() => programmingState.value === 'running' && connectionState == "connected")
+const isPlayEnabled = computed(() => programmingState.value === 'idle' && connectionState.value === "connected")
+const isStopEnabled = computed(() => programmingState.value === 'running' && connectionState.value === "connected")
 
 function control(command) {
     programmingState.value = command;
