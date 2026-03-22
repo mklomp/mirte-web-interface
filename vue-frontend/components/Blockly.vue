@@ -26,8 +26,6 @@ let workspace = null
 let toolBox = getToolbox()
 const customBlockModules = import.meta.glob('@/assets/blockly/*.js', { eager: true })
 
-console.log(customBlockModules)
-
 const { locale } = useI18n()
 const codeStore = useCodeStore()
 const rosStore = useRosStore()

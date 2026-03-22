@@ -35,7 +35,6 @@ export class SerialTransport {
     this.reader = this.port.readable.getReader()
     this.writer = this.port.writable.getWriter()
 
-    console.log('connected')
     connectionState.value = "connected"
     this.startReaderLoop()
   }

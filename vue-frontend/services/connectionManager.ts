@@ -23,8 +23,6 @@ export class ConnectionManager {
       this.transport = new SerialTransport()
       await this.transport.connect(autoconnect)
 
-      console.log("hieeerr...")
-
       // We get the REPL data, which should be parsed on:
       //
       // "__START__": detecting when execution started (see main.py)
@@ -66,13 +64,9 @@ export class ConnectionManager {
       await new Promise(r => setTimeout(r, 200))
       await this.transport.write('\x03') // CTRL-C (soft reoot started main again)
 
-      console.log("en hierrr....")
-
       this.device = new MCUDevice(this.transport)
       await this.device.initialize()
 
-
-      console.log("en initialized....")
       useConnectionStore().setConnection("serial", type)
     }
 
