@@ -1,5 +1,5 @@
 // Get base url, and make sure it has a triling slash
-const baseURL = (process.env.NUXT_APP_BASE_URL || '/mirte-web-interace/').replace(/\/?$/, '/');
+const baseURL = (process.env.NUXT_APP_BASE_URL || '/mirte-web-interface/').replace(/\/?$/, '/');
 
 export default defineNuxtConfig({
   app: {
