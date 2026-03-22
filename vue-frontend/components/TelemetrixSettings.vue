@@ -17,7 +17,7 @@
           Microcontroller:
           <div class="float-end">
             <select v-model="state.board" class="form-control">
-              <option v-for="(mc, name) in microcontrollers" :key="name" :value="name">
+              <option v-for="(mc, name) in microcontrollers" :key="name" :value="name" :disabled="!isUsableMC(name)">
                 {{ mc.text }}
               </option>
             </select>
@@ -31,14 +31,14 @@
             <thead>
               <tr>
                 <th>
-                  <div class="dropdown">
+                  <div class="dropdown" :disabled="!isConnected">
                     <button class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
                       {{ $t("settings.add") }}
                     </button>
 
                     <ul class="dropdown-menu">
                       <li v-for="(p, key) in peripheralsDef" :key="key">
-                        <button class="dropdown-item" @click="addPeripheral(key)">
+                        <button class="dropdown-item" @click="addPeripheral(key)" :disabled="!isUsablePeripheral(key)">
                           {{ $t("peripherals." + p.text) }}
                         </button>
                       </li>
@@ -89,6 +89,14 @@ const {
 const peripheralsSetting = useState("peripheral-settings")
 const connectionState = useState("connection-state");
 const isConnected = computed(() => connectionState.value === "connected")
+
+function isUsableMC(name){
+  return name === "pico"
+}
+
+function isUsablePeripheral(key){
+  return connectionState.value == "connected" && ['motor', 'intensity', 'servo', 'keypad'].includes(key)
+}
 
 onMounted(() => {
   if (useState("connection-state").value == "connected") {
