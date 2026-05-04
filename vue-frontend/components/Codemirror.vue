@@ -1,7 +1,5 @@
 <template>
-  <div class="d-flex flex-column h-100">
-    <div ref="editorContainer" class="editor d-flex flex-column h-100"></div>
-  </div>
+  <div ref="editorContainer" class="editor" style="width: 100%; height: 100%;"></div>
 </template>
 
 <script setup>
@@ -72,3 +70,9 @@ defineExpose({
 
 
 </script>
+
+<style scoped>
+:deep(.cm-editor) {
+  height: 100%;
+}
+</style>

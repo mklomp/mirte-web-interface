@@ -68,9 +68,9 @@ function redo() {
 
 
       <div class="col-9 p-2 h-100" style="overflow: hidden;">
-         <div class="layoutbox rounded h-100" style="overflow: hidden; display: flex; flex-flow: column;">
+         <div class="layoutbox rounded" style="overflow: hidden; display: flex; flex-direction: column; height: 100%">
 
-            <div class="text-black p-2 h3 m-0 layoutbox-title w-100 background-secondary">
+            <div class="layoutbox-title text-black p-2 h3 m-0 w-100 background-secondary" style="flex: 0 0 auto;">
                {{ $t('main.programming') }}
 
                <button v-bind:class="isBlockly ? 'code-active' : ''" class="btn btn-outline-light mx-2"
@@ -83,31 +83,21 @@ function redo() {
                   {{ $t('programming.python') }}
                </button>
 
-
-
-
                <div style="float: right">
                   <ControlButtons @undo="undo" @redo="redo" />
                </div>
 
             </div>
 
+            <div class="layoutbox-content" style="flex: 1 1 auto; min-height: 0; padding: 0; margin: 0;">
+               <div v-show="isBlockly" class="h-100">
+                  <Blockly ref="blocklyEditor" />
+               </div>
 
-            <div v-show="isBlockly" class="h-100">
-               <Blockly ref="blocklyEditor" />
+               <div v-show="!isBlockly" class="h-100">
+                  <Codemirror ref="pythonEditor" />
+               </div>
             </div>
-
-
-
-
-            <div v-show="!isBlockly" class="h-100">
-               <Codemirror ref="pythonEditor" />
-            </div>
-
-
-
-
-
 
          </div>
 
