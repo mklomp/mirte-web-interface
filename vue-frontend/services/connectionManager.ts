@@ -14,6 +14,7 @@ export class ConnectionManager {
   private buffer = ""
   private running = false
   private started_found = false
+  private stopped_found = false
 
   async connect(type: "mcu" | "sbc", autoconnect = false) {
 
@@ -32,23 +33,34 @@ export class ConnectionManager {
 
         this.buffer += data
 
-        if (this.started_found) {
-          this.term.write(data)
-        }
+        // detecting __START__, only stripping the buffer
         if (this.buffer.includes("__START__\r\n")){
-          const stripped_data = this.buffer.split("__START__\r\n")[1]
-          this.term.write(stripped_data)
-          this.buffer = ""
+          this.buffer = this.buffer.split("__START__\r\n")[1] // throw away everyting before __START__
           this.started_found = true
         }
-        // TODO: I should alos detect the case that __START__ and __STOP__ are in the same buffer (eg, no/minimal ouput)
 
-        // Also detect if the program itself gave a stopped
+        // detecting __START__, only stripping the buffer
         if (this.buffer.includes("__STOP__\r\n")){
-          const stripped_data = this.buffer.split("__STOP__\r\n")[0]
-          this.term.write(stripped_data)
-          this.buffer = ""
+          this.stopped_found = true
+          this.buffer = this.buffer.split("__STOP__\r\n")[0] // throw away everything after __STOP__
           useState("programming-state").value = "idle"
+        }
+
+        // write and remove all newlines in the buffer
+        if (this.started_found){
+          let index
+          while ((index = this.buffer.indexOf("\r\n")) !== -1) {
+            const line = this.buffer.slice(0, index + 1)
+            this.buffer = this.buffer.slice(index + 1)
+            this.term.write(line)
+          }
+        }
+
+        // clear the buffer after __STOP__
+        if (this.stopped_found){
+          this.buffer = ""
+          this.started_found = false
+          this.stopped_found = false
         }
         
       })
