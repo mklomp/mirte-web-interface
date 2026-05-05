@@ -3,6 +3,7 @@ import { MicroPythonREPL } from "./micropythonREPL"
 
 import pythonMainCode from '@/assets/python/main.py?raw'
 import pythonRobotCode from '@/assets/python/robot.py?raw'
+import pythonNumbersCode from '@/assets/python/numbers.py?raw'
 
 import * as YAML from 'js-yaml'
 
@@ -54,6 +55,8 @@ export class MCUDevice {
   async uploadMIRTEapi() {
     // adding main.py, and mirte_robot files
     await this.uploadFile("/main.py", pythonMainCode)
+    // numbers.py this is needed for generated blockly varibale change by block
+    await this.uploadFile("/numbers.py", pythonNumbersCode) 
     await this.fs.mkdir("mirte_robot")
     await this.uploadFile("/mirte_robot/robot.py", pythonRobotCode)
     await this.uploadFile("/mirte_robot/__main__.py", "")
