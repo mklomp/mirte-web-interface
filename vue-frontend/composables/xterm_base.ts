@@ -17,7 +17,8 @@ export function useXTermBase(debug = false) {
       foreground: '#000000',
       cursor: '#000000',
     }
-
+    term.options.disableStdin = true;
+    
     term.loadAddon(fitAddon)
 
     return term

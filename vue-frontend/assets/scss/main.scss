@@ -29,6 +29,10 @@ footer {
   text-align: center;
 }
 
+.xterm-cursor {
+  display: none !important;
+}
+
 .hero {
   flex: 1;
   background-size: cover;
