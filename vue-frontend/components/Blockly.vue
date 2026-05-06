@@ -60,7 +60,6 @@ function loadCustomModules(settings) {
   if (connectionStore.compute_type == "mcu" && connectionState.value != "connected") return
 
   for (const module of Object.values(customBlockModules)) {
-    
     const module_type = module.getType()
     let dropdown_instances = []
     let instances = []
@@ -211,9 +210,7 @@ function initBlockly(reason = "") {
 }
 
 onMounted(() => {
-  if (useState("connection-state").value == "connected") {
-    loadCustomModules()
-  }
+  loadCustomModules(settingsState.value)
   codeStore.loadFromLocalStorage()
   initBlockly()
 })
@@ -224,7 +221,7 @@ watch(locale, () => {
 
 // TODO: we could rewrite initBlockly in a way that we only
 // need to do Blockly.resizeSvg() in these two watches.
-// Only teh lang_change, really needs a re-init of the
+// Only the lang_change, really needs a re-init of the
 // whole blockly workspace.
 watch(() => codeStore.active, (newVal) => {
   if (newVal == "blockly") {
@@ -235,6 +232,8 @@ watch(() => codeStore.active, (newVal) => {
 })
 
 watch(settingsState, (newState) => {
+  // TODO: check if this is working at all. does not seem to work
+  // when settings change due to connecting
   loadCustomModules(newState)
   initBlockly("serial_connection")
 })
