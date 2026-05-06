@@ -4,7 +4,7 @@ export function load(Blockly, pythonGenerator, instances) {
     instances = [["NO PERIPHERAL CONFIGURED", "NO PERIPHERAL CONFIGURED"]]
   }
 
-  Blockly.Extensions.register('dynamic_instances_extension_pp_motor',
+  Blockly.Extensions.register('dynamic_instances_extension_motor',
     function () {
       if (this.getInput('INSTANCE')) {
         this.getInput('INSTANCE')
@@ -33,7 +33,7 @@ export function load(Blockly, pythonGenerator, instances) {
         "previousStatement": null,
         "nextStatement": null,
         "colour": "%{BKY_ACTIONS_RGB}",
-        "extensions": ["dynamic_instances_extension_pp_motor"]
+        "extensions": ["dynamic_instances_extension_motor"]
       });
     }
   };
@@ -70,7 +70,7 @@ export function load(Blockly, pythonGenerator, instances) {
         "previousStatement": null,
         "nextStatement": null,
         "colour": "%{BKY_ACTIONS_RGB}",
-        "extensions": ["dynamic_instances_extension_pp_motor"]
+        "extensions": ["dynamic_instances_extension_motor"]
       });
     }
   };
@@ -96,7 +96,7 @@ export function load(Blockly, pythonGenerator, instances) {
         "previousStatement": null,
         "nextStatement": null,
         "colour": "%{BKY_ACTIONS_RGB}",
-        "extensions": ["dynamic_instances_extension_pp_motor"]
+        "extensions": ["dynamic_instances_extension_motor"]
       });
     }
   };
