@@ -17,11 +17,10 @@ export class SerialTransport {
       { usbVendorId: 0x2E8A, usbProductId: 0x0005 }  // Raspberry Pi Pico 2040
     ];
 
-    if (autoconnect) {
-      const ports = await navigator.serial.getPorts()
-      if (ports.length > 0) {
-        this.port = ports[0]
-      }
+    //if (autoconnect) {
+    const ports = await navigator.serial.getPorts()
+    if (ports.length > 0) {
+      this.port = ports[0]
     } else {
       this.port = await navigator.serial.requestPort({ filters })
     }
