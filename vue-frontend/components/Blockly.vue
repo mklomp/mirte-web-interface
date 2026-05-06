@@ -214,6 +214,14 @@ onMounted(() => {
   initBlockly()
 })
 
+onBeforeUnmount(() =>{
+  // We need to close the blockly elements
+  // that are not inside the Blockly-div 
+  // (eg dropdowns). Otherwise they will still
+  // be rendered in the python tab.
+  Blockly.hideChaff()
+})
+
 watch(locale, () => {
   initBlockly("lang_change")
 })
@@ -223,6 +231,8 @@ watch(locale, () => {
 // Only the lang_change, really needs a re-init of the
 // whole blockly workspace.
 watch(() => codeStore.active, (newVal) => {
+  // TODO: check if this is working at all. does not seem to work
+  // when settings change due to connecting
   if (newVal == "blockly") {
     nextTick(() => {
       initBlockly("tab_change")
