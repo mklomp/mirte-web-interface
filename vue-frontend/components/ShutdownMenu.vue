@@ -6,7 +6,7 @@ const connectionStore = useConnectionStore()
 const { connect, disconnect } = useConnection()
 
 const isConnected = computed(() => connectionStore.status == "connected")
-const isDisconnected = computed(() => connectionStore.status == "disconnected")
+const isDisconnected = computed(() => connectionStore.status != "connected")
 
 const { t } = useI18n()
 
