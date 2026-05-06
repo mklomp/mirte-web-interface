@@ -30,7 +30,6 @@ const { locale } = useI18n()
 const codeStore = useCodeStore()
 const rosStore = useRosStore()
 const connectionStore = useConnectionStore()
-const connectionState = useState("connection-state");
 const settingsState = useState("peripheral-settings");
 
 // Blockly state
@@ -57,7 +56,7 @@ function addToToolbox(type, item) {
 function loadCustomModules(settings) {
 
   if (connectionStore.compute_type == "sbc" && Object.keys(rosStore.peripherals).length == 0) return
-  if (connectionStore.compute_type == "mcu" && connectionState.value != "connected") return
+  if (connectionStore.compute_type == "mcu" && connectionStore.status != "connected") return
 
   for (const module of Object.values(customBlockModules)) {
     const module_type = module.getType()
@@ -138,7 +137,7 @@ function restoreWorkspace() {
 function initBlockly(reason = "") {
 
   // Set workspaceDOM from previous session
-  if (codeStore.blockly && (Object.keys(rosStore.peripherals).length != 0 || connectionState.value == "connected")) {
+  if (codeStore.blockly && (Object.keys(rosStore.peripherals).length != 0 || connectionStore.status == "connected")) {
     workspaceDOM = Blockly.utils.xml.textToDom(codeStore.blockly)
   }
 

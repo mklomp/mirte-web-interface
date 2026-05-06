@@ -7,12 +7,12 @@ export class SerialTransport {
   writer: WritableStreamDefaultWriter<Uint8Array> | null = null
 
   private encoder = new TextEncoder()
-
+  
   listeners: ((data: string) => void)[] = []
 
   async connect(autoconnect = false) {
+    const connectionStore = useConnectionStore()
 
-    const connectionState = useState("connection-state")
     const filters = [
       { usbVendorId: 0x2E8A, usbProductId: 0x0005 }  // Raspberry Pi Pico 2040
     ];
@@ -25,7 +25,7 @@ export class SerialTransport {
     } else {
       this.port = await navigator.serial.requestPort({ filters })
     }
-    connectionState.value = "connecting"
+    connectionStore.setConnectionStatus("connecting")
     await this.port.open({ baudRate: 115200 })
 
     this.port.addEventListener("disconnect", () => {
@@ -35,7 +35,7 @@ export class SerialTransport {
     this.reader = this.port.readable.getReader()
     this.writer = this.port.writable.getWriter()
 
-    connectionState.value = "connected"
+    connectionStore.setConnectionStatus("connected")
     this.startReaderLoop()
   }
 
@@ -71,6 +71,7 @@ export class SerialTransport {
   }
 
   async disconnect() {
+    const connectionStore = useConnectionStore()
     console.log("disconnecting")
 
     try {
@@ -101,6 +102,6 @@ export class SerialTransport {
     this.writer = null
     this.listeners = []
 
-    useState("connection-state").value = "disconnected"
+    connectionStore.setConnectionStatus("disconnected")
   }
 }

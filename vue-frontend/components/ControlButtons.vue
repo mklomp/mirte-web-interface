@@ -53,6 +53,7 @@
 
 import { useCodeStore } from "@/stores/user_code"
 const codeStore = useCodeStore()
+const connectionStore = useConnectionStore()
 const { startCode, stopCode } = useConnection()
 
 const file_input = ref(null)
@@ -60,11 +61,9 @@ const file_input = ref(null)
 const emit = defineEmits(['undo', 'redo'])
 
 const programmingState = useState('programming-state')
-const connectionState = useState('connection-state')
 
-
-const isPlayEnabled = computed(() => programmingState.value === 'idle' && connectionState.value === "connected")
-const isStopEnabled = computed(() => programmingState.value === 'running' && connectionState.value === "connected")
+const isPlayEnabled = computed(() => programmingState.value === 'idle' && connectionStore.status === "connected")
+const isStopEnabled = computed(() => programmingState.value === 'running' && connectionStore.status === "connected")
 
 function control(command) {
     programmingState.value = command;

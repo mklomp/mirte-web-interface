@@ -87,19 +87,19 @@ const {
 } = useWiring(peripheralsDef, microcontrollers)
 
 const peripheralsSetting = useState("peripheral-settings")
-const connectionState = useState("connection-state");
-const isConnected = computed(() => connectionState.value === "connected")
+const connectionStore = useConnectionStore()
+const isConnected = computed(() => connectionStore.status === "connected")
 
 function isUsableMC(name){
   return name === "pico"
 }
 
 function isUsablePeripheral(key){
-  return connectionState.value == "connected" && ['motor', 'intensity', 'servo', 'keypad'].includes(key)
+  return connectionStore.status == "connected" && ['motor', 'intensity', 'servo', 'keypad'].includes(key)
 }
 
 onMounted(() => {
-  if (useState("connection-state").value == "connected") {
+  if (connectionStore.status == "connected") {
     loadFromYAML(peripheralsSetting.value)
   }
 })

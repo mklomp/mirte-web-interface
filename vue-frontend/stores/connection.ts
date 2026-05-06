@@ -4,7 +4,8 @@ export const useConnectionStore = defineStore('connection', {
   state: () => ({
     transport: "",
     device: "",
-    ip_address: "192.168.43.1"
+    ip_address: "192.168.43.1",
+    status: "disconnected"
   }),
 
   actions: {
@@ -12,22 +13,37 @@ export const useConnectionStore = defineStore('connection', {
       if (!process.client) return
 
       try {
-        const stored = localStorage.getItem('connection')
+        const stored = localStorage.getItem('connection');
         if (!stored) return
 
         const full_state = JSON.parse(stored)
 
-        this.transport = full_state?.transport ?? ""
-        this.device = full_state?.device ?? ""
+        this.transport = full_state?.transport ?? this.transport
+        this.device = full_state?.device ?? this.device
+        this.status = full_state?.status ?? this.status
       } catch (e) {
         console.warn("Failed to parse connection from localStorage", e)
       }
     },
-    setConnection(transport, device) {
+    setConnectionType(device, transport) {
+      // update store
       this.transport = transport
       this.device = device
-      let full_state = { transport: this.transport, device: this.device }
-      localStorage.setItem('connection', JSON.stringify(full_state))
+
+      // update localstorage
+      const connection = JSON.parse(localStorage.getItem('connection')) || {};
+      connection.transport = transport
+      connection.device = device
+      localStorage.setItem('connection', JSON.stringify(connection))
+    },
+    setConnectionStatus(status){
+      // update store
+      this.status = status
+
+      // update localstorage
+      const connection = JSON.parse(localStorage.getItem('connection')) || {};
+      connection.status = status
+      localStorage.setItem('connection', JSON.stringify(connection))
     }
   }
 })

@@ -19,7 +19,6 @@ let connection = null
 
 const terminal = ref(null);
 const programmingState = useState("programming-state");
-const connectionState = useState("connection-state");
 const ROSState = useState("ros-state");
 const termState = useState("term-state");
 const connectionStore = useConnectionStore()
@@ -153,7 +152,7 @@ function connectSBC() {
       if (ROSState.value == "connected") {
         // TODO: should be done somehere else with wathinng ROSState and termState
         programmingState.value = "idle";
-        connectionState.value = "connected"
+        connectionStore.status = "connected"
       }
     } else if (buffer.includes("__STOP__\r\n>>> ")) {
       buffer = "";

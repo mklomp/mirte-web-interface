@@ -1,9 +1,3 @@
-<script setup>
-
-useState("connection-state").value = "disconnected"
-
-</script>
-
 <template>
   <div class="wrapper">
     <nav class="navbar navbar-expand-sm fixed-top">

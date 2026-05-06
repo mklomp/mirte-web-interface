@@ -2,11 +2,11 @@
 import { useI18n } from 'vue-i18n'
 import { computed } from "vue"
 
-const connectionState = useState("connection-state");
+const connectionStore = useConnectionStore()
 const { connect, disconnect } = useConnection()
 
-const isConnected = computed(() => connectionState.value === "connected")
-const isDisconnected = computed(() => connectionState.value === "disconnected")
+const isConnected = computed(() => connectionStore.status == "connected")
+const isDisconnected = computed(() => connectionStore.status == "disconnected")
 
 const { t } = useI18n()
 
@@ -28,7 +28,7 @@ function shutdown() {
 <template>
   <a class="nav-link dropdown-toggle" href="#" id="localeDropdown" role="button" data-bs-toggle="dropdown"
     aria-expanded="false">
-    {{ $t("main.connection." + connectionState) }}
+    {{ $t("main.connection." + connectionStore.status) }}
   </a>
 
   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="localeDropdown">

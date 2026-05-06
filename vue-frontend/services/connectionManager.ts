@@ -10,7 +10,6 @@ export class ConnectionManager {
   device: any = null
   term: any = null
 
-  privat
   private buffer = ""
   private running = false
   private started_found = false
@@ -79,7 +78,7 @@ export class ConnectionManager {
       this.device = new MCUDevice(this.transport)
       await this.device.initialize()
 
-      useConnectionStore().setConnection("serial", type)
+      useConnectionStore().setConnectionType("serial", type)
     }
 
     /*if (type === "sbc") {

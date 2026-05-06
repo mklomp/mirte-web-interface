@@ -2,13 +2,15 @@
 import { useLocalePath } from '#i18n'
 const localePath = useLocalePath()
 const head = useLocaleHead()
+const connectionStore = useConnectionStore()
 
 onMounted(async () => {
-  // autoconnect if there are existing connections
-  /*const ports = await navigator.serial.getPorts()
-  if (ports.length > 0) {
+  // autoconnect if there are existing connections 
+  // and I was previously connected
+  const ports = await navigator.serial.getPorts()
+  if (ports.length > 0 && connectionStore.status == "connected") {
     await useConnection().connect("mcu", true)
-  }*/
+  }
 })
 
 useState('programming-state', () => "initializing") // ready (todo: rename idle), running, paused

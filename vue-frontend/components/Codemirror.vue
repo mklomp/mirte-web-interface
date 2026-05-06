@@ -12,8 +12,8 @@ import { useCodeStore } from "@/stores/user_code"
 const editorContainer = ref(null)
 let editor = null // could not be ref due to undo/redo
 const codeStore = useCodeStore()
-let connectionState = useState("connection-state")
-let pythonCode = (connectionState == "connected") ? codeStore.python : ""
+const connectionStore = useConnectionStore()
+let pythonCode = (connectionStore.status == "connected") ? codeStore.python : ""
 
 function undoAction() {
   undo(editor)
@@ -49,7 +49,7 @@ watch(
   () => codeStore.python,
   (newCode) => {
 
-    if (!editor || connectionState != "connected") return
+    if (!editor || connectionStore.status != "connected") return
 
     const current = editor.state.doc.toString()
 
@@ -65,9 +65,10 @@ watch(
   }
 )
 
-watch(connectionState, (newState) => {
-  console.log(newState)
-  if (newState == "connected"){
+watch(() => connectionStore.status, async () => {
+  if (!editor) return
+
+  if (connectionStore.status == "connected"){
       editor.dispatch({
         changes: {
           from: 0,
