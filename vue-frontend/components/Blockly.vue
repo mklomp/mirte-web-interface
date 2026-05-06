@@ -38,6 +38,7 @@ let flyout_visible = false
 let scale = 0.8
 let scrollX = 0
 let scrollY = 0
+let suppressStore = false
 
 // TODO: use colors from scss
 Blockly.Msg.FLOW_RGB = "#cee6ed"
@@ -193,14 +194,15 @@ function initBlockly(reason = "") {
 
   workspace.addChangeListener((event) => {
     // Ignore UI events (scroll, selection, toolbox open, etc.)
-    if (event.isUiEvent) return
+    if (event.isUiEvent || suppressStore) return
 
     // Only store meaningful changes
     if (
       event.type === Blockly.Events.BLOCK_CREATE ||
       event.type === Blockly.Events.BLOCK_DELETE ||
       event.type === Blockly.Events.BLOCK_CHANGE ||
-      event.type === Blockly.Events.BLOCK_MOVE
+      event.type === Blockly.Events.BLOCK_MOVE ||
+      event.type === Blockly.Events.BLOCK_FIELD_INTERMEDIATE_CHANGE
     ) {
       storeCode()
     }
@@ -214,7 +216,7 @@ onMounted(() => {
   initBlockly()
 })
 
-onBeforeUnmount(() =>{
+onBeforeUnmount(() => {
   // We need to close the blockly elements
   // that are not inside the Blockly-div 
   // (eg dropdowns). Otherwise they will still
@@ -245,6 +247,19 @@ watch(settingsState, (newState) => {
   // when settings change due to connecting
   loadCustomModules(newState)
   initBlockly("serial_connection")
+})
+
+watch(() => connectionStore.status, (newStatus) => {
+  if (newStatus == "disconnected") {
+    suppressStore = true
+
+    workspace.clear()
+
+    // Let Blockly finish firing events, then re-enable
+    setTimeout(() => {
+      suppressStore = false
+    }, 50)
+  }
 })
 
 watch(() => rosStore.peripherals, () => {

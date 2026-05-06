@@ -11,6 +11,7 @@ import { useCodeStore } from "@/stores/user_code"
 
 const editorContainer = ref(null)
 let editor = null // could not be ref due to undo/redo
+let suppressStore = false
 const codeStore = useCodeStore()
 const connectionStore = useConnectionStore()
 let pythonCode = (connectionStore.status == "connected") ? codeStore.python : ""
@@ -33,10 +34,11 @@ onMounted(() => {
       basicSetup,
       python(),
       EditorView.updateListener.of(update => {
+        if (suppressStore) return
         const newCode = update.state.doc.toString()
-        if (update.docChanged && 
-            codeStore.active == "python" &&
-            newCode != codeStore.python) {
+        if (update.docChanged &&
+          codeStore.active == "python" &&
+          newCode != codeStore.python) {
           codeStore.setPython(newCode)
         }
       })
@@ -65,18 +67,25 @@ watch(
   }
 )
 
-watch(() => connectionStore.status, async () => {
+watch(() => connectionStore.status, () => {
   if (!editor) return
 
-  if (connectionStore.status == "connected"){
-      editor.dispatch({
-        changes: {
-          from: 0,
-          to: editor.state.doc.length,
-          insert: codeStore.python
-        }
-      })
+  let code = ""
+  if (connectionStore.status == "connected") {
+    code = codeStore.python
   }
+
+  suppressStore = true
+
+  editor.dispatch({
+    changes: {
+      from: 0,
+      to: editor.state.doc.length,
+      insert: code
+    }
+  })
+
+  suppressStore = false
 })
 
 defineExpose({
