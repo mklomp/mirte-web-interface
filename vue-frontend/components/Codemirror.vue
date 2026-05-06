@@ -12,6 +12,8 @@ import { useCodeStore } from "@/stores/user_code"
 const editorContainer = ref(null)
 let editor = null // could not be ref due to undo/redo
 const codeStore = useCodeStore()
+let connectionState = useState("connection-state")
+let pythonCode = (connectionState == "connected") ? codeStore.python : ""
 
 function undoAction() {
   undo(editor)
@@ -25,7 +27,7 @@ onMounted(() => {
 
   editor = new EditorView({
     parent: editorContainer.value,
-    doc: codeStore.python,
+    doc: pythonCode,
 
     extensions: [
       basicSetup,
@@ -47,7 +49,7 @@ watch(
   () => codeStore.python,
   (newCode) => {
 
-    if (!editor) return
+    if (!editor || connectionState != "connected") return
 
     const current = editor.state.doc.toString()
 
@@ -62,6 +64,19 @@ watch(
     }
   }
 )
+
+watch(connectionState, (newState) => {
+  console.log(newState)
+  if (newState == "connected"){
+      editor.dispatch({
+        changes: {
+          from: 0,
+          to: editor.state.doc.length,
+          insert: codeStore.python
+        }
+      })
+  }
+})
 
 defineExpose({
   undoAction,
