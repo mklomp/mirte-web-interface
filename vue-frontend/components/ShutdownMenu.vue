@@ -6,9 +6,14 @@ const connectionStore = useConnectionStore()
 const { connect, disconnect } = useConnection()
 
 const isConnected = computed(() => connectionStore.status == "connected")
-const isDisconnected = computed(() => connectionStore.status != "connected")
 
 const { t } = useI18n()
+
+const mounted = ref(false)
+
+onMounted(() => {
+  mounted.value = true
+})
 
 function shutdown() {
   if (confirm(t('main.shutdown_confirm'))) {
@@ -33,7 +38,7 @@ function shutdown() {
 
   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="localeDropdown">
     <li>
-      <button class="dropdown-item" @click="connect('mcu')" :disabled="!isDisconnected">
+      <button class="dropdown-item" @click="connect('mcu')" :disabled="mounted && isConnected">
         MIRTE Basic
       </button>
     </li>
@@ -50,7 +55,7 @@ function shutdown() {
     </li>
 
     <li>
-      <button class="dropdown-item" @click="disconnect" :disabled="!isConnected">
+      <button class="dropdown-item" @click="disconnect" :disabled="mounted && !isConnected">
         Disconnect
       </button>
     </li>

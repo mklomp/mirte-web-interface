@@ -17,11 +17,11 @@ export class ConnectionManager {
 
   async connect(type: "mcu" | "sbc", autoconnect = false) {
 
-    this.disconnect()
-
     if (type == "mcu") {
       this.transport = new SerialTransport()
-      await this.transport.connect(autoconnect)
+      let connection = await this.transport.connect(autoconnect)
+
+      if (!connection) { return false }
 
       // We get the REPL data, which should be parsed on:
       //

@@ -9,7 +9,7 @@ export const useConnectionStore = defineStore('connection', {
   }),
 
   actions: {
-    loadFromLocalStorage() {
+    async loadFromLocalStorage() {
       if (!process.client) return
 
       try {
@@ -21,6 +21,13 @@ export const useConnectionStore = defineStore('connection', {
         this.transport = full_state?.transport ?? this.transport
         this.device = full_state?.device ?? this.device
         this.status = full_state?.status ?? this.status
+
+        // Reset status to disconnected if no previous connections were found
+        // This happens when someone resets the known deviced while the status
+        // was still connected
+        const ports = await navigator.serial.getPorts()
+        if (ports.length == 0){ this.setConnectionStatus("disconnected")}
+
       } catch (e) {
         console.warn("Failed to parse connection from localStorage", e)
       }

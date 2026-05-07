@@ -1,41 +1,80 @@
 //https://developer.mozilla.org/en-US/docs/Web/API/Web_Serial_API
 //https://developer.chrome.com/docs/capabilities/serial
 
+import { useToast } from '~/composables/useToast'
+
 export class SerialTransport {
   port: SerialPort | null = null
   reader: ReadableStreamDefaultReader<Uint8Array> | null = null
   writer: WritableStreamDefaultWriter<Uint8Array> | null = null
 
   private encoder = new TextEncoder()
-  
+
   listeners: ((data: string) => void)[] = []
+
+  private disconnectHandler: (() => void) | null = null
 
   async connect(autoconnect = false) {
     const connectionStore = useConnectionStore()
+    const { addToast } = useToast()
 
     const filters = [
       { usbVendorId: 0x2E8A, usbProductId: 0x0005 }  // Raspberry Pi Pico 2040
     ];
 
-    //if (autoconnect) {
     const ports = await navigator.serial.getPorts()
+    let ableToAutoConnect = false
+
     if (ports.length > 0) {
       this.port = ports[0]
-    } else {
-      this.port = await navigator.serial.requestPort({ filters })
-    }
-    connectionStore.setConnectionStatus("connecting")
-    await this.port.open({ baudRate: 115200 })
+      await this.port.open({ baudRate: 115200 })
+      ableToAutoConnect = Object.keys(this.port.getInfo()).length != 0
 
-    this.port.addEventListener("disconnect", () => {
-      this.disconnect()
-    })
+      if (autoconnect && !ableToAutoConnect) {
+        addToast('Unable to connect to known connections.', 'info')
+        this.runDisconnect()
+        return false
+      }
+    }
+
+    if (!ableToAutoConnect) {
+      try {
+        this.port = await navigator.serial.requestPort({ filters })
+      } catch (error) {
+        addToast('No devices selected. Make sure MicroPython is installed, and the robot is plugged in.', 'error')
+        this.runDisconnect()
+        return false
+      }
+
+      try {
+        await this.port.open({ baudRate: 115200 })
+      } catch (error) {
+        addToast('Unable to open device. Make sure the device is not connected in another program by replugging the USB cable.', 'error')
+        this.runDisconnect()
+        return false
+      }
+    }
+
+    // Nicely disconnect when a USB cable was unplugged
+    this.disconnectHandler = () => {
+      this.runDisconnect()
+      addToast('Disconnected.', 'info')
+    }
+
+    this.port.addEventListener("disconnect", this.disconnectHandler)
 
     this.reader = this.port.readable.getReader()
     this.writer = this.port.writable.getWriter()
 
     connectionStore.setConnectionStatus("connected")
+    if (ableToAutoConnect && !autoconnect){
+      addToast('Automatically connected to known robot.', 'success')
+    } else if (!ableToAutoConnect){
+      addToast('Connected to robot.', 'success')
+    }
+
     this.startReaderLoop()
+    return true
   }
 
   async write(data: string) {
@@ -70,8 +109,17 @@ export class SerialTransport {
   }
 
   async disconnect() {
+    const { addToast } = useToast()
+    this.runDisconnect()
+    addToast('Successfully disconnected.', 'success')
+  }
+
+  async runDisconnect() {
     const connectionStore = useConnectionStore()
-    console.log("disconnecting")
+
+    if (this.port && this.disconnectHandler) {
+      this.port.removeEventListener("disconnect", this.disconnectHandler)
+    }
 
     try {
       // Cancel reader
