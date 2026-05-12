@@ -29,13 +29,16 @@ let shell = null;
 
 connectionStore.loadFromLocalStorage()
 
+let debug = true
+
+
 onMounted(async () => {
   if (terminal.value) {
     const term = await init()
-    shell = attachContainer(terminal.value);
+    shell = attachContainer(terminal.value, debug);
 
     // Attach terminal to transport output
-    attachTerminal(term)
+    attachTerminal(term, debug)
   }
 })
 
