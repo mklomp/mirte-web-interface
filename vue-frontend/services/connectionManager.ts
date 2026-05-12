@@ -25,7 +25,6 @@ export class ConnectionManager {
       this.transport = new BLETransport()
     }
 
-    console.log(this.transport)
     if (type == "mcu") {
 
       let connection = await this.transport.connect(autoconnect)
@@ -39,8 +38,6 @@ export class ConnectionManager {
       this.transport?.onData((data) => {
 
         if (!this.term) return
-        console.log("newdata:")
-        console.log(data)
 
         if (!this.debug && this.running) {
           this.buffer += data

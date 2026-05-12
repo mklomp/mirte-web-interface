@@ -1,6 +1,4 @@
-// bluetoothTransport.ts
 // Web Bluetooth transport using Nordic UART Service (NUS)
-// Compatible interface with your SerialTransport
 
 import { useToast } from '~/composables/useToast'
 
@@ -32,14 +30,10 @@ export class BLETransport {
     }
 
     try {
-      // NOTE:
-      // Web Bluetooth does not support true autoconnect like Web Serial.
-      // Previously paired devices are not directly accessible.
-      // So autoconnect is ignored for now.
       this.device = await navigator.bluetooth.requestDevice({
         filters: [
           {
-            services: [BLE_NUS_SERVICE_UUID]
+            namePrefix: 'MIRTE-'
           }
         ],
         optionalServices: [BLE_NUS_SERVICE_UUID]
@@ -50,6 +44,9 @@ export class BLETransport {
         return false
       }
 
+      if (!this.device.gatt.connected) {
+        addToast('Bluetooth connecting.', 'warning')
+      }
       this.server = await this.device.gatt.connect()
 
       this.service = await this.server.getPrimaryService(
