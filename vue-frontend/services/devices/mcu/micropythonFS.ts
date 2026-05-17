@@ -84,7 +84,8 @@ export class MicroPythonFS {
   }
 
   async writeLine(line: string) {
+    const promptPromise = this.waitForPrompt()
     await this.transport.write(line + "\r\n")
-    await this.waitForPrompt()
+    await promptPromise
   }
 }
