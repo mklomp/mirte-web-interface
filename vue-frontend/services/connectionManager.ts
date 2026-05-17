@@ -49,9 +49,7 @@ export class ConnectionManager {
           }
 
           // detecting __STOP__, only stripping the buffer
-          console.log(this.buffer)
           if (this.buffer.includes("__STOP__\r\n")) {
-            console.log("STOP FOUND")
             this.stopped_found = true
             this.buffer = this.buffer.split("__STOP__\r\n")[0] // throw away everything after __STOP__
             useState("programming-state").value = "idle"
