@@ -259,6 +259,8 @@ watch(() => connectionStore.status, (newStatus) => {
     setTimeout(() => {
       suppressStore = false
     }, 50)
+  } else {
+    initBlockly("serial_connection")
   }
 })
 
