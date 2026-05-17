@@ -70,12 +70,12 @@ export class MicroPythonFS {
   async writeFile(path: string, content: string) {
     const cleaned = content.replace(/\r/g, '')
 
-    await this.writeLine(`f = open('${path}', 'w')`)
+    await this.writeLine(`f = open('${path}', 'w')\r\n`)
     for (const line of cleaned.split("\n")) {
       const escaped = line.replace(/"/g, '\\"')
-      await this.writeLine(`f.write("${escaped}\\n")`)
+      await this.writeLine(`f.write("${escaped}\\n")\r\n`)
     }
-    await this.writeLine(`f.close()`)
+    await this.writeLine(`f.close()\r\n`)
   }
 
   async mkdir(path: string) {

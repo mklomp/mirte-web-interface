@@ -31,6 +31,7 @@ export class BLETransport {
 
     try {
       this.device = await navigator.bluetooth.requestDevice({
+        //acceptAllDevices: true,
         filters: [
           {
             namePrefix: 'MIRTE-'
@@ -104,7 +105,6 @@ export class BLETransport {
       throw new Error('Not connected')
     }
 
-    // Add carriage return like your original implementation
     const encoder = new TextEncoder()
     const encoded = encoder.encode(data)
 
@@ -118,6 +118,8 @@ export class BLETransport {
       const chunk = data.slice(i, i + MTU)
 
       await this.rxCharacteristic.writeValue(chunk)
+
+      await new Promise(resolve => setTimeout(resolve, 10))
     }
   }
 

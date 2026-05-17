@@ -39,7 +39,7 @@ export class ConnectionManager {
 
         if (!this.term) return
 
-        if (!this.debug && this.running) {
+        if (this.running) {
           this.buffer += data
 
           // detecting __START__, only stripping the buffer
@@ -48,8 +48,10 @@ export class ConnectionManager {
             this.started_found = true
           }
 
-          // detecting __START__, only stripping the buffer
+          // detecting __STOP__, only stripping the buffer
+          console.log(this.buffer)
           if (this.buffer.includes("__STOP__\r\n")) {
+            console.log("STOP FOUND")
             this.stopped_found = true
             this.buffer = this.buffer.split("__STOP__\r\n")[0] // throw away everything after __STOP__
             useState("programming-state").value = "idle"
@@ -61,7 +63,9 @@ export class ConnectionManager {
             while ((index = this.buffer.indexOf("\r\n")) !== -1) {
               const line = this.buffer.slice(0, index + 1)
               this.buffer = this.buffer.slice(index + 1)
-              this.term.write(line)
+              if (!this.debug) {
+                this.term.write(line)
+              }
             }
           }
 
@@ -71,7 +75,9 @@ export class ConnectionManager {
             this.started_found = false
             this.stopped_found = false
           }
-        } else {
+        } 
+        
+        if (this.debug) {
           this.term.write(data)
         }
 
@@ -82,16 +88,18 @@ export class ConnectionManager {
       // TODO: should we also stop raw-REPL (eg if you were conncted to thonny)
       // TODO: is this the right place to do this?
       await this.transport.write('\x03') // CTRL-C (kill main)
-      if (this.term) { this.term.clear() }
       await new Promise(r => setTimeout(r, 200))
-      // TODO: instead of CTRL-D, we should do something else?
-      await this.transport.write('\x02') // CTRL-B (make sure to be in interactive mode)
-      //await new Promise(r => setTimeout(r, 200))
-      //await this.transport.write('\x03') // CTRL-C (soft reoot started main again)
 
       this.device = new MCUDevice(this.transport)
-      //await this.device.initialize()
+      if (transport == "serial"){
+        await this.device.initialize()
+      }
 
+      await this.transport.write('from main import run\n')
+      await new Promise(r => setTimeout(r, 200))
+      if (this.term) { this.term.clear() }
+
+      useState("programming-state").value = "idle"
       useConnectionStore().setConnectionType(transport, type)
 
     }
@@ -113,7 +121,6 @@ export class ConnectionManager {
 
     // Send user input to transport
     this.term.onData(async (data) => {
-      console.log(data)
       if (!this.transport) return
       await this.transport.write(data)
     })
@@ -133,8 +140,6 @@ export class ConnectionManager {
 
 
   async uploadFile(path, content) {
-    console.log(path)
-    console.log(content)
     await this.device.uploadFile(path, content)
   }
 

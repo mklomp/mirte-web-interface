@@ -6,9 +6,13 @@ max_pwm = 65535
 
 class Robot():
   def __init__(self):
-    with open(".settings.json", "r") as f:
-      data = f.read()
-    self.config = ujson.loads(data)
+    self.config = {}
+    try:
+      with open(".settings.json", "r") as f:
+        data = f.read()
+      self.config = ujson.loads(data)
+    except:
+      pass
     # TODO: this is where I can already set pins for
     # everything in the config
     
@@ -21,7 +25,7 @@ class Robot():
 
   # MIRTE API (same as blockly and ROS)
   def setDigitalPinValue(self, pin, value):
-    Pin(int(self.stripGP(pin)), Pin.OUT).value(value)
+    Pin(self.stripGP(pin), Pin.OUT).value(value)
 
   # TODO: check with ROS version on value range
   def setAnalogPinValue(self, pin, value):
