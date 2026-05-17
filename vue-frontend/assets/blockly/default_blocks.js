@@ -43,7 +43,7 @@ export function load(Blockly, pythonGenerator) {
                     {
                         "type": "field_input",
                         "name": "PIN",
-                        "text": "GP25"
+                        "text": "LED"
                     },
                     {
                         "type": "input_value",

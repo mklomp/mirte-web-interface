@@ -24,8 +24,10 @@ class Robot():
     return int((x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min)
 
   # MIRTE API (same as blockly and ROS)
-  def setDigitalPinValue(self, pin, value):
-    Pin(self.stripGP(pin), Pin.OUT).value(value)
+  def setDigitalPinValue(self, pinStr, value):
+    pin = self.stripGP(pinStr)
+    if (pin.isdigit()): pin = int(pin)
+    Pin(pin, Pin.OUT).value(value)
 
   # TODO: check with ROS version on value range
   def setAnalogPinValue(self, pin, value):
