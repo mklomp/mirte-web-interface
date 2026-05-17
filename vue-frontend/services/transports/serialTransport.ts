@@ -78,7 +78,6 @@ export class SerialTransport {
   }
 
   async write(data: string) {
-    console.log(data)
     if (!this.writer) throw new Error("Not connected")
     await this.writer.write(this.encoder.encode(data))
   }

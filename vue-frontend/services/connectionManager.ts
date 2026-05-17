@@ -92,10 +92,15 @@ export class ConnectionManager {
 
       this.device = new MCUDevice(this.transport)
       if (transport == "serial"){
+        // TODO: we should check if code is already there. If not then
+        // upload, and do CTRL-D to make sure BLE is initialized
+        // TODO: can we check if system had BLE, so we can only upload
+        // the things we need?
         await this.device.initialize()
+        //await this.transport.write('\x04') // CTRL-D (soft reboot)
       }
 
-      await this.transport.write('from main import run\n')
+      await this.transport.write('from main import run\r\n')
       await new Promise(r => setTimeout(r, 200))
       if (this.term) { this.term.clear() }
 
