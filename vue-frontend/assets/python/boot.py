@@ -1,9 +1,7 @@
-from ble import ble_uart_repl
-
 try:
+    from ble import ble_uart_repl
     ble_uart_repl.start()
-except KeyboardInterrupt:
-    print("boot")
-    
-print("done boot")
+except Exception as e:
+    # Probably no BLE on the MCU
+    pass
 
