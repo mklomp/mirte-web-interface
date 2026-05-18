@@ -7,7 +7,8 @@ import machine
 import time
 
 from .ble_uart_peripheral import BLEUART
-#from .ble_uart_aioble import BLEUART 
+
+# from .ble_uart_aioble import BLEUART
 
 _MP_STREAM_POLL = const(3)
 _MP_STREAM_POLL_RD = const(0x0001)
@@ -82,19 +83,25 @@ class BLEUARTStream(io.IOBase):
 
 
 def start():
-    
+
     micropython.kbd_intr(3)
     ble = bluetooth.BLE()
     uart = BLEUART(ble, name="MIRTE-abcdef")
-    stream = BLEUARTStream(uart)   
+    stream = BLEUARTStream(uart)
 
     os.dupterm(stream)
-    
+
     timer = machine.Timer()
+    hb_timer_ticks = 0
 
     def tick(t):
+        nonlocal hb_timer_ticks
+        # poll uart
         micropython.schedule(lambda _: uart.poll(), 0)
+        # and send hreartbeat
+        hb_timer_ticks = hb_timer_ticks + 1
+        if (hb_timer_ticks > 100):
+            hb_timer_ticks = 0
+            uart.write(b'__HB__\\r\\n')
 
     timer.init(period=10, mode=machine.Timer.PERIODIC, callback=tick)
-
-

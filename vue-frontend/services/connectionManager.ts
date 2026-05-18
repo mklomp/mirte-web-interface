@@ -9,6 +9,7 @@ export class ConnectionManager {
 
   transport: any = null
   device: any = null
+  transporttype: string = ""
   term: any = null
   debug: boolean = false
 
@@ -16,8 +17,35 @@ export class ConnectionManager {
   private running = false
   private started_found = false
   private stopped_found = false
+  private lastHeartbeat = Date.now()
+  private heartbeatTimer = {}
+
+  startHeartbeatMonitor() {
+    const { addToast } = useToast()
+    this.lastHeartbeat = Date.now()
+
+    this.heartbeatTimer = window.setInterval(() => {
+      const now = Date.now()
+
+      // 1.5 second timeout
+      if (now - this.lastHeartbeat > 1100) {
+        this.stopHeartbeatMonitor()
+        this.disconnect(true)
+      }
+    }, 1100)
+  }
+
+  stopHeartbeatMonitor() {
+    if (this.heartbeatTimer) {
+      clearInterval(this.heartbeatTimer)
+      this.heartbeatTimer = {}
+    }
+  }
 
   async connect(type: "mcu" | "sbc", transport: "serial" | "ble", autoconnect = false) {
+    this.transporttype = transport
+    const { addToast } = useToast()
+    const connectionStore = useConnectionStore()
 
     if (transport == "serial") {
       this.transport = new SerialTransport()
@@ -29,7 +57,9 @@ export class ConnectionManager {
 
       let connection = await this.transport.connect(autoconnect)
 
-      if (!connection) { return false }
+      if (!connection.connected) { return false }
+
+      if (transport == "ble") { this.startHeartbeatMonitor() }
 
       // We get the REPL data, which should be parsed on:
       //
@@ -37,10 +67,17 @@ export class ConnectionManager {
       // "__STOP__": detecting when execution stopped (see main.py)
       this.transport?.onData((data) => {
 
+        this.buffer += data
+
+        // detecting heartbeat __HB__, and removing if found
+        if (this.buffer.includes("__HB__\r\n")) {
+          this.buffer = this.buffer.replaceAll("__HB__\r\n", "") // remove all heartbeats (except when in debug)
+          this.lastHeartbeat = Date.now()
+        }
+
         if (!this.term) return
 
         if (this.running) {
-          this.buffer += data
 
           // detecting __START__, only stripping the buffer
           if (this.buffer.includes("__START__\r\n")) {
@@ -73,8 +110,8 @@ export class ConnectionManager {
             this.started_found = false
             this.stopped_found = false
           }
-        } 
-        
+        }
+
         if (this.debug) {
           this.term.write(data)
         }
@@ -89,12 +126,20 @@ export class ConnectionManager {
       await new Promise(r => setTimeout(r, 200))
 
       this.device = new MCUDevice(this.transport)
-      if (transport == "serial"){
+      if (transport == "serial") {
         // TODO: we should check if code is already there. If not then
         // upload, and do CTRL-D to make sure BLE is initialized
         // TODO: can we check if system had BLE, so we can only upload
         // the things we need?
-        await this.device.initialize()
+        try {
+          if (this.debug) {
+            addToast('Uploading MIRTE scripts.', 'info', 'connection-status')
+          }
+          await this.device.initialize()
+        } catch (error) {
+          addToast('Failed to upload MIRTE scripts.', 'error', 'connection-status')
+        }
+
         //await this.transport.write('\x04') // CTRL-D (soft reboot)
       }
 
@@ -102,6 +147,13 @@ export class ConnectionManager {
       await new Promise(r => setTimeout(r, 200))
       if (this.term) { this.term.clear() }
 
+      if (connection.autoConnected) {
+        addToast('Automatically connected to known robot.', 'success', 'connection-status')
+      } else {
+        addToast('Connected to robot.', 'success', 'connection-status')
+      }
+
+      connectionStore.setConnectionStatus("connected")
       useState("programming-state").value = "idle"
       useConnectionStore().setConnectionType(transport, type)
 
@@ -110,7 +162,7 @@ export class ConnectionManager {
     /*if (type === "sbc") {
       this.transport = new USBTransport()
       await this.transport.connect()
- 
+   
       this.device = new SBCDevice(this.transport)
     }*/
 
@@ -130,8 +182,8 @@ export class ConnectionManager {
   }
 
   startCode() {
-    if (!this.debug){ this.term.write('\x1bc'); } // full terminal reset
-    this.device.startCode()
+    if (!this.debug) { this.term.write('\x1bc'); } // full terminal reset
+    this.device.startCode(this.transporttype == "ble")
     this.running = true
     this.started_found = false
   }
@@ -141,7 +193,6 @@ export class ConnectionManager {
     this.running = false
   }
 
-
   async uploadFile(path, content) {
     await this.device.uploadFile(path, content)
   }
@@ -150,10 +201,11 @@ export class ConnectionManager {
     await this.device.runCommand?.(cmd)
   }
 
-  disconnect() {
-    this.transport?.disconnect?.()
+  disconnect(connectionLost = false) {
+    this.transport?.disconnect?.(connectionLost)
     this.transport = null
     this.device = null
-    if (this.term) { this.term.clear() }
+    this.hbInterval = {}
+    if (this.term) { this.term.write('\x1bc'); } // full terminal reset
   }
 }

@@ -21,12 +21,13 @@ export class BLETransport {
   private disconnectHandler: ((event: Event) => void) | null = null
 
   async connect(autoconnect = false) {
-    const connectionStore = useConnectionStore()
     const { addToast } = useToast()
+    const connectionStore = useConnectionStore()
+
 
     if (!navigator.bluetooth) {
       addToast('Web Bluetooth is not supported in this browser.', 'error')
-      return false
+      return { connected: false }
     }
 
     try {
@@ -42,11 +43,11 @@ export class BLETransport {
 
       if (!this.device.gatt) {
         addToast('Bluetooth GATT not available.', 'error')
-        return false
+        return { connected: false }
       }
 
       if (!this.device.gatt.connected) {
-        addToast('Bluetooth connecting.', 'warning')
+        addToast('Connecting to Bluetooth.....', 'info', 'connection-status')
       }
       this.server = await this.device.gatt.connect()
 
@@ -73,7 +74,7 @@ export class BLETransport {
       // Disconnect handling
       this.disconnectHandler = () => {
         this.runDisconnect()
-        addToast('Disconnected.', 'info')
+        addToast('Disconnected.', 'info', 'connection-status')
       }
 
       this.device.addEventListener(
@@ -81,11 +82,7 @@ export class BLETransport {
         this.disconnectHandler
       )
 
-      connectionStore.setConnectionStatus('connected')
-
-      addToast('Connected to robot via Bluetooth.', 'success')
-
-      return true
+      return { connected: true, autoConnected: false }
     } catch (error) {
       console.error(error)
 
@@ -96,7 +93,7 @@ export class BLETransport {
 
       this.runDisconnect()
 
-      return false
+      return { connected: false }
     }
   }
 
@@ -144,12 +141,18 @@ export class BLETransport {
     this.listeners.push(callback)
   }
 
-  async disconnect() {
+  async disconnect(connectionLost = false) {
     const { addToast } = useToast()
+    const connectionStore = useConnectionStore()
 
+    if (connectionLost) {
+      addToast('Bluetooth connection lost.', 'error', 'connection-status')
+      connectionStore.setConnectionStatus('disconnected')
+    }
     await this.runDisconnect()
-
-    addToast('Successfully disconnected.', 'success')
+    if (!connectionLost) {
+      addToast('Successfully disconnected.', 'success', 'connection-status')
+    }
   }
 
   async runDisconnect() {

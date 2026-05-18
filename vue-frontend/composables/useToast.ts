@@ -3,25 +3,68 @@ import { ref } from 'vue'
 type ToastType = 'info' | 'success' | 'warning' | 'error'
 
 interface Toast {
-  id: number
+  id: string
   message: string
   type: ToastType
 }
 
 const toasts = ref<Toast[]>([])
 
-export function useToast() {
-  function addToast(message: string, type: ToastType = 'info', duration = 10) {
-    const id = Date.now()
-    toasts.value.push({ id, message, type })
+const timers = new Map<string, ReturnType<typeof setTimeout>>()
 
-    setTimeout(() => {
-      toasts.value = toasts.value.filter(t => t.id !== id)
+export function useToast() {
+  function addToast(
+    message: string,
+    type: ToastType = 'info',
+    id?: string,
+    duration = 5
+  ) {
+    const toastId = id ?? `${Date.now()}`
+
+    const existingIndex = toasts.value.findIndex(t => t.id === toastId)
+
+    if (existingIndex !== -1) {
+      toasts.value[existingIndex] = {
+        ...toasts.value[existingIndex],
+        message,
+        type,
+        id: toastId,
+      }
+    } else {
+      toasts.value.push({
+        id: toastId,
+        message,
+        type,
+      })
+    }
+
+    // reset timer every time (even updates)
+    if (timers.has(toastId)) {
+      clearTimeout(timers.get(toastId)!)
+    }
+
+    const timer = setTimeout(() => {
+      toasts.value = toasts.value.filter(t => t.id !== toastId)
+      timers.delete(toastId)
     }, duration * 1000)
+
+    timers.set(toastId, timer)
+  }
+
+  function removeToast(id: string) {
+    // remove from list
+    toasts.value = toasts.value.filter(t => t.id !== id)
+
+    // clear and remove timer if it exists
+    if (timers.has(id)) {
+      clearTimeout(timers.get(id)!)
+      timers.delete(id)
+    }
   }
 
   return {
     toasts,
-    addToast
+    addToast,
+    removeToast
   }
 }

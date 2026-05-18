@@ -45,9 +45,12 @@ export class MCUDevice {
     await this.fs.writeLine(cmd)
   }
 
-  async startCode() {
-    await this.uploadFile('/mirte.py', useCodeStore().python)
+  async startCode(toast = false) {
+    const { addToast, removeToast } = useToast()
     useState("programming-state").value = "running";
+    if (toast) { addToast('Sending code to robot....', 'info', 'uploading-user-code') }  
+    await this.uploadFile('/mirte.py', useCodeStore().python)
+    if (toast) { removeToast('uploading-user-code') } 
     await this.runCommand('run()\n') // imported from main.py
   }
 

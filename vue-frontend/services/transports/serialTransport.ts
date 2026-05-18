@@ -15,9 +15,8 @@ export class SerialTransport {
   private disconnectHandler: (() => void) | null = null
 
   async connect(autoconnect = false) {
-    const connectionStore = useConnectionStore()
     const { addToast } = useToast()
-
+    
     const filters = [
       { usbVendorId: 0x2E8A, usbProductId: 0x0005 }  // Raspberry Pi Pico 2040
     ];
@@ -33,7 +32,7 @@ export class SerialTransport {
       if (autoconnect && !ableToAutoConnect) {
         addToast('Unable to connect to known connections.', 'info')
         this.runDisconnect()
-        return false
+        return {connected: false}
       }
     }
 
@@ -43,7 +42,7 @@ export class SerialTransport {
       } catch (error) {
         addToast('No devices selected. Make sure MicroPython is installed, and the robot is plugged in.', 'error')
         this.runDisconnect()
-        return false
+        return {connected: false}
       }
 
       try {
@@ -51,14 +50,15 @@ export class SerialTransport {
       } catch (error) {
         addToast('Unable to open device. Make sure the device is not connected in another program by replugging the USB cable.', 'error')
         this.runDisconnect()
-        return false
+        return {connected: false}
       }
     }
+    addToast('Connecting to USB.....', 'info', 'connection-status')
 
     // Nicely disconnect when a USB cable was unplugged
     this.disconnectHandler = () => {
       this.runDisconnect()
-      addToast('Disconnected.', 'info')
+      addToast('Disconnected.', 'info', 'connection-status')
     }
 
     this.port.addEventListener("disconnect", this.disconnectHandler)
@@ -66,15 +66,9 @@ export class SerialTransport {
     this.reader = this.port.readable.getReader()
     this.writer = this.port.writable.getWriter()
 
-    connectionStore.setConnectionStatus("connected")
-    if (ableToAutoConnect && !autoconnect){
-      addToast('Automatically connected to known robot.', 'success')
-    } else if (!ableToAutoConnect){
-      addToast('Connected to robot.', 'success')
-    }
-
+    let autoConnected = (ableToAutoConnect && !autoconnect)
     this.startReaderLoop()
-    return true
+    return {connected: true, autoConnected: autoConnected}
   }
 
   async write(data: string) {
@@ -108,10 +102,10 @@ export class SerialTransport {
     this.listeners.push(callback)
   }
 
-  async disconnect() {
+  async disconnect(connectionLost = false) {
     const { addToast } = useToast()
     this.runDisconnect()
-    addToast('Successfully disconnected.', 'success')
+    addToast('Successfully disconnected.', 'success', 'connection-status')
   }
 
   async runDisconnect() {
