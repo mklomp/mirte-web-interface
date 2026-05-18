@@ -130,7 +130,7 @@ export class ConnectionManager {
   }
 
   startCode() {
-    this.term.clear()
+    if (!this.debug){ this.term.write('\x1bc'); } // full terminal reset
     this.device.startCode()
     this.running = true
     this.started_found = false
