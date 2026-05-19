@@ -1,13 +1,6 @@
 <template>
   <div class="toast-container">
-    <div
-      v-for="toast in toasts"
-      :key="toast.id"
-      class="toast"
-      :class="toast.type"
-    >
-      {{ toast.message }}
-    </div>
+    <div v-for="toast in toasts" :key="toast.id" class="toast" :class="toast.type" v-html="toast.message" />
   </div>
 </template>
 
@@ -37,13 +30,31 @@ const { toasts } = useToast()
   color: white;
 }
 
-.toast.info { background: #333; }
-.toast.success { background: #2e7d32; }
-.toast.warning { background: #ed6c02; }
-.toast.error { background: #c62828; }
+.toast.info {
+  background: #333;
+}
+
+.toast.success {
+  background: #2e7d32;
+}
+
+.toast.warning {
+  background: #ed6c02;
+}
+
+.toast.error {
+  background: #c62828;
+}
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 </style>

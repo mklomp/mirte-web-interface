@@ -14,8 +14,10 @@ export class ConnectionManager {
   debug: boolean = false
 
   private buffer = ""
+  private exception_buffer = ""
   private running = false
-  private started_found = false
+  private buffer_status = "filter" // "filter, print, exception"
+  private next_status = "filter"
   private stopped_found = false
   private lastHeartbeat = Date.now()
   private heartbeatTimer = {}
@@ -67,33 +69,65 @@ export class ConnectionManager {
       // "__STOP__": detecting when execution stopped (see main.py)
       this.transport?.onData((data) => {
 
+        if (!this.term) return
+
         this.buffer += data
 
         // detecting heartbeat __HB__, and removing if found
-        if (this.buffer.includes("__HB__\r\n")) {
+        if (this.transporttype == "ble" && this.buffer.includes("__HB__\r\n")) {
           this.buffer = this.buffer.replaceAll("__HB__\r\n", "") // remove all heartbeats (except when in debug)
           this.lastHeartbeat = Date.now()
         }
 
-        if (!this.term) return
-
+        // make sure not to print the output of the main.py
+        // code which was started on boot of the MCU
         if (this.running) {
 
           // detecting __START__, only stripping the buffer
           if (this.buffer.includes("__START__\r\n")) {
-            this.buffer = this.buffer.split("__START__\r\n")[1] // throw away everyting before __START__
-            this.started_found = true
+            const marker = "__START__\r\n"
+            const idx = this.buffer.indexOf(marker)
+            this.buffer = this.buffer.slice(idx + marker.length) // throw away everyting before __START__
+            this.next_status = "print"
+          }
+
+          // detecting __START_EXCEPTION__, strip from buffer but keep exception
+          else if (this.buffer.includes("__START_EXCEPTION__\r\n")) {
+            const marker = "__START_EXCEPTION__\r\n"
+            const idx = this.buffer.indexOf(marker)
+
+            this.exception_buffer = this.exception_buffer + this.buffer.slice(idx + marker.length)
+            this.buffer = this.buffer.slice(0, idx) // keep everything before
+            this.next_status = "exception"
+          }
+
+          // detecting __STOP_EXCEPTION__, only stripping the buffer
+          else if (this.buffer.includes("__STOP_EXCEPTION__\r\n")) {
+            const marker = "__STOP_EXCEPTION__\r\n"
+            const idx = this.buffer.indexOf(marker)
+
+            this.exception_buffer = this.exception_buffer + this.buffer.slice(0, idx)
+            this.buffer = this.buffer.slice(idx + marker.length)
+            this.next_status = "print"
+
+            addToast(this.exception_buffer, 'error', 'code-error')
+            this.exception_buffer = ""
           }
 
           // detecting __STOP__, only stripping the buffer
-          if (this.buffer.includes("__STOP__\r\n")) {
+          else if (this.buffer.includes("__STOP__\r\n")) {
+            const marker = "__STOP__\r\n"
+            const idx = this.buffer.indexOf(marker)
+
+            this.next_status = "filter"
             this.stopped_found = true
-            this.buffer = this.buffer.split("__STOP__\r\n")[0] // throw away everything after __STOP__
+            this.buffer = this.buffer.slice(0, idx) // throw away everything after __STOP__
+
             useState("programming-state").value = "idle"
           }
 
           // write and remove all newlines in the buffer
-          if (this.started_found) {
+          if (this.buffer_status == "print") {
             let index
             while ((index = this.buffer.indexOf("\r\n")) !== -1) {
               const line = this.buffer.slice(0, index + 1)
@@ -103,14 +137,23 @@ export class ConnectionManager {
               }
             }
           }
-
-          // clear the buffer after __STOP__
-          if (this.stopped_found) {
-            this.buffer = ""
-            this.started_found = false
-            this.stopped_found = false
-          }
         }
+
+        // clear the buffer after __STOP__ or when not running
+        if (this.stopped_found || !this.running) {
+          const marker = "__HB__\r\n"
+          const idx = this.buffer.indexOf(marker)
+          if (this.transporttype == "ble" && idx > 0) {
+            this.buffer = this.buffer.slice(idx + marker.length)
+          } else {
+            this.buffer = ""
+          }
+
+          this.stopped_found = false
+          this.running = false
+        }
+
+        this.buffer_status = this.next_status
 
         if (this.debug) {
           this.term.write(data)
@@ -130,7 +173,7 @@ export class ConnectionManager {
 
       await this.transport.write('from main import run\r\n')
       await new Promise(r => setTimeout(r, 200))
-      if (this.term) { this.term.clear() }
+      if (this.term && !this.debug) { this.term.write('\x1bc'); } // full terminal reset
 
       if (connection.autoConnected) {
         addToast('Automatically connected to known robot.', 'success', 'connection-status')

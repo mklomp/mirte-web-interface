@@ -1,4 +1,5 @@
 import os
+import sys
 from machine import Pin
 
 def stop():
@@ -12,8 +13,11 @@ def run():
     print("__START__")
     exec(open('./mirte.py').read(),globals())
   except KeyboardInterrupt:
-    pass
     stop()
+  except Exception as e:
+    print("__START_EXCEPTION__")
+    print(sys.print_exception(e))
+    print("__STOP_EXCEPTION__")
   finally:
     if 'main.py' in os.listdir():
       stop()

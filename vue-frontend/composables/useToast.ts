@@ -13,6 +13,7 @@ const toasts = ref<Toast[]>([])
 const timers = new Map<string, ReturnType<typeof setTimeout>>()
 
 export function useToast() {
+
   function addToast(
     message: string,
     type: ToastType = 'info',
@@ -21,19 +22,21 @@ export function useToast() {
   ) {
     const toastId = id ?? `${Date.now()}`
 
+    const formattedMessage = message.replace(/\n/g, '<br>')
+
     const existingIndex = toasts.value.findIndex(t => t.id === toastId)
 
     if (existingIndex !== -1) {
       toasts.value[existingIndex] = {
         ...toasts.value[existingIndex],
-        message,
+        message: formattedMessage,
         type,
         id: toastId,
       }
     } else {
       toasts.value.push({
         id: toastId,
-        message,
+        message: formattedMessage,
         type,
       })
     }

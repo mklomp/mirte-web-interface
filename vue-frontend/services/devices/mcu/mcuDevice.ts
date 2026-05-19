@@ -39,7 +39,7 @@ export class MCUDevice {
       addToast('Uploading MIRTE scripts.', 'info', 'connection-status')
       try {
         await this.uploadMIRTEapi()
-        await this.transport.write('\x04') // CTRL-D (soft reboot)
+        //await this.transport.write('\x04') // CTRL-D (soft reboot)
       } catch (error) {
         addToast('Failed to upload MIRTE scripts.', 'error', 'connection-status')
       }
