@@ -1,5 +1,4 @@
 import { MicroPythonFS } from "./micropythonFS"
-import { MicroPythonREPL } from "./micropythonREPL"
 
 import pythonMainCode from '@/assets/python/main.py?raw'
 import pythonRobotCode from '@/assets/python/robot.py?raw'
@@ -20,21 +19,39 @@ import * as YAML from 'js-yaml'
 
 
 export class MCUDevice {
+  transport
   fs
   repl
 
   constructor(private transport) {
     this.fs = new MicroPythonFS(transport)
-    //this.repl = new MicroPythonREPL(transport)
+    this.transport = transport
   }
 
   async initialize() {
-    await this.uploadMIRTEapi()
+    // Check if one of the (empty) MIRTE files are there
+    // We should actually only do this in USB mode, but 
+    // if it was able to connect to BLE the code should
+    // have been uploaded anyway.
+    const { addToast } = useToast()
+    const mirte_check_file = await this.fs.readFile("/mirte_robot/__main__.py")
+    if (mirte_check_file == "__READ_ERROR__\r\n") {
+      addToast('Uploading MIRTE scripts.', 'info', 'connection-status')
+      try {
+        await this.uploadMIRTEapi()
+        await this.transport.write('\x04') // CTRL-D (soft reboot)
+      } catch (error) {
+        addToast('Failed to upload MIRTE scripts.', 'error', 'connection-status')
+      }
+    }
+    await this.loadSettings()
+  }
 
+  async loadSettings() {
     // read settings from MCU
-    const file = await this.fs.readFile("settings.yaml")
-    const settings = YAML.load(file)
-    useState("peripheral-settings").value = settings
+    const yamlText = await this.fs.readFile("settings.yaml")
+    const yaml = YAML.load(yamlText)
+    useState("peripheral-settings").value = yaml
   }
 
   async uploadFile(path, content) {
@@ -48,9 +65,9 @@ export class MCUDevice {
   async startCode(toast = false) {
     const { addToast, removeToast } = useToast()
     useState("programming-state").value = "running";
-    if (toast) { addToast('Sending code to robot....', 'info', 'uploading-user-code') }  
+    if (toast) { addToast('Sending code to robot....', 'info', 'uploading-user-code') }
     await this.uploadFile('/mirte.py', useCodeStore().python)
-    if (toast) { removeToast('uploading-user-code') } 
+    if (toast) { removeToast('uploading-user-code') }
     await this.runCommand('run()\n') // imported from main.py
   }
 
@@ -64,7 +81,7 @@ export class MCUDevice {
     await this.uploadFile("/main.py", pythonMainCode)
 
     // numbers.py this is needed for generated blockly varibale change by block
-    await this.uploadFile("/numbers.py", pythonNumbersCode) 
+    await this.uploadFile("/numbers.py", pythonNumbersCode)
     await this.uploadFile("/settings.yaml", "")
     await this.uploadFile("/mirte.py", "")
 

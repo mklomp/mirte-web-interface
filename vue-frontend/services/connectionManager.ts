@@ -126,22 +126,7 @@ export class ConnectionManager {
       await new Promise(r => setTimeout(r, 200))
 
       this.device = new MCUDevice(this.transport)
-      if (transport == "serial") {
-        // TODO: we should check if code is already there. If not then
-        // upload, and do CTRL-D to make sure BLE is initialized
-        // TODO: can we check if system had BLE, so we can only upload
-        // the things we need?
-        try {
-          if (this.debug) {
-            addToast('Uploading MIRTE scripts.', 'info', 'connection-status')
-          }
-          await this.device.initialize()
-        } catch (error) {
-          addToast('Failed to upload MIRTE scripts.', 'error', 'connection-status')
-        }
-
-        //await this.transport.write('\x04') // CTRL-D (soft reboot)
-      }
+      await this.device.initialize()
 
       await this.transport.write('from main import run\r\n')
       await new Promise(r => setTimeout(r, 200))

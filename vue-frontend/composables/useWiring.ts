@@ -48,44 +48,48 @@ export function useWiring(peripheralsDef: any, microcontrollers: any) {
   }
 
   function loadFromYAML(data: any) {
+    
     const list: PeripheralInstance[] = []
 
     // device info
-    if (data.device?.mirte) {
+    if (data?.device?.mirte) {
       state.value.board = data.device.mirte.board || "pico"
       state.value.type = data.device.mirte.type || "breadboard"
     }
 
     // peripherals
-    for (const [type, group] of Object.entries(data)) {
-      if (type === "device") continue
-
-      for (const [name, item] of Object.entries(group as any)) {
-        list.push({
-          id: crypto.randomUUID(),
-          type,
-          name: item.name || name,
-          pins: { ...item.pins },
-        })
+    if (data) {
+      for (const [type, group] of Object.entries(data)) {
+        if (type === "device") continue
+        for (const [name, item] of Object.entries(group as any)) {
+          list.push({
+            id: crypto.randomUUID(),
+            type,
+            name: item.name || name,
+            pins: { ...item.pins },
+          })
+        }
       }
     }
-
     state.value.peripherals = list
   }
 
-  async function saveYAML(){
+  async function saveYAML() {
 
+    const { addToast } = useToast()
     const { uploadFile } = useConnection()
     const json = toJSON()
-    const yaml = YAML.dump(json)
-    await uploadFile('/settings.yaml', yaml)
+    const yamlText = YAML.dump(json)
+    await uploadFile('/settings.yaml', yamlText)
 
     // but also store the json equivalent to be
     // used by mircopython
     await uploadFile('/.settings.json', JSON.stringify(json, null, 2))
-    
+
     // modify the used state (TODO: or should this be in Device?)
+    const yaml = YAML.load(yamlText)
     useState("peripheral-settings").value = yaml
+    addToast('Successfully saved the settings.', 'success', 'upload-settings')
   }
 
   function toJSON() {

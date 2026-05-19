@@ -61,12 +61,11 @@ export class MicroPythonFS {
     return new Promise(async (resolve) => {
       this.captureResolver = resolve
       this.capturing = false
-
-      // Needs to be one line, in order to correctly capture the __BEGIN__ (TODO: is this true?)
-      await this.writeLine(`import sys; f = open('${path}'); print('__BEGIN__'); _ = sys.stdout.write(f.read()); print('__END__'); f.close()`)
+      // Needs to be a single writeLine, in order to correctly capture the __BEGIN__ (TODO: is this true?)
+      await this.writeLine(`import sys\ntry:\n\tf = open('${path}')\n\tprint('__BEGIN__')\n\t_ = sys.stdout.write(f.read())\n\tprint('__END__')\n\tf.close()\nexcept OSError:\n\tprint('__BEGIN__\\n__READ_ERROR__\\n__END__')\n`)
     })
   }
-  
+
   async writeFile(path: string, content: string) {
     const cleaned = content.replace(/\r/g, '')
 
