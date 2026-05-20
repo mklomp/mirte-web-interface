@@ -19,9 +19,10 @@ export class MicroPythonFS {
     this.buffer += data
 
     if (this.buffer.includes("__BEGIN__\r\n")) {
+      const marker = "__BEGIN__\r\n"
+      const idx = this.buffer.indexOf(marker)
+      this.captureBuffer = this.buffer.slice(idx + marker.length)
       this.capturing = true
-      this.captureBuffer = ""
-      this.captureBuffer = this.buffer.split("__BEGIN__\r\n")[1]
     }
 
     // TODO: gaat dit goed? hij heeft hem hier net op true gezet
@@ -31,7 +32,6 @@ export class MicroPythonFS {
 
     if (this.captureBuffer.includes("__END__\r\n")) {
       const result = this.captureBuffer.split("__END__\r\n")[0]
-
       this.capturing = false
 
       if (this.captureResolver) {
@@ -61,6 +61,8 @@ export class MicroPythonFS {
     return new Promise(async (resolve) => {
       this.captureResolver = resolve
       this.capturing = false
+      this.buffer = ""
+      this.captureBuffer = ""
       // Needs to be a single writeLine, in order to correctly capture the __BEGIN__ (TODO: is this true?)
       await this.writeLine(`import sys\ntry:\n\tf = open('${path}')\n\tprint('__BEGIN__')\n\t_ = sys.stdout.write(f.read())\n\tprint('__END__')\n\tf.close()\nexcept OSError:\n\tprint('__BEGIN__\\n__READ_ERROR__\\n__END__')\n`)
     })

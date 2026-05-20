@@ -107,7 +107,7 @@ export class SerialTransport {
     const { addToast } = useToast()
     const { $i18n } = useNuxtApp()
     this.runDisconnect()
-    addToast($i18n.t('toast.usb_disconneced_success'), 'success', 'connection-status')
+    addToast($i18n.t('toast.usb_disconnected_success'), 'success', 'connection-status')
   }
 
   async runDisconnect() {

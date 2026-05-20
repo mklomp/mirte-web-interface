@@ -1,8 +1,5 @@
 import { ref } from "vue"
-import { useI18n } from 'vue-i18n'
 import * as YAML from 'js-yaml'
-
-const { t } = useI18n()
 
 export type PeripheralInstance = {
   id: string
@@ -80,6 +77,7 @@ export function useWiring(peripheralsDef: any, microcontrollers: any) {
   async function saveYAML() {
 
     const { addToast } = useToast()
+    const { $i18n } = useNuxtApp()
     const { uploadFile } = useConnection()
     const json = toJSON()
     const yamlText = YAML.dump(json)
@@ -92,7 +90,7 @@ export function useWiring(peripheralsDef: any, microcontrollers: any) {
     // modify the used state (TODO: or should this be in Device?)
     const yaml = YAML.load(yamlText)
     useState("peripheral-settings").value = yaml
-    addToast( t('toast.saved_settings_success'), 'success', 'upload-settings')
+    addToast( $i18n.t('toast.saved_settings_success'), 'success', 'upload-settings')
   }
 
   function toJSON() {

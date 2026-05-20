@@ -111,6 +111,13 @@ watch(
   }
 )
 
+watch(
+  isConnected,
+  (val) => {
+    if (!val) peripheralsSetting.value = {}
+  }
+)
+
 const busy = ref(false)
 
 async function save() {

@@ -75,7 +75,7 @@ export class BLETransport {
       // Disconnect handling
       this.disconnectHandler = () => {
         this.runDisconnect()
-        addToast($i18n.t('toast.ble_disonnected'), 'info', 'connection-status')
+        addToast($i18n.t('toast.ble_disconnected'), 'info', 'connection-status')
       }
 
       this.device.addEventListener(

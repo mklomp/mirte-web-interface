@@ -29,11 +29,11 @@ export class ConnectionManager {
       const now = Date.now()
 
       // 1.5 second timeout
-      if (now - this.lastHeartbeat > 3000) {
+      if (now - this.lastHeartbeat > 1100) {
         this.stopHeartbeatMonitor()
         this.disconnect(true)
       }
-    }, 1000)
+    }, 1100)
   }
 
   stopHeartbeatMonitor() {
