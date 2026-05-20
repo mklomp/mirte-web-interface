@@ -24,7 +24,7 @@ main {
 }
 
 footer {
-  background: #fff;
+  background: $white;
   padding: 1rem;
   text-align: center;
 }
@@ -120,7 +120,7 @@ nav {
 
 
 input:disabled+label {
-  color: #ccc;
+  color: $light-grey;
 }
 
 .locale-selector {
@@ -221,8 +221,8 @@ $custom-control-indicator-checked-bg: $grey-blue;
 }
 
 .hero-section { 
-  background: #004080; 
-  color: white; 
+  background: $grey-blue; 
+  color: $white; 
   text-align: center; padding: 20px;
   background-size: cover;
   background-position: bottom;
@@ -253,7 +253,7 @@ $custom-control-indicator-checked-bg: $grey-blue;
 
 
 .grey-blue {
-  color: #9db7be !important;
+  color: $grey-blue !important;
 }
 
 .pillar-card {
@@ -262,7 +262,7 @@ $custom-control-indicator-checked-bg: $grey-blue;
   border: none;
   border-radius: 1rem;
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  background: #fff;
+  background: $white;
 }
 
 .icon-bg {
@@ -271,7 +271,7 @@ $custom-control-indicator-checked-bg: $grey-blue;
   left: 50%;
   transform: translate(-50%, -50%);
   font-size: 5rem; /* grote iconen */
-  color: #9db7be;
+  color: $dark-grey;
   opacity: 0.3; /* transparantie */
   pointer-events: none;
   z-index: 0;
@@ -291,7 +291,7 @@ $custom-control-indicator-checked-bg: $grey-blue;
 .two-column { display: flex; flex-direction: column; gap: 20px; }
 .column-text { flex: 1; }
 .column-pillars { flex: 1; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; justify-items: center; align-items: start; }
-.pillar { background: #f9f9f9; padding: 15px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; transition: transform 0.3s; }
+.pillar { background: $white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; transition: transform 0.3s; }
 .pillar:hover { transform: rotate(-2deg) scale(1.05); }
 
 

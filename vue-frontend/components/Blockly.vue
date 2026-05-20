@@ -40,12 +40,12 @@ let scrollX = 0
 let scrollY = 0
 let suppressStore = false
 
-// TODO: use colors from scss
-Blockly.Msg.FLOW_RGB = "#cee6ed"
+// TODO: import colors from scss
+Blockly.Msg.FLOW_RGB = "#b8d1eb"
 Blockly.Msg.DATA_RGB = "#9b372a"
 Blockly.Msg.MODULES_RGB = "#cf0000"
-Blockly.Msg.SENSORS_RGB = "#9db7be"
-Blockly.Msg.ACTIONS_RGB = "#f1be45"
+Blockly.Msg.SENSORS_RGB = "#6089ba"
+Blockly.Msg.ACTIONS_RGB = "#fbb927"
 
 function addToToolbox(type, item) {
   const category = toolBox.contents.find(c => c.id === type)

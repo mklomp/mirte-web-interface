@@ -69,19 +69,19 @@ const { toasts, removeToast } = useToast()
 }
 
 .toast.info {
-  background: #333;
+  background: $light-blue;
 }
 
 .toast.success {
-  background: #2e7d32;
+  background: $green;
 }
 
 .toast.warning {
-  background: #ed6c02;
+  background: $orange;
 }
 
 .toast.error {
-  background: #c62828;
+  background: $red;
 }
 
 @keyframes fadeIn {
