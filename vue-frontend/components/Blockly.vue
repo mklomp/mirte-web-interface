@@ -159,6 +159,7 @@ function initBlockly(reason = "") {
 
   workspace = Blockly.inject(blocklyDiv.value, {
     toolbox: toolBox,
+    media: 'blockly/media',
     zoom: {
       controls: true,
       wheel: true,
