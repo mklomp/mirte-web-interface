@@ -16,6 +16,7 @@ export class SerialTransport {
 
   async connect(autoconnect = false) {
     const { addToast } = useToast()
+    const { $i18n } = useNuxtApp()
     
     const filters = [
       { usbVendorId: 0x2E8A, usbProductId: 0x0005 }  // Raspberry Pi Pico 2040
@@ -30,7 +31,7 @@ export class SerialTransport {
       ableToAutoConnect = Object.keys(this.port.getInfo()).length != 0
 
       if (autoconnect && !ableToAutoConnect) {
-        addToast('Unable to connect to known connections.', 'info')
+        addToast($i18n.t('toast.usb_unable_connect_known_connection'), 'info')
         this.runDisconnect()
         return {connected: false}
       }
@@ -40,7 +41,7 @@ export class SerialTransport {
       try {
         this.port = await navigator.serial.requestPort({ filters })
       } catch (error) {
-        addToast('No devices selected. Make sure MicroPython is installed, and the robot is plugged in.', 'error')
+        addToast($i18n.t('toast.usb_no_device_selected'), 'error')
         this.runDisconnect()
         return {connected: false}
       }
@@ -48,17 +49,17 @@ export class SerialTransport {
       try {
         await this.port.open({ baudRate: 115200 })
       } catch (error) {
-        addToast('Unable to open device. Make sure the device is not connected in another program by replugging the USB cable.', 'error')
+        addToast($i18n.t('toast.usb_unable_to_open_device'), 'error')
         this.runDisconnect()
         return {connected: false}
       }
     }
-    addToast('Connecting to USB.....', 'info', 'connection-status')
+    addToast($i18n.t('toast.usb_connecting'), 'info', 'connection-status')
 
     // Nicely disconnect when a USB cable was unplugged
     this.disconnectHandler = () => {
       this.runDisconnect()
-      addToast('Disconnected.', 'info', 'connection-status')
+      addToast($i18n.t('toast.usb_disconnected'), 'info', 'connection-status')
     }
 
     this.port.addEventListener("disconnect", this.disconnectHandler)
@@ -104,8 +105,9 @@ export class SerialTransport {
 
   async disconnect(connectionLost = false) {
     const { addToast } = useToast()
+    const { $i18n } = useNuxtApp()
     this.runDisconnect()
-    addToast('Successfully disconnected.', 'success', 'connection-status')
+    addToast($i18n.t('toast.usb_disconneced_success'), 'success', 'connection-status')
   }
 
   async runDisconnect() {

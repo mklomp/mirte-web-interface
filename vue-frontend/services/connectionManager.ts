@@ -23,18 +23,17 @@ export class ConnectionManager {
   private heartbeatTimer = {}
 
   startHeartbeatMonitor() {
-    const { addToast } = useToast()
     this.lastHeartbeat = Date.now()
 
     this.heartbeatTimer = window.setInterval(() => {
       const now = Date.now()
 
       // 1.5 second timeout
-      if (now - this.lastHeartbeat > 2000) {
+      if (now - this.lastHeartbeat > 3000) {
         this.stopHeartbeatMonitor()
         this.disconnect(true)
       }
-    }, 2000)
+    }, 1000)
   }
 
   stopHeartbeatMonitor() {
@@ -47,6 +46,7 @@ export class ConnectionManager {
   async connect(type: "mcu" | "sbc", transport: "serial" | "ble", autoconnect = false) {
     this.transporttype = transport
     const { addToast } = useToast()
+    const { $i18n } = useNuxtApp()
     const connectionStore = useConnectionStore()
 
     if (transport == "serial") {
@@ -176,9 +176,9 @@ export class ConnectionManager {
       if (this.term && !this.debug) { this.term.write('\x1bc'); } // full terminal reset
 
       if (connection.autoConnected) {
-        addToast('Automatically connected to known robot.', 'success', 'connection-status')
+        addToast($i18n.t('toast.automatically_connected'), 'success', 'connection-status')
       } else {
-        addToast('Connected to robot.', 'success', 'connection-status')
+        addToast($i18n.t('toast.connected'), 'success', 'connection-status')
       }
 
       connectionStore.setConnectionStatus("connected")

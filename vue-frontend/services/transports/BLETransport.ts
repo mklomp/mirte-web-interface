@@ -22,11 +22,12 @@ export class BLETransport {
 
   async connect(autoconnect = false) {
     const { addToast } = useToast()
+    const { $i18n } = useNuxtApp()
     const connectionStore = useConnectionStore()
 
 
     if (!navigator.bluetooth) {
-      addToast('Web Bluetooth is not supported in this browser.', 'error')
+      addToast($i18n.t('toast.ble_not_supported'), 'error')
       return { connected: false }
     }
 
@@ -42,12 +43,12 @@ export class BLETransport {
       })
 
       if (!this.device.gatt) {
-        addToast('Bluetooth GATT not available.', 'error')
+        addToast($i18n.t('toast.ble_gatt_unavailable'), 'error')
         return { connected: false }
       }
 
       if (!this.device.gatt.connected) {
-        addToast('Connecting to Bluetooth.....', 'info', 'connection-status')
+        addToast($i18n.t('toast.ble_connecting'), 'info', 'connection-status')
       }
       this.server = await this.device.gatt.connect()
 
@@ -74,7 +75,7 @@ export class BLETransport {
       // Disconnect handling
       this.disconnectHandler = () => {
         this.runDisconnect()
-        addToast('Disconnected.', 'info', 'connection-status')
+        addToast($i18n.t('toast.ble_disonnected'), 'info', 'connection-status')
       }
 
       this.device.addEventListener(
@@ -86,10 +87,7 @@ export class BLETransport {
     } catch (error) {
       console.error(error)
 
-      addToast(
-        'Unable to connect to Bluetooth device.',
-        'error'
-      )
+      addToast($i18n.t('toast.ble_unable_to_connect'), 'error')
 
       this.runDisconnect()
 
@@ -143,15 +141,17 @@ export class BLETransport {
 
   async disconnect(connectionLost = false) {
     const { addToast } = useToast()
+    const { $i18n } = useNuxtApp()
     const connectionStore = useConnectionStore()
 
     if (connectionLost) {
-      addToast('Bluetooth connection lost.', 'error', 'connection-status')
+      $i18n.t('toast.ble_disonnected')
+      addToast($i18n.t('toast.ble_connection_lost'), 'error', 'connection-status')
       connectionStore.setConnectionStatus('disconnected')
     }
     await this.runDisconnect()
     if (!connectionLost) {
-      addToast('Successfully disconnected.', 'success', 'connection-status')
+      addToast($i18n.t('toast.ble_disconnected_success'), 'success', 'connection-status')
     }
   }
 

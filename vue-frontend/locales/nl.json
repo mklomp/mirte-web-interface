@@ -118,5 +118,26 @@
     "DDP_MOTOR_TB": "Motor (ddp)",
     "SERVO_TB": "Servo",
     "OLED_TB": "OLED Scherm"
+  },
+  "toast": {
+    "saved_settings_success": "Instellingen opgeslagen.",
+    "ble_connecting": "Verbinden met Bluetooth.....",
+    "ble_not_supported": "Web Bluetooth wordt niet onderstuend in deze browser.",
+    "ble_gatt_unavaiable": "Bluetooth GATT niet gevonden.",
+    "ble_disconnected": "Bluetooth verbinding verbroken.",
+    "ble_unable_to_connect": "Verbinden met Bluetooth device niet mogelijk.",
+    "ble_connection_lost": "Bluetooth verbinding verloren.",
+    "ble_disconnected_success": "Bluetooth verbinding verbroken.",
+    "usb_disconnected_success": "USB verbinding verbroken.",
+    "usb_unable_connect_known_connection": "Niet gelukt om met bekende verbinding te verbinden.",
+    "usb_no_device_selected": "Geen devices geselecteerd. Zorg er voor dat MicroPython is geinstaleerd, en de robot aangesloten is.",
+    "usb_unable_to_open_device": "Niet gelukt om device te openen. Zorg er voor dat het device niet via een ander programme verbonden is door deze opnieuw in te pluggen.",
+    "usb_connecting": "Verbinden met USB.....",
+    "usb_disconnected": "USB verbinding verbroken",
+    "automatically_connected": "Automatisch verbonden met bekende robot.",
+    "connected": "Verbonden met robot.",
+    "uploading_code": "Code versturen naar robot....",
+    "uploading_mirte_scripts": "Installeert MIRTE scripts.",
+    "uploading_mirte_scripts_error": "Fout tijdens installeren van MIRTE scripts."
   }
 }

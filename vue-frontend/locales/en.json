@@ -118,5 +118,26 @@
     "DDP_MOTOR_TB": "Motor (ddp)",
     "SERVO_TB": "Servo",
     "OLED_TB": "OLED Screen"
+  },
+  "toast": {
+    "saved_settings_success": "Successfully saved the settings.",
+    "ble_connecting": "Connecting to Bluetooth.....",
+    "ble_not_supported": "Web Bluetooth is not supported in this browser.",
+    "ble_gatt_unavaiable": "Bluetooth GATT not available.",
+    "ble_disconnected": "Bluetooth disconnected.",
+    "ble_unable_to_connect": "Unable to connect to Bluetooth device.",
+    "ble_connection_lost": "Bluetooth connection lost.",
+    "ble_disconnected_success": "Bluetooth successfully disconnected.",
+    "usb_disconnected_success": "USB successfully disconnected.",
+    "usb_unable_connect_known_connection": "Unable to connect to known connections.",
+    "usb_no_device_selected": "No devices selected. Make sure MicroPython is installed, and the robot is plugged in.",
+    "usb_unable_to_open_device": "Unable to open device. Make sure the device is not connected in another program by replugging the USB cable.",
+    "usb_connecting": "Connecting to USB.....",
+    "usb_disconnected": "USB disconnected",
+    "automatically_connected": "Automatically connected to known robot.",
+    "connected": "Connected to robot.",
+    "uploading_code": "Sending code to robot....",
+    "uploading_mirte_scripts": "Installing MIRTE scripts.",
+    "uploading_mirte_scripts_error": "Failed to install MIRTE scripts."
   }
 }

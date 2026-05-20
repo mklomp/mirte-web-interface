@@ -34,14 +34,15 @@ export class MCUDevice {
     // if it was able to connect to BLE the code should
     // have been uploaded anyway.
     const { addToast } = useToast()
+    const { $i18n } = useNuxtApp()
     const mirte_check_file = await this.fs.readFile("/mirte_robot/__main__.py")
     if (mirte_check_file == "__READ_ERROR__\r\n") {
-      addToast('Uploading MIRTE scripts.', 'info', 'connection-status')
+      addToast($i18n.t('toast.uploading_mirte_scripts'), 'info', 'connection-status')
       try {
         await this.uploadMIRTEapi()
         //await this.transport.write('\x04') // CTRL-D (soft reboot)
       } catch (error) {
-        addToast('Failed to upload MIRTE scripts.', 'error', 'connection-status')
+        addToast($i18n.t('toast.uploading_mirte_scripts_error'), 'error', 'connection-status')
       }
     }
     await this.loadSettings()
@@ -64,8 +65,9 @@ export class MCUDevice {
 
   async startCode(toast = false) {
     const { addToast, removeToast } = useToast()
+    const { $i18n } = useNuxtApp()
     useState("programming-state").value = "running";
-    if (toast) { addToast('Sending code to robot....', 'info', 'uploading-user-code') }
+    if (toast) { addToast($i18n.t('toast.uploading_code'), 'info', 'uploading-user-code') }
     await this.uploadFile('/mirte.py', useCodeStore().python)
     if (toast) { removeToast('uploading-user-code') }
     await this.runCommand('run()\n') // imported from main.py

@@ -68,22 +68,6 @@ const { toasts, removeToast } = useToast()
   line-height: 1;
 }
 
-.toast.info {
-  background: $light-blue;
-}
-
-.toast.success {
-  background: $green;
-}
-
-.toast.warning {
-  background: $orange;
-}
-
-.toast.error {
-  background: $red;
-}
-
 @keyframes fadeIn {
   from {
     opacity: 0;
