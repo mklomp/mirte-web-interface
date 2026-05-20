@@ -6,6 +6,7 @@ interface Toast {
   id: string
   message: string
   type: ToastType
+  duration: number
 }
 
 const toasts = ref<Toast[]>([])
@@ -32,33 +33,35 @@ export function useToast() {
         message: formattedMessage,
         type,
         id: toastId,
+        duration,
       }
     } else {
       toasts.value.push({
         id: toastId,
         message: formattedMessage,
         type,
+        duration,
       })
     }
 
-    // reset timer every time (even updates)
     if (timers.has(toastId)) {
       clearTimeout(timers.get(toastId)!)
+      timers.delete(toastId)
     }
 
-    const timer = setTimeout(() => {
-      toasts.value = toasts.value.filter(t => t.id !== toastId)
-      timers.delete(toastId)
-    }, duration * 1000)
+    if (duration !== -1) {
+      const timer = setTimeout(() => {
+        toasts.value = toasts.value.filter(t => t.id !== toastId)
+        timers.delete(toastId)
+      }, duration * 1000)
 
-    timers.set(toastId, timer)
+      timers.set(toastId, timer)
+    }
   }
 
   function removeToast(id: string) {
-    // remove from list
     toasts.value = toasts.value.filter(t => t.id !== id)
 
-    // clear and remove timer if it exists
     if (timers.has(id)) {
       clearTimeout(timers.get(id)!)
       timers.delete(id)

@@ -30,11 +30,11 @@ export class ConnectionManager {
       const now = Date.now()
 
       // 1.5 second timeout
-      if (now - this.lastHeartbeat > 1100) {
+      if (now - this.lastHeartbeat > 2000) {
         this.stopHeartbeatMonitor()
         this.disconnect(true)
       }
-    }, 1100)
+    }, 2000)
   }
 
   stopHeartbeatMonitor() {
@@ -110,7 +110,7 @@ export class ConnectionManager {
             this.buffer = this.buffer.slice(idx + marker.length)
             this.next_status = "print"
 
-            addToast(this.exception_buffer, 'error', 'code-error')
+            addToast(this.exception_buffer, 'error', 'code-error', -1)
             this.exception_buffer = ""
           }
 
