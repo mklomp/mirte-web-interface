@@ -145,6 +145,7 @@ export class SerialTransport {
     this.writer = null
     this.listeners = []
 
+    useState("peripheral-settings").value = {}
     connectionStore.setConnectionStatus("disconnected")
   }
 }

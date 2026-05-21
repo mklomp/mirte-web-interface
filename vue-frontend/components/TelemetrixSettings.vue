@@ -90,31 +90,22 @@ const peripheralsSetting = useState("peripheral-settings")
 const connectionStore = useConnectionStore()
 const isConnected = computed(() => connectionStore.status === "connected")
 
-function isUsableMC(name){
+function isUsableMC(name) {
   return name === "pico"
 }
 
-function isUsablePeripheral(key){
+function isUsablePeripheral(key) {
   return connectionStore.status == "connected" && ['motor', 'intensity', 'servo', 'keypad'].includes(key)
 }
 
 onMounted(() => {
-  if (connectionStore.status == "connected") {
-    loadFromYAML(peripheralsSetting.value)
-  }
+  loadFromYAML(peripheralsSetting.value)
 })
 
 watch(
   peripheralsSetting,
   (val) => {
-    if (val) loadFromYAML(val)
-  }
-)
-
-watch(
-  isConnected,
-  (val) => {
-    if (!val) peripheralsSetting.value = {}
+    loadFromYAML(val)
   }
 )
 

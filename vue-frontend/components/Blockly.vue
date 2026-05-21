@@ -28,7 +28,6 @@ const customBlockModules = import.meta.glob('@/assets/blockly/*.js', { eager: tr
 
 const { locale } = useI18n()
 const codeStore = useCodeStore()
-const rosStore = useRosStore()
 const connectionStore = useConnectionStore()
 const settingsState = useState("peripheral-settings");
 
@@ -59,6 +58,9 @@ function loadCustomModules(settings) {
   if (connectionStore.compute_type == "sbc" && Object.keys(rosStore.peripherals).length == 0) return
   if (connectionStore.compute_type == "mcu" && connectionStore.status != "connected") return
 
+  // start with a clean toolbox
+  toolBox = getToolbox()
+
   for (const module of Object.values(customBlockModules)) {
     const module_type = module.getType()
     let dropdown_instances = []
@@ -69,11 +71,13 @@ function loadCustomModules(settings) {
       dropdown_instances = instances.map(n => [n, n])
     }
 
-    if (!Blockly.Extensions.isRegistered('dynamic_instances_extension_' + module_type?.type)) {
-      if (instances.length != 0) { // default_blocks are already in the toolbox
-        const custom_module = module.load(Blockly, pythonGenerator, dropdown_instances)
-        addToToolbox(custom_module.type, custom_module.contents)
+    if (instances.length != 0) { // default_blocks are already in the toolbox
+      let extensionName = 'dynamic_instances_extension_' + module_type?.type
+      if (Blockly.Extensions.isRegistered(extensionName)) {
+        Blockly.Extensions.unregister(extensionName)
       }
+      const custom_module = module.load(Blockly, pythonGenerator, dropdown_instances)
+      addToToolbox(custom_module.type, custom_module.contents)
     }
   }
 }
@@ -138,8 +142,10 @@ function restoreWorkspace() {
 function initBlockly(reason = "") {
 
   // Set workspaceDOM from previous session
-  if (codeStore.blockly && (Object.keys(rosStore.peripherals).length != 0 || connectionStore.status == "connected")) {
+  if (codeStore.blockly && connectionStore.status == "connected") {
     workspaceDOM = Blockly.utils.xml.textToDom(codeStore.blockly)
+  } else {
+    workspaceDOM = null
   }
 
   // Save workspace if language changed
@@ -243,33 +249,22 @@ watch(() => codeStore.active, (newVal) => {
   }
 })
 
+// settings can be changed independatly of connection state
 watch(settingsState, (newState) => {
-  // TODO: check if this is working at all. does not seem to work
-  // when settings change due to connecting
   loadCustomModules(newState)
   initBlockly("serial_connection")
 })
 
+// connectino can change
 watch(() => connectionStore.status, (newStatus) => {
   if (newStatus == "disconnected") {
-    suppressStore = true
-
-    workspace.clear()
-
-    // Let Blockly finish firing events, then re-enable
-    setTimeout(() => {
-      suppressStore = false
-    }, 50)
-  } else {
-    initBlockly("serial_connection")
+    loadCustomModules()
   }
+  initBlockly("serial_connection")
 })
 
-watch(() => rosStore.peripherals, () => {
-  loadCustomModules()
-  initBlockly("ros_change")
-})
-
+// TODO: we need to rethink if we really need codeStore changes.
+// why would we need to update blokcky?
 watch(() => codeStore.reinit_blockly, () => {
   nextTick(() => {
     initBlockly("xml_loaded")

@@ -197,6 +197,7 @@ export class BLETransport {
     this.txCharacteristic = null
     this.listeners = []
 
+    useState("peripheral-settings").value = {}
     connectionStore.setConnectionStatus('disconnected')
   }
 }
