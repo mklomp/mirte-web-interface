@@ -18,6 +18,8 @@ export class MicroPythonFS {
   parseData(data: string) {
     this.buffer += data
 
+    this.buffer = this.buffer.replaceAll("__HB__\r\n", "")
+
     if (this.buffer.includes("__BEGIN__\r\n")) {
       const marker = "__BEGIN__\r\n"
       const idx = this.buffer.indexOf(marker)
