@@ -11,7 +11,6 @@ import { pythonGenerator } from "blockly/python"
 // Import custom items
 import { getToolbox } from '@/assets/blockly/toolbox'
 import { useCodeStore } from "@/stores/user_code"
-import { useRosStore } from '@/stores/ros_params'
 import { useConnectionStore } from "@/stores/connection"
 
 import CustomNl from "@/locales/nl.json"

@@ -1,6 +1,6 @@
 import * as ROSLIB from 'roslib'
 import properties_ph from "../assets/json/properties_ph.json"
-import { useRosStore } from '~/stores/ros_params'
+//import { useRosStore } from '~/stores/ros_params'
 
 export default defineNuxtPlugin(() => {
 
@@ -136,8 +136,8 @@ export default defineNuxtPlugin(() => {
               }
             }
             
-            const rosStore = useRosStore()
-            rosStore.setPeripherals(peripherals)
+            //const rosStore = useRosStore()
+            //rosStore.setPeripherals(peripherals)
           });
         }); 
       }
