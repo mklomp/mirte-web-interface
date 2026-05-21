@@ -29,6 +29,8 @@ const { locale } = useI18n()
 const codeStore = useCodeStore()
 const connectionStore = useConnectionStore()
 const settingsState = useState("peripheral-settings");
+const isMounted = ref(false)
+
 
 // Blockly state
 let workspaceDOM = null
@@ -140,6 +142,9 @@ function restoreWorkspace() {
 // - After refresh (or any revisit, so with something in localStorage)
 function initBlockly(reason = "") {
 
+  console.log("status: " + connectionStore.status)
+  console.log("reason: " + reason)
+   
   // Set workspaceDOM from previous session
   if (codeStore.blockly && connectionStore.status == "connected") {
     workspaceDOM = Blockly.utils.xml.textToDom(codeStore.blockly)
@@ -220,6 +225,7 @@ onMounted(() => {
   loadCustomModules(settingsState.value)
   codeStore.loadFromLocalStorage()
   initBlockly()
+  isMounted.value = true
 })
 
 onBeforeUnmount(() => {
@@ -241,7 +247,7 @@ watch(locale, () => {
 watch(() => codeStore.active, (newVal) => {
   // TODO: check if this is working at all. does not seem to work
   // when settings change due to connecting
-  if (newVal == "blockly") {
+  if (newVal == "blockly" && isMounted.value) {
     nextTick(() => {
       initBlockly("tab_change")
     })
@@ -251,15 +257,15 @@ watch(() => codeStore.active, (newVal) => {
 // settings can be changed independatly of connection state
 watch(settingsState, (newState) => {
   loadCustomModules(newState)
-  initBlockly("serial_connection")
+  initBlockly("settings_changed")
 })
 
 // connectino can change
 watch(() => connectionStore.status, (newStatus) => {
-  if (newStatus == "disconnected") {
+  if (isMounted.value) {
     loadCustomModules()
+    initBlockly("serial_connection")
   }
-  initBlockly("serial_connection")
 })
 
 // TODO: we need to rethink if we really need codeStore changes.
