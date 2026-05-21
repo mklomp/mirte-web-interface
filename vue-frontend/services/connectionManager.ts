@@ -218,7 +218,6 @@ export class ConnectionManager {
 
   stopCode() {
     this.device.stopCode()
-    this.running = false
   }
 
   async uploadFile(path, content) {

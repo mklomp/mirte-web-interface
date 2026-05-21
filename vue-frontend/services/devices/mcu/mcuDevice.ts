@@ -75,7 +75,6 @@ export class MCUDevice {
 
   async stopCode() {
     await this.runCommand("\x03"); // CTRL-C
-    useState("programming-state").value = "idle";
   }
 
   async uploadMIRTEapi() {

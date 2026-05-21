@@ -29,7 +29,7 @@ let shell = null;
 
 connectionStore.loadFromLocalStorage()
 
-let debug = false
+let debug = true
 
 
 onMounted(async () => {

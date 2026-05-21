@@ -19,7 +19,7 @@ export function useXTermBase() {
       //cursor: '#000000',
     }
 
-    if (debug){ term.options.disableStdin = true; }
+    //if (debug){ term.options.disableStdin = true; }
  
     term.loadAddon(fitAddon)
 
