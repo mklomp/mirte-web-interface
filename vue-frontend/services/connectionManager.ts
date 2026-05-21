@@ -130,8 +130,8 @@ export class ConnectionManager {
           if (this.buffer_status == "print") {
             let index
             while ((index = this.buffer.indexOf("\r\n")) !== -1) {
-              const line = this.buffer.slice(0, index + 1)
-              this.buffer = this.buffer.slice(index + 1)
+              const line = this.buffer.slice(0, index + 2)
+              this.buffer = this.buffer.slice(index + 2)
               if (!this.debug) {
                 this.term.write(line)
               }
