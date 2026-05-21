@@ -95,7 +95,7 @@ function isUsableMC(name) {
 }
 
 function isUsablePeripheral(key) {
-  return connectionStore.status == "connected" && ['motor', 'intensity', 'servo', 'keypad'].includes(key)
+  return connectionStore.status == "connected" && ['motor', 'line', 'object', 'servo', 'keypad'].includes(key)
 }
 
 onMounted(() => {

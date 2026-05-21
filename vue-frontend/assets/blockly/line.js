@@ -4,17 +4,17 @@ export function load(Blockly, pythonGenerator, instances) {
     instances = [["NO PERIPHERAL CONFIGURED", "NO PERIPHERAL CONFIGURED"]]
   }
 
-  Blockly.Extensions.register('dynamic_instances_extension_intensity',
+  Blockly.Extensions.register('dynamic_instances_extension_line',
     function () {
       this.getInput('INSTANCE')
         .appendField(new Blockly.FieldDropdown(instances), 'INSTANCE');
     });
 
-  Blockly.Blocks['get_value_intensity'] = {
+  Blockly.Blocks['get_value_line'] = {
     init: function () {
       this.jsonInit({
         "type": "block_type",
-        "message0": "%{BKY_IR_SENSOR}",
+        "message0": "%{BKY_LINE_SENSOR}",
         "args0": [
           {
             "type": "input_dummy",
@@ -24,15 +24,15 @@ export function load(Blockly, pythonGenerator, instances) {
         "inputsInline": true,
         "colour": "%{BKY_SENSORS_RGB}",
         "output": "Number",
-        "extensions": ["dynamic_instances_extension_intensity"]
+        "extensions": ["dynamic_instances_extension_line"]
       });
     }
   };
 
-  pythonGenerator.forBlock['get_value_intensity'] = function (block) {
+  pythonGenerator.forBlock['get_value_line'] = function (block) {
     pythonGenerator.definitions_['import_mirte'] = 'from mirte_robot import robot\nmirte=robot.createRobot()';
     let instance = block.getFieldValue('INSTANCE');
-    let code = `mirte.getIntensity('${instance}')`;
+    let code = `mirte.getLine('${instance}')`;
     return [code, pythonGenerator.ORDER_NONE]
   };
 
@@ -40,10 +40,10 @@ export function load(Blockly, pythonGenerator, instances) {
     type: "sensors",
     contents: {
       kind: "category",
-      name: "%{BKY_IR_SENSOR_TB}",
+      name: "%{BKY_LINE_SENSOR_TB}",
       colour: "%{BKY_SENSORS_RGB}",
       contents: [
-        { kind: "block", type: "get_value_intensity" },
+        { kind: "block", type: "get_value_line" },
       ]
     }
   }
@@ -53,6 +53,6 @@ export function load(Blockly, pythonGenerator, instances) {
 export function getType() {
   return {
     category: "sensors",
-    type: "intensity"
+    type: "line"
   }
 }
