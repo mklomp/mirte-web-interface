@@ -144,7 +144,7 @@ function initBlockly(reason = "") {
 
   console.log("status: " + connectionStore.status)
   console.log("reason: " + reason)
-   
+
   // Set workspaceDOM from previous session
   if (codeStore.blockly && connectionStore.status == "connected") {
     workspaceDOM = Blockly.utils.xml.textToDom(codeStore.blockly)
@@ -263,7 +263,9 @@ watch(settingsState, (newState) => {
 // connectino can change
 watch(() => connectionStore.status, (newStatus) => {
   if (isMounted.value) {
-    loadCustomModules()
+    if (newStatus == "disconnected") {
+      loadCustomModules()
+    }
     initBlockly("serial_connection")
   }
 })
