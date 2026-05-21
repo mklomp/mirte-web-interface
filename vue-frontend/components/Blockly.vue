@@ -142,9 +142,6 @@ function restoreWorkspace() {
 // - After refresh (or any revisit, so with something in localStorage)
 function initBlockly(reason = "") {
 
-  console.log("status: " + connectionStore.status)
-  console.log("reason: " + reason)
-
   // Set workspaceDOM from previous session
   if (codeStore.blockly && connectionStore.status == "connected") {
     workspaceDOM = Blockly.utils.xml.textToDom(codeStore.blockly)
