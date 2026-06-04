@@ -47,6 +47,7 @@ jobs:
                   }
               )
           ' sbom.spdx.json > licenses.json
+          cat licenses.json
       - name: Build
         run: |          
           source node_env/bin/activate
@@ -60,7 +61,7 @@ jobs:
           cd ..
           ls vue-frontend/.output/
       - name: Archive production artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: dist
           path: |
