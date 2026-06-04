@@ -55,7 +55,6 @@ jobs:
           npm run generate
           rm .output/nitro.json
           tar -czvf .output/public.tar.gz .output/public/
-          rm -rf .output/public/
           cp sbom.spdx.json .output
           cp licenses.json .ouput
           cd ..
@@ -65,7 +64,8 @@ jobs:
         with:
           name: dist
           path: |
-            vue-frontend/.output/*
+            vue-frontend/.output/sbom.spdx.json
+            vue-frontend/.output/public.tar.gz
       - name: Upload as a github-pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
