@@ -65,8 +65,21 @@ jobs:
           name: dist
           archive: false
           path: |
-            vue-frontend/.output/sbom.spdx.json
             vue-frontend/.output/public.tar.gz
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          archive: false
+          path: |
+            vue-frontend/sbom.spdx.json
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          archive: false
+          path: |
+            vue-frontend/licenses.json
       - name: Upload as a github-pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
