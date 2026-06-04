@@ -63,6 +63,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: dist
+          archive: false
           path: |
             vue-frontend/.output/sbom.spdx.json
             vue-frontend/.output/public.tar.gz
