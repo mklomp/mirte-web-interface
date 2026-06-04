@@ -20,6 +20,8 @@ jobs:
           curl -sSfL https://get.anchore.io/syft | sudo sh -s -- -b /usr/local/bin
           syft . -o spdx-json > sbom.spdx.json
           cat sbom.spdx.json
+          npm ls --omit=dev --depth=0 --json > test.json
+          cat test.json
           npm ls --omit=dev --depth=0 --json | jq '.dependencies | keys' > deps.json
           cat deps.json
           jq --slurpfile deps deps.json '
