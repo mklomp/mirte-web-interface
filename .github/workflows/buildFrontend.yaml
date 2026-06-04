@@ -65,7 +65,7 @@ jobs:
         with:
           name: dist
           path: |
-            vue-frontend/.output/
+            vue-frontend/.output/*
       - name: Upload as a github-pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
