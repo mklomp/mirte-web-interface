@@ -21,12 +21,7 @@ jobs:
           cd vue-frontend
           curl -sSfL https://get.anchore.io/syft | sudo sh -s -- -b /usr/local/bin
           syft . -o spdx-json > sbom.spdx.json
-          cat sbom.spdx.json
-          npm ls --json > test.json
-          cat test.json
-          pwd
           npm ls --omit=dev --depth=0 --json | jq '.dependencies | keys' > deps.json
-          cat deps.json
           jq --slurpfile deps deps.json '
             def clean_license:
               (
@@ -52,9 +47,10 @@ jobs:
                   }
               )
           ' sbom.spdx.json > licenses.json
-          cat licenses.json
       - name: Build
         run: |          
+          source node_env/bin/activate
+          cd vue-frontend
           npm run generate
           rm .output/nitro.json
           cp sbom.spdx.json .output
