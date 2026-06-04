@@ -15,13 +15,48 @@ jobs:
           source node_env/bin/activate
           cd vue-frontend
           npm install
+      - name: Check licence compatability
+        run: |
+          curl -sSfL https://get.anchore.io/syft | sudo sh -s -- -b /usr/local/bin
+          syft . -o spdx-json > sbom.spdx.json
+          npm ls --omit=dev --depth=0 --json | jq '.dependencies | keys' > deps.json
+          jq --slurpfile deps deps.json '
+            def clean_license:
+              (
+                .licenseDeclared,
+                .licenseConcluded
+              )
+              | select(. != null)
+              | select(. != "NOASSERTION");
+
+            .packages
+            | map(
+                select(.name as $n | $deps[0] | index($n))
+                | {
+                    name,
+                    version: .versionInfo,
+                    license: (
+                      clean_license
+                      // (.licenses[]?.license?.id?)
+                      // (.licenses[]?.license?)
+                      // "UNKNOWN"
+                    ),
+                    website: (.homepage // .downloadLocation)
+                  }
+              )
+          ' sbom.spdx.json > licenses.json
+      - name: Build
+        run: |          
           npm run generate
+          rm .output/nitro.json
+          cp sbom.spdx.json .output
+          cp licenses.json .ouput
       - name: Archive production artifacts
         uses: actions/upload-artifact@v4
         with:
           name: dist
           path: |
-            vue-frontend/.output/public
+            vue-frontend/.output
       - name: Upload as a github-pages artifact
         uses: actions/upload-pages-artifact@v3
         with:

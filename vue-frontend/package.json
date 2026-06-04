@@ -27,7 +27,7 @@
     "js-yaml": "^4.1.1",
     "nuxt": "^3.15.4",
     "pinia": "^3.0.4",
-    "roslib": "RobotWebTools/roslibjs#2999d0afdf812b72f1722c945eb732d230731541",
+    "roslib": "^2.1.0",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0"
   },
