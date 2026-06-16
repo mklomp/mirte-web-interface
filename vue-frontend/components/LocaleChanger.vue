@@ -23,7 +23,9 @@ const langs = [
      role="button"
      data-bs-toggle="dropdown"
      aria-expanded="false">
-    <img class="fi" :src="langs.find(l => l.code === locale).flag" alt="flag">
+     <ClientOnly>
+       <img class="fi" :src="langs.find(l => l.code === locale).flag" alt="flag">
+     </ClientOnly>
   </a>
   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="localeDropdown">
     <li v-for="lang in langs" :key="lang.code">
