@@ -1,4 +1,4 @@
-# mirte-website
+# mirte-web-intreface
 
 This repository contains the code for the MIRTE website on https://mirte.org.
 
@@ -33,12 +33,12 @@ source node_env/bin/activate
   # visit http://localhost:8000
   ```
 
-- local deployment (as fork on <username>.github.io/mirte-website):
+- local deployment (as fork on <username>.github.io/mirte-web-interface):
 
   ```sh
   npm install
   npm run generate
-  mv dist mirte-website
+  mv dist mirte-web-interface
   python3 -m http.server
-  # visit http://localhost:8000/mirte-website
+  # visit http://localhost:8000/mirte-web-interface
   ```

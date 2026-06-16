@@ -6,35 +6,46 @@ max_pwm = 65535
 
 class Robot():
   def __init__(self):
+    # peripheral objects
+    self.distance_objects = {}
+    
     with open(".settings.json", "r") as f:
       data = f.read()
     self.config = ujson.loads(data)
-    # TODO: this is where I can already set pins for
-    # everything in the config
+    
+    # TODO: add motor initialization 
+    if (self.config['distance']):
+        from hcsr04 import HCSR04
+        for sensor in self.config['distance']:
+            sensor_obj = self.config['distance'][sensor]
+            name = sensor_obj['name']
+            trigger_pin = sensor_obj['pins']['trigger']
+            echo_pin = sensor_obj['pins']['echo']
+            self.distance_objects[name] = HCSR04(trigger_pin, echo_pin)
     
   # HELPER FUNTIONS
   def stripGP(self, s):
-    return s[2:] if s.startswith("GP") else s
+    return int(s[2:]) if s.startswith("GP") else s
 
   def map_value(self, x, in_min, in_max, out_min, out_max):
     return int((x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min)
 
   # MIRTE API (same as blockly and ROS)
   def setDigitalPinValue(self, pin, value):
-    Pin(int(self.stripGP(pin)), Pin.OUT).value(value)
+    Pin(self.stripGP(pin), Pin.OUT).value(value)
 
   # TODO: check with ROS version on value range
   def setAnalogPinValue(self, pin, value):
-    pwm = PWM(Pin(int(self.stripGP(pin))))
+    pwm = PWM(Pin(self.stripGP(pin)))
     pwm.freq(50) # standard PWM servo
     pwm.duty_u16(value)
 
   def getDigitalPinValue(self, pin):
-    return Pin(int(self.stripGP(pin)), Pin.IN).value()
+    return Pin(self.stripGP(pin), Pin.IN).value()
 
   # TODO: check with ROS version on value range
   def getAnalogPinValue(self, pin):
-    return ADC(int(self.stripGP(pin))).read_u16()
+    return ADC(self.stripGP(pin)).read_u16()
 
   def setMotorSpeed(self, instance, speed):
     # currently supporting pp motors (as on PCB)
@@ -71,10 +82,12 @@ class Robot():
       return "right"
     if (value < 880 / scale):
       return "enter"
+    
+  def getDistance(self, instance):
+    return self.distance_objects[instance].distance_cm()
+    
 
 def createRobot():
   global mirte
   mirte = Robot()
   return mirte
-
-
