@@ -4,16 +4,16 @@ const manager = new ConnectionManager()
 
 export function useConnection() {
 
-  async function connect(type: "mcu" | "sbc", autoconnect = false) {
-    await manager.connect(type, autoconnect)
+  async function connect(type: "mcu" | "sbc", transport: "serial" | "ble", autoconnect = false) {
+    await manager.connect(type, transport, autoconnect)
   }
 
   async function disconnect() {
     await manager.disconnect()
   }
 
-  function attachTerminal(term) {
-    manager.attachTerminal(term)
+  function attachTerminal(term, debug) {
+    manager.attachTerminal(term, debug)
   }
 
   async function uploadFile(path: string, content) {

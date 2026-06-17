@@ -232,5 +232,5 @@ export const toolboxJson = {
 }
 
 export function getToolbox() {
-  return structuredClone(toolboxJson);
+  return structuredClone(toolboxJson)
 }

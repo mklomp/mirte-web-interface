@@ -38,8 +38,13 @@ function shutdown() {
 
   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="localeDropdown">
     <li>
-      <button class="dropdown-item" @click="connect('mcu')" :disabled="mounted && isConnected">
-        MIRTE Basic
+      <button class="dropdown-item" @click="connect('mcu', 'serial')" :disabled="mounted && isConnected">
+        USB
+      </button>
+    </li>
+    <li>
+      <button class="dropdown-item" @click="connect('mcu', 'ble')" :disabled="mounted && isConnected">
+        Bluetooth
       </button>
     </li>
 

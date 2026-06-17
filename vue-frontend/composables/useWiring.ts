@@ -76,8 +76,10 @@ export function useWiring(peripheralsDef: any, microcontrollers: any) {
 
     // and store to the 
     if (isConnected) {
+      const { addToast } = useToast()
       const { uploadFile } = useConnection()
       await uploadFile('/.settings.json', JSON.stringify(json, null, 2))
+      addToast( $i18n.t('toast.saved_settings_success'), 'success', 'upload-settings')
     }
   }
 
@@ -107,28 +109,29 @@ export function useWiring(peripheralsDef: any, microcontrollers: any) {
 
 
   function loadFromYAML(data: any) {
+    
     const list: PeripheralInstance[] = []
 
     // device info
-    if (data.device?.mirte) {
+    if (data?.device?.mirte) {
       state.value.board = data.device.mirte.board || "pico"
       state.value.type = data.device.mirte.type || "breadboard"
     }
 
     // peripherals
-    for (const [type, group] of Object.entries(data)) {
-      if (type === "device") continue
-
-      for (const [name, item] of Object.entries(group as any)) {
-        list.push({
-          id: crypto.randomUUID(),
-          type,
-          name: item.name || name,
-          pins: { ...item.pins },
-        })
+    if (data) {
+      for (const [type, group] of Object.entries(data)) {
+        if (type === "device") continue
+        for (const [name, item] of Object.entries(group as any)) {
+          list.push({
+            id: crypto.randomUUID(),
+            type,
+            name: item.name || name,
+            pins: { ...item.pins },
+          })
+        }
       }
     }
-
     state.value.peripherals = list
   }
 

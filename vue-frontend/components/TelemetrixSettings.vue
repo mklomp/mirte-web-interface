@@ -92,7 +92,7 @@ const {
 
 const connectionStore = useConnectionStore()
 
-function isUsableMC(name){
+function isUsableMC(name) {
   return name === "pico"
 }
 

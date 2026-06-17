@@ -1,4 +1,5 @@
 import { SerialTransport } from "@/services/transports/serialTransport"
+import { BLETransport } from "~/services/transports/BLETransport"
 //import { USBTransport } from "./transports/usbTransport"
 
 import { MCUDevice } from "./devices/mcu/mcuDevice"
@@ -8,60 +9,156 @@ export class ConnectionManager {
 
   transport: any = null
   device: any = null
+  transporttype: string = ""
   term: any = null
+  debug: boolean = false
 
   private buffer = ""
+  private exception_buffer = ""
   private running = false
-  private started_found = false
+  private buffer_status = "filter" // "filter, print, exception"
+  private next_status = "filter"
   private stopped_found = false
+  private lastHeartbeat = Date.now()
+  private heartbeatTimer = {}
 
-  async connect(type: "mcu" | "sbc", autoconnect = false) {
+  startHeartbeatMonitor() {
+    this.lastHeartbeat = Date.now()
+
+    this.heartbeatTimer = window.setInterval(() => {
+      const now = Date.now()
+
+      // 1.5 second timeout
+      if (now - this.lastHeartbeat > 1100) {
+        this.stopHeartbeatMonitor()
+        this.disconnect(true)
+      }
+    }, 1100)
+  }
+
+  stopHeartbeatMonitor() {
+    if (this.heartbeatTimer) {
+      clearInterval(this.heartbeatTimer)
+      this.heartbeatTimer = {}
+    }
+  }
+
+  async connect(type: "mcu" | "sbc", transport: "serial" | "ble", autoconnect = false) {
+    this.transporttype = transport
+    const { addToast } = useToast()
+    const { $i18n } = useNuxtApp()
+    const connectionStore = useConnectionStore()
+
+    if (transport == "serial") {
+      this.transport = new SerialTransport()
+    } else if (transport == "ble") {
+      this.transport = new BLETransport()
+    }
 
     if (type == "mcu") {
-      this.transport = new SerialTransport()
+
       let connection = await this.transport.connect(autoconnect)
 
-      if (!connection) { return false }
+      if (!connection.connected) { return false }
+
+      if (transport == "ble") { this.startHeartbeatMonitor() }
 
       // We get the REPL data, which should be parsed on:
       //
       // "__START__": detecting when execution started (see main.py)
       // "__STOP__": detecting when execution stopped (see main.py)
       this.transport?.onData((data) => {
-        if (!this.term || !this.running) return
+
+        if (!this.term) return
 
         this.buffer += data
 
-        // detecting __START__, only stripping the buffer
-        if (this.buffer.includes("__START__\r\n")){
-          this.buffer = this.buffer.split("__START__\r\n")[1] // throw away everyting before __START__
-          this.started_found = true
+        // detecting heartbeat __HB__, and removing if found
+        if (this.transporttype == "ble" && this.buffer.includes("__HB__\r\n")) {
+          this.buffer = this.buffer.replaceAll("__HB__\r\n", "") // remove all heartbeats (except when in debug)
+          this.lastHeartbeat = Date.now()
         }
 
-        // detecting __START__, only stripping the buffer
-        if (this.buffer.includes("__STOP__\r\n")){
-          this.stopped_found = true
-          this.buffer = this.buffer.split("__STOP__\r\n")[0] // throw away everything after __STOP__
-          useState("programming-state").value = "idle"
-        }
+        // make sure not to print the output of the main.py
+        // code which was started on boot of the MCU
+        if (this.running) {
 
-        // write and remove all newlines in the buffer
-        if (this.started_found){
-          let index
-          while ((index = this.buffer.indexOf("\r\n")) !== -1) {
-            const line = this.buffer.slice(0, index + 1)
-            this.buffer = this.buffer.slice(index + 1)
-            this.term.write(line)
+          // detecting __START__, only stripping the buffer
+          if (this.buffer.includes("__START__\r\n")) {
+            const marker = "__START__\r\n"
+            const idx = this.buffer.indexOf(marker)
+            this.buffer = this.buffer.slice(idx + marker.length) // throw away everyting before __START__
+            this.next_status = "print"
+          }
+
+          // detecting __START_EXCEPTION__, strip from buffer but keep exception
+          else if (this.buffer.includes("__START_EXCEPTION__\r\n")) {
+            const marker = "__START_EXCEPTION__\r\n"
+            const idx = this.buffer.indexOf(marker)
+
+            this.exception_buffer = this.exception_buffer + this.buffer.slice(idx + marker.length)
+            this.buffer = this.buffer.slice(0, idx) // keep everything before
+            this.next_status = "exception"
+          }
+
+          // detecting __STOP_EXCEPTION__, only stripping the buffer
+          else if (this.buffer.includes("__STOP_EXCEPTION__\r\n")) {
+            const marker = "__STOP_EXCEPTION__\r\n"
+            const idx = this.buffer.indexOf(marker)
+
+            this.exception_buffer = this.exception_buffer + this.buffer.slice(0, idx)
+            this.buffer = this.buffer.slice(idx + marker.length)
+            this.next_status = "print"
+
+            addToast(this.exception_buffer, 'error', 'code-error', -1)
+            this.exception_buffer = ""
+          }
+
+          // detecting __STOP__, only stripping the buffer
+          else if (this.buffer.includes("__STOP__\r\n")) {
+            const marker = "__STOP__\r\n"
+            const idx = this.buffer.indexOf(marker)
+
+            this.next_status = "filter"
+            this.stopped_found = true
+            this.buffer = this.buffer.slice(0, idx) // throw away everything after __STOP__
+
+            useState("programming-state").value = "idle"
+          }
+
+          // write and remove all newlines in the buffer
+          if (this.buffer_status == "print") {
+            let index
+            while ((index = this.buffer.indexOf("\r\n")) !== -1) {
+              const line = this.buffer.slice(0, index + 2)
+              this.buffer = this.buffer.slice(index + 2)
+              if (!this.debug) {
+                this.term.write(line)
+              }
+            }
           }
         }
 
-        // clear the buffer after __STOP__
-        if (this.stopped_found){
-          this.buffer = ""
-          this.started_found = false
+        // clear the buffer after __STOP__ or when not running
+        if (this.stopped_found || !this.running) {
+          const marker = "__HB__\r\n"
+          const idx = this.buffer.indexOf(marker)
+          if (this.transporttype == "ble" && idx > 0) {
+            this.buffer = this.buffer.slice(idx + marker.length)
+          } else {
+            this.buffer = ""
+          }
+
           this.stopped_found = false
+          this.running = false
         }
-        
+
+        this.buffer_status = this.next_status
+
+        if (this.debug) {
+          this.term.write(data)
+        }
+
       })
 
       // make sure the terminal is in a determined state
@@ -69,22 +166,31 @@ export class ConnectionManager {
       // TODO: should we also stop raw-REPL (eg if you were conncted to thonny)
       // TODO: is this the right place to do this?
       await this.transport.write('\x03') // CTRL-C (kill main)
-      if (this.term) { this.term.clear() }
       await new Promise(r => setTimeout(r, 200))
-      await this.transport.write('\x04') // CTRL-D (soft reboot)
-      await new Promise(r => setTimeout(r, 200))
-      await this.transport.write('\x03') // CTRL-C (soft reoot started main again)
 
       this.device = new MCUDevice(this.transport)
       await this.device.initialize()
 
-      useConnectionStore().setConnectionType("serial", type)
+      await this.transport.write('from main import run\r\n')
+      await new Promise(r => setTimeout(r, 200))
+      if (this.term && !this.debug) { this.term.write('\x1bc'); } // full terminal reset
+
+      if (connection.autoConnected) {
+        addToast($i18n.t('toast.automatically_connected'), 'success', 'connection-status')
+      } else {
+        addToast($i18n.t('toast.connected'), 'success', 'connection-status')
+      }
+
+      connectionStore.setConnectionStatus("connected")
+      useState("programming-state").value = "idle"
+      useConnectionStore().setConnectionType(transport, type)
+
     }
 
     /*if (type === "sbc") {
       this.transport = new USBTransport()
       await this.transport.connect()
- 
+   
       this.device = new SBCDevice(this.transport)
     }*/
 
@@ -92,8 +198,9 @@ export class ConnectionManager {
 
   }
 
-  attachTerminal(term) {
+  attachTerminal(term, debug) {
     this.term = term
+    this.debug = debug
 
     // Send user input to transport
     this.term.onData(async (data) => {
@@ -103,21 +210,17 @@ export class ConnectionManager {
   }
 
   startCode() {
-    this.term.clear()
-    this.device.startCode()
+    if (!this.debug) { this.term.write('\x1bc'); } // full terminal reset
+    this.device.startCode(this.transporttype == "ble")
     this.running = true
     this.started_found = false
   }
 
   stopCode() {
     this.device.stopCode()
-    this.running = false
   }
 
-
   async uploadFile(path, content) {
-    console.log(path)
-    console.log(content)
     await this.device.uploadFile(path, content)
   }
 
@@ -125,10 +228,11 @@ export class ConnectionManager {
     await this.device.runCommand?.(cmd)
   }
 
-  disconnect() {
-    this.transport?.disconnect?.()
+  disconnect(connectionLost = false) {
+    this.transport?.disconnect?.(connectionLost)
     this.transport = null
     this.device = null
-    if (this.term) { this.term.clear() }
+    this.hbInterval = {}
+    if (this.term) { this.term.write('\x1bc'); } // full terminal reset
   }
 }

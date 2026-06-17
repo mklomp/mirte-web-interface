@@ -30,6 +30,8 @@ const { locale } = useI18n()
 const codeStore = useCodeStore()
 const peripheralStore = usePeripheralStore()
 const connectionStore = useConnectionStore()
+const isMounted = ref(false)
+
 
 // Blockly state
 let workspaceDOM = null
@@ -39,12 +41,12 @@ let scrollX = 0
 let scrollY = 0
 let suppressStore = false
 
-// TODO: use colors from scss
-Blockly.Msg.FLOW_RGB = "#cee6ed"
+// TODO: import colors from scss
+Blockly.Msg.FLOW_RGB = "#b8d1eb"
 Blockly.Msg.DATA_RGB = "#9b372a"
 Blockly.Msg.MODULES_RGB = "#cf0000"
-Blockly.Msg.SENSORS_RGB = "#9db7be"
-Blockly.Msg.ACTIONS_RGB = "#f1be45"
+Blockly.Msg.SENSORS_RGB = "#6089ba"
+Blockly.Msg.ACTIONS_RGB = "#fbb927"
 
 function addToToolbox(type, item) {
   const category = toolBox.contents.find(c => c.id === type)
@@ -58,7 +60,9 @@ function loadCustomModules(settings) {
   if (connectionStore.compute_type == "sbc" && Object.keys(peripheralStore.peripherals).length == 0) return
   if (connectionStore.compute_type == "mcu" && connectionStore.status != "connected") return
 
+  // start with a clean toolbox
   toolBox = getToolbox()
+
   for (const module of Object.values(customBlockModules)) {
     const module_type = module.getType()
     let dropdown_instances = []
@@ -69,11 +73,13 @@ function loadCustomModules(settings) {
       dropdown_instances = instances.map(n => [n, n])
     }
 
-    if (!Blockly.Extensions.isRegistered('dynamic_instances_extension_' + module_type?.type)) {
-      if (instances.length != 0) { // default_blocks are already in the toolbox
-        const custom_module = module.load(Blockly, pythonGenerator, dropdown_instances)
-        addToToolbox(custom_module.type, custom_module.contents)
+    if (instances.length != 0) { // default_blocks are already in the toolbox
+      let extensionName = 'dynamic_instances_extension_' + module_type?.type
+      if (Blockly.Extensions.isRegistered(extensionName)) {
+        Blockly.Extensions.unregister(extensionName)
       }
+      const custom_module = module.load(Blockly, pythonGenerator, dropdown_instances)
+      addToToolbox(custom_module.type, custom_module.contents)
     }
   }
 }
@@ -138,8 +144,10 @@ function restoreWorkspace() {
 function initBlockly(reason = "clean") {
 
   // Set workspaceDOM from previous session
-  if (codeStore.blockly && (Object.keys(peripheralStore.peripherals).length != 0 || connectionStore.status == "connected")) {
+  if (codeStore.blockly && connectionStore.status == "connected") {
     workspaceDOM = Blockly.utils.xml.textToDom(codeStore.blockly)
+  } else {
+    workspaceDOM = null
   }
 
   // Save workspace if language changed
@@ -159,6 +167,7 @@ function initBlockly(reason = "clean") {
 
   workspace = Blockly.inject(blocklyDiv.value, {
     toolbox: toolBox,
+    media: 'blockly/media',
     zoom: {
       controls: true,
       wheel: true,
@@ -215,6 +224,7 @@ onMounted(() => {
   loadCustomModules(peripheralStore.peripherals)
   codeStore.loadFromLocalStorage()
   initBlockly()
+  isMounted.value = true
 })
 
 onBeforeUnmount(() => {
@@ -236,7 +246,7 @@ watch(locale, () => {
 watch(() => codeStore.active, (newVal) => {
   // TODO: check if this is working at all. does not seem to work
   // when settings change due to connecting
-  if (newVal == "blockly") {
+  if (newVal == "blockly" && isMounted.value) {
     nextTick(() => {
       initBlockly("tab_change")
     })
@@ -244,18 +254,16 @@ watch(() => codeStore.active, (newVal) => {
 })
 
 watch(() => connectionStore.status, (newStatus) => {
-  if (newStatus == "disconnected") {
-    suppressStore = true
-
-    workspace.clear()
-
-    // Let Blockly finish firing events, then re-enable
-    setTimeout(() => {
-      suppressStore = false
-    }, 50)
+  if (isMounted.value) {
+    if (newStatus == "disconnected") {
+      loadCustomModules()
+    }
+    initBlockly("serial_connection")
   }
 })
 
+// TODO: we need to rethink if we really need codeStore changes.
+// why would we need to update blokcky?
 watch(() => codeStore.reinit_blockly, () => {
   nextTick(() => {
     initBlockly("xml_loaded")

@@ -10,7 +10,7 @@ onMounted(async () => {
   // and I was previously connected
   const ports = await navigator.serial.getPorts()
   if (ports.length > 0 && connectionStore.status == "connected") {
-    await useConnection().connect("mcu", true)
+    await useConnection().connect("mcu", "serial", true)
   }
 
   peripheralStoreStore.loadFromLocalStorage()

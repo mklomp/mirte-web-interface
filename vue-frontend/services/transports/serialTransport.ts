@@ -15,9 +15,9 @@ export class SerialTransport {
   private disconnectHandler: (() => void) | null = null
 
   async connect(autoconnect = false) {
-    const connectionStore = useConnectionStore()
     const { addToast } = useToast()
-
+    const { $i18n } = useNuxtApp()
+    
     const filters = [
       { usbVendorId: 0x2E8A, usbProductId: 0x0005 }  // Raspberry Pi Pico 2040
     ];
@@ -31,9 +31,9 @@ export class SerialTransport {
       ableToAutoConnect = Object.keys(this.port.getInfo()).length != 0
 
       if (autoconnect && !ableToAutoConnect) {
-        addToast('Unable to connect to known connections.', 'info')
+        addToast($i18n.t('toast.usb_unable_connect_known_connection'), 'info')
         this.runDisconnect()
-        return false
+        return {connected: false}
       }
     }
 
@@ -41,24 +41,25 @@ export class SerialTransport {
       try {
         this.port = await navigator.serial.requestPort({ filters })
       } catch (error) {
-        addToast('No devices selected. Make sure MicroPython is installed, and the robot is plugged in.', 'error')
+        addToast($i18n.t('toast.usb_no_device_selected'), 'error')
         this.runDisconnect()
-        return false
+        return {connected: false}
       }
 
       try {
         await this.port.open({ baudRate: 115200 })
       } catch (error) {
-        addToast('Unable to open device. Make sure the device is not connected in another program by replugging the USB cable.', 'error')
+        addToast($i18n.t('toast.usb_unable_to_open_device'), 'error')
         this.runDisconnect()
-        return false
+        return {connected: false}
       }
     }
+    addToast($i18n.t('toast.usb_connecting'), 'info', 'connection-status')
 
     // Nicely disconnect when a USB cable was unplugged
     this.disconnectHandler = () => {
       this.runDisconnect()
-      addToast('Disconnected.', 'info')
+      addToast($i18n.t('toast.usb_disconnected'), 'info', 'connection-status')
     }
 
     this.port.addEventListener("disconnect", this.disconnectHandler)
@@ -66,15 +67,9 @@ export class SerialTransport {
     this.reader = this.port.readable.getReader()
     this.writer = this.port.writable.getWriter()
 
-    connectionStore.setConnectionStatus("connected")
-    if (ableToAutoConnect && !autoconnect){
-      addToast('Automatically connected to known robot.', 'success')
-    } else if (!ableToAutoConnect){
-      addToast('Connected to robot.', 'success')
-    }
-
+    let autoConnected = (ableToAutoConnect && !autoconnect)
     this.startReaderLoop()
-    return true
+    return {connected: true, autoConnected: autoConnected}
   }
 
   async write(data: string) {
@@ -108,10 +103,11 @@ export class SerialTransport {
     this.listeners.push(callback)
   }
 
-  async disconnect() {
+  async disconnect(connectionLost = false) {
     const { addToast } = useToast()
+    const { $i18n } = useNuxtApp()
     this.runDisconnect()
-    addToast('Successfully disconnected.', 'success')
+    addToast($i18n.t('toast.usb_disconnected_success'), 'success', 'connection-status')
   }
 
   async runDisconnect() {
@@ -149,6 +145,7 @@ export class SerialTransport {
     this.writer = null
     this.listeners = []
 
+    useState("peripheral-settings").value = {}
     connectionStore.setConnectionStatus("disconnected")
   }
 }

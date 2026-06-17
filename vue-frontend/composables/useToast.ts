@@ -3,25 +3,74 @@ import { ref } from 'vue'
 type ToastType = 'info' | 'success' | 'warning' | 'error'
 
 interface Toast {
-  id: number
+  id: string
   message: string
   type: ToastType
+  duration: number
 }
 
 const toasts = ref<Toast[]>([])
 
-export function useToast() {
-  function addToast(message: string, type: ToastType = 'info', duration = 10) {
-    const id = Date.now()
-    toasts.value.push({ id, message, type })
+const timers = new Map<string, ReturnType<typeof setTimeout>>()
 
-    setTimeout(() => {
-      toasts.value = toasts.value.filter(t => t.id !== id)
-    }, duration * 1000)
+export function useToast() {
+
+  function addToast(
+    message: string,
+    type: ToastType = 'info',
+    id?: string,
+    duration = 5
+  ) {
+    const toastId = id ?? `${Date.now()}`
+
+    const formattedMessage = message.replace(/\n/g, '<br>')
+
+    const existingIndex = toasts.value.findIndex(t => t.id === toastId)
+
+    if (existingIndex !== -1) {
+      toasts.value[existingIndex] = {
+        ...toasts.value[existingIndex],
+        message: formattedMessage,
+        type,
+        id: toastId,
+        duration,
+      }
+    } else {
+      toasts.value.push({
+        id: toastId,
+        message: formattedMessage,
+        type,
+        duration,
+      })
+    }
+
+    if (timers.has(toastId)) {
+      clearTimeout(timers.get(toastId)!)
+      timers.delete(toastId)
+    }
+
+    if (duration !== -1) {
+      const timer = setTimeout(() => {
+        toasts.value = toasts.value.filter(t => t.id !== toastId)
+        timers.delete(toastId)
+      }, duration * 1000)
+
+      timers.set(toastId, timer)
+    }
+  }
+
+  function removeToast(id: string) {
+    toasts.value = toasts.value.filter(t => t.id !== id)
+
+    if (timers.has(id)) {
+      clearTimeout(timers.get(id)!)
+      timers.delete(id)
+    }
   }
 
   return {
     toasts,
-    addToast
+    addToast,
+    removeToast
   }
 }

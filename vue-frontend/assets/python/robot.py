@@ -9,9 +9,13 @@ class Robot():
     # peripheral objects
     self.distance_objects = {}
     
-    with open(".settings.json", "r") as f:
-      data = f.read()
-    self.config = ujson.loads(data)
+    self.config = {}
+    try:
+      with open(".settings.json", "r") as f:
+        data = f.read()
+      self.config = ujson.loads(data)
+    except:
+      pass
     
     # TODO: add motor initialization 
     if (self.config['distance']):
@@ -63,9 +67,13 @@ class Robot():
     duty = self.map_value(angle, 0, 180, 1800, 7800) # https://randomnerdtutorials.com/raspberry-pi-pico-servo-motor-micropython/
     self.setAnalogPinValue(pin, duty)
 
-  def getIntensity(self, instance):
-    pin = self.config['intensity'][instance]['pins']['analog']
+  def getLine(self, instance):
+    pin = self.config['line'][instance]['pins']['analog']
     return self.getAnalogPinValue(pin)
+  
+  def getObject(self, instance):
+    pin = self.config['object'][instance]['pins']['digital']
+    return not self.getDigitalPinValue(pin) # the sensor values are inverted
 
   def getKeypad(self, instance):
     pin = self.config['keypad'][instance]['pins']['pin']

@@ -1,9 +1,12 @@
 import { MicroPythonFS } from "./micropythonFS"
-import { MicroPythonREPL } from "./micropythonREPL"
 
 import pythonMainCode from '@/assets/python/main.py?raw'
 import pythonRobotCode from '@/assets/python/robot.py?raw'
 import pythonNumbersCode from '@/assets/python/numbers.py?raw'
+import bleAdvertisingCode from '@/assets/python/ble/ble_advertising.py?raw'
+import blePeripheralCode from '@/assets/python/ble/ble_uart_peripheral.py?raw'
+import bleREPLCode from '@/assets/python/ble/ble_uart_repl.py?raw'
+import bootCode from '@/assets/python/boot.py?raw'
 
 // hardware peripherals
 import pythonDistanceCode from '@/assets/python/hcsr04.py?raw'
@@ -20,20 +23,40 @@ import * as YAML from 'js-yaml'
 import { usePeripheralStore } from '@/stores/peripherals'
 
 export class MCUDevice {
+  transport
   fs
   peripheralStore
 
   constructor(private transport) {
     this.fs = new MicroPythonFS(transport)
     this.peripheralStore = usePeripheralStore()
+    this.transport = transport
   }
 
   async initialize() {
-    await this.uploadMIRTEapi()
+    // Check if one of the (empty) MIRTE files are there
+    // We should actually only do this in USB mode, but 
+    // if it was able to connect to BLE the code should
+    // have been uploaded anyway.
+    const { addToast } = useToast()
+    const { $i18n } = useNuxtApp()
+    const mirte_check_file = await this.fs.readFile("/mirte_robot/__main__.py")
+    if (mirte_check_file == "__READ_ERROR__\r\n") {
+      addToast($i18n.t('toast.uploading_mirte_scripts'), 'info', 'connection-status')
+      try {
+        await this.uploadMIRTEapi()
+        //await this.transport.write('\x04') // CTRL-D (soft reboot)
+      } catch (error) {
+        addToast($i18n.t('toast.uploading_mirte_scripts_error'), 'error', 'connection-status')
+      }
+    }
+    await this.loadSettings()
+  }
 
+  async loadSettings() {
     // read settings from MCU
     const file = await this.fs.readFile("settings.yaml")
-    const settings = YAML.load(file)
+    const settings = JSON.parse(file)
     this.peripheralStore.setPeripherals(settings)
   }
 
@@ -45,22 +68,30 @@ export class MCUDevice {
     await this.fs.writeLine(cmd)
   }
 
-  async startCode() {
-    await this.uploadFile('/mirte.py', useCodeStore().python)
+  async startCode(toast = false) {
+    const { addToast, removeToast } = useToast()
+    const { $i18n } = useNuxtApp()
     useState("programming-state").value = "running";
-    await this.runCommand('\x04') // soft reboot
+    if (toast) { addToast($i18n.t('toast.uploading_code'), 'info', 'uploading-user-code') }
+    await this.uploadFile('/mirte.py', useCodeStore().python)
+    if (toast) { removeToast('uploading-user-code') }
+    await this.runCommand('run()\n') // imported from main.py
   }
 
   async stopCode() {
     await this.runCommand("\x03"); // CTRL-C
-    useState("programming-state").value = "idle";
   }
 
   async uploadMIRTEapi() {
     // adding main.py, and mirte_robot files
     await this.uploadFile("/main.py", pythonMainCode)
+
     // numbers.py this is needed for generated blockly varibale change by block
-    await this.uploadFile("/numbers.py", pythonNumbersCode) 
+    await this.uploadFile("/numbers.py", pythonNumbersCode)
+    await this.uploadFile("/settings.yaml", "")
+    await this.uploadFile("/mirte.py", "")
+
+    // MIRTE python api
     await this.fs.mkdir("mirte_robot")
     await this.uploadFile("/mirte_robot/robot.py", pythonRobotCode)
     await this.uploadFile("/mirte_robot/__main__.py", "")
@@ -68,6 +99,15 @@ export class MCUDevice {
     await this.uploadFile("/hcsr04.py", pythonDistanceCode) 
 
     useState("programming-state").value = "idle"
+
+    // BLE api
+    await this.fs.mkdir("ble")
+    await this.uploadFile("/ble/ble_advertising.py", bleAdvertisingCode)
+    await this.uploadFile("/ble/ble_uart_peripheral.py", blePeripheralCode)
+    await this.uploadFile("/ble/ble_uart_repl.py", bleREPLCode)
+    await this.uploadFile("/ble/__main__.py", "")
+    await this.uploadFile("/boot.py", bootCode)
+
   }
 
 }
