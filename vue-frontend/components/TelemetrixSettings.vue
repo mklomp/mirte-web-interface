@@ -1,4 +1,5 @@
 <template>
+
   <div class="row h-100">
     <div class="col-12 h-100">
       <div class="layoutbox rounded h-100 d-flex flex-column">
@@ -7,7 +8,7 @@
         <div class="text-white p-2 h3 layoutbox-title background-secondary">
           {{ $t("settings.wiring") }}
 
-          <button @click="save" class="btn btn-mirte float-end" :disabled="!isConnected">
+          <button @click="save" class="btn btn-mirte float-end">
             {{ $t("settings.save") }}
           </button>
         </div>
@@ -31,7 +32,7 @@
             <thead>
               <tr>
                 <th>
-                  <div class="dropdown" :disabled="!isConnected">
+                  <div class="dropdown">
                     <button class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
                       {{ $t("settings.add") }}
                     </button>
@@ -67,47 +68,46 @@
 <script setup>
 import { ref, watch } from "vue"
 
+
 import properties_ph from "~/assets/json/properties_ph.json"
 import properties_mc from "~/assets/json/properties_mc.json"
 
 import { useWiring } from "~/composables/useWiring"
+import { usePeripheralStore } from '@/stores/peripherals'
 
 import PeripheralRow from "~/components/PeripheralRow.vue"
 
 const peripheralsDef = properties_ph
 const microcontrollers = properties_mc
+const peripheralStore = usePeripheralStore()
 
 const {
   state,
   addPeripheral,
   removePeripheral,
   getValidPins,
-  loadFromYAML,
-  saveYAML
+  JSONtoUI,
+  saveJSON
 } = useWiring(peripheralsDef, microcontrollers)
 
-const peripheralsSetting = useState("peripheral-settings")
 const connectionStore = useConnectionStore()
-const isConnected = computed(() => connectionStore.status === "connected")
 
 function isUsableMC(name){
   return name === "pico"
 }
 
 function isUsablePeripheral(key){
-  return connectionStore.status == "connected" && ['motor', 'intensity', 'servo', 'keypad', 'distance'].includes(key)
+  return ['motor', 'intensity', 'servo', 'keypad', 'distance'].includes(key)
 }
 
 onMounted(() => {
-  if (connectionStore.status == "connected") {
-    loadFromYAML(peripheralsSetting.value)
-  }
+  peripheralStore.loadFromLocalStorage()
 })
 
 watch(
-  peripheralsSetting,
+  peripheralStore,
   (val) => {
-    if (val) loadFromYAML(val)
+    if (val) JSONtoUI(val.peripherals)
   }
 )
 
@@ -115,7 +115,7 @@ const busy = ref(false)
 
 async function save() {
   busy.value = true
-  await saveYAML()
+  await saveJSON()
   //location.reload()
 }
 </script>

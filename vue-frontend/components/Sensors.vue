@@ -27,7 +27,7 @@
 <script>
 
 import properties_ph from "../assets/json/properties_ph.json"
-import { useRosStore } from '~/stores/ros_params'
+import { usePeripheralStore } from '~/stores/peripherals'
 import { storeToRefs } from 'pinia'
 import { watch, reactive } from 'vue'
 import * as ROSLIB from 'roslib'
@@ -60,8 +60,8 @@ export default {
   },
 
   mounted() {
-    const rosStore = useRosStore()
-    const { peripherals: storePeripherals } = storeToRefs(rosStore)
+    const peripheralsStore = usePeripheralStore()
+    const { peripherals: storePeripherals } = storeToRefs(peripheralsStore)
     const { $ros } = useNuxtApp() // get ros from plugin
 
     // Watch the Pinia store for peripherals being set

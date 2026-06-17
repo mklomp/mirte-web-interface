@@ -1,5 +1,5 @@
 import { ref } from "vue"
-import * as YAML from 'js-yaml'
+import { usePeripheralStore } from '@/stores/peripherals'
 
 export type PeripheralInstance = {
   id: string
@@ -9,6 +9,11 @@ export type PeripheralInstance = {
 }
 
 export function useWiring(peripheralsDef: any, microcontrollers: any) {
+
+  const connectionStore = useConnectionStore()
+  const peripheralStore = usePeripheralStore()
+  const isConnected = connectionStore.status === "connected"
+
   const state = ref({
     board: "pico",
     type: "breadboard",
@@ -47,6 +52,60 @@ export function useWiring(peripheralsDef: any, microcontrollers: any) {
     return pinMap.map(([value]) => ({ value, text: value }))
   }
 
+
+  async function saveYAML() {
+
+    const json = UItoJSON()
+    const yaml = YAML.dump(json)
+
+    if (isConnected) {
+      const { uploadFile } = useConnection()
+      await uploadFile('/settings.yaml', yaml)
+
+      // but also store the json equivalent to be
+      // used by mircopython
+      await uploadFile('/.settings.json', JSON.stringify(json, null, 2))
+    }
+  }
+
+  async function saveJSON() {
+    const json = UItoJSON()
+
+    // locally save the settings
+    peripheralStore.setPeripherals(json)
+
+    // and store to the 
+    if (isConnected) {
+      const { uploadFile } = useConnection()
+      await uploadFile('/.settings.json', JSON.stringify(json, null, 2))
+    }
+  }
+
+
+  function UItoJSON() {
+    const result: any = {
+      device: {
+        mirte: {
+          type: state.value.type,
+          board: state.value.board,
+        },
+      },
+    }
+
+    for (const p of state.value.peripherals) {
+      if (!result[p.type]) result[p.type] = {}
+
+      result[p.type][p.name] = {
+        name: p.name,
+        device: "mirte",
+        pins: p.pins,
+      }
+    }
+
+    return result
+  }
+
+
   function loadFromYAML(data: any) {
     const list: PeripheralInstance[] = []
 
@@ -73,42 +132,8 @@ export function useWiring(peripheralsDef: any, microcontrollers: any) {
     state.value.peripherals = list
   }
 
-  async function saveYAML(){
-
-    const { uploadFile } = useConnection()
-    const json = toJSON()
-    const yaml = YAML.dump(json)
-    await uploadFile('/settings.yaml', yaml)
-
-    // but also store the json equivalent to be
-    // used by mircopython
-    await uploadFile('/.settings.json', JSON.stringify(json, null, 2))
-    
-    // modify the used state (TODO: or should this be in Device?)
-    useState("peripheral-settings").value = yaml
-  }
-
-  function toJSON() {
-    const result: any = {
-      device: {
-        mirte: {
-          type: state.value.type,
-          board: state.value.board,
-        },
-      },
-    }
-
-    for (const p of state.value.peripherals) {
-      if (!result[p.type]) result[p.type] = {}
-
-      result[p.type][p.name] = {
-        name: p.name,
-        device: "mirte",
-        pins: p.pins,
-      }
-    }
-
-    return result
+  function JSONtoUI(input: any) {
+    loadFromYAML(input)
   }
 
   return {
@@ -118,5 +143,7 @@ export function useWiring(peripheralsDef: any, microcontrollers: any) {
     getValidPins,
     loadFromYAML,
     saveYAML,
+    saveJSON,
+    JSONtoUI
   }
 }

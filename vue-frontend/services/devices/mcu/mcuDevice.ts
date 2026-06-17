@@ -17,14 +17,15 @@ import * as YAML from 'js-yaml'
 // - runnning mirte.py (while loop)
 // - raw REPL (only theoretically, since we do not set it)
 
+import { usePeripheralStore } from '@/stores/peripherals'
 
 export class MCUDevice {
   fs
-  repl
+  peripheralStore
 
   constructor(private transport) {
     this.fs = new MicroPythonFS(transport)
-    //this.repl = new MicroPythonREPL(transport)
+    this.peripheralStore = usePeripheralStore()
   }
 
   async initialize() {
@@ -33,7 +34,7 @@ export class MCUDevice {
     // read settings from MCU
     const file = await this.fs.readFile("settings.yaml")
     const settings = YAML.load(file)
-    useState("peripheral-settings").value = settings
+    this.peripheralStore.setPeripherals(settings)
   }
 
   async uploadFile(path, content) {

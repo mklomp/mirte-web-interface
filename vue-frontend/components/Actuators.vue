@@ -249,8 +249,8 @@ export default {
   },
   mounted(){
 
-    const rosStore = useRosStore()
-    const { peripherals: storePeripherals } = storeToRefs(rosStore)
+    const peripheralStore = usePeripheralStore()
+    const { peripherals: storePeripherals } = storeToRefs(peripheralStore)
     const { $ros } = useNuxtApp() // get ros from plugin
 
     watch(

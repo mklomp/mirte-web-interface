@@ -3,6 +3,7 @@ import { useLocalePath } from '#i18n'
 const localePath = useLocalePath()
 const head = useLocaleHead()
 const connectionStore = useConnectionStore()
+const peripheralStoreStore = usePeripheralStore()
 
 onMounted(async () => {
   // autoconnect if there are existing connections 
@@ -11,6 +12,8 @@ onMounted(async () => {
   if (ports.length > 0 && connectionStore.status == "connected") {
     await useConnection().connect("mcu", true)
   }
+
+  peripheralStoreStore.loadFromLocalStorage()
 })
 
 useState('programming-state', () => "initializing") // ready (todo: rename idle), running, paused

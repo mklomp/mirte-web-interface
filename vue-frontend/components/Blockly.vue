@@ -11,7 +11,7 @@ import { pythonGenerator } from "blockly/python"
 // Import custom items
 import { getToolbox } from '@/assets/blockly/toolbox'
 import { useCodeStore } from "@/stores/user_code"
-import { useRosStore } from '@/stores/ros_params'
+import { usePeripheralStore } from '@/stores/peripherals'
 import { useConnectionStore } from "@/stores/connection"
 
 import CustomNl from "@/locales/nl.json"
@@ -28,9 +28,8 @@ const customBlockModules = import.meta.glob('@/assets/blockly/*.js', { eager: tr
 
 const { locale } = useI18n()
 const codeStore = useCodeStore()
-const rosStore = useRosStore()
+const peripheralStore = usePeripheralStore()
 const connectionStore = useConnectionStore()
-const settingsState = useState("peripheral-settings");
 
 // Blockly state
 let workspaceDOM = null
@@ -56,9 +55,10 @@ function addToToolbox(type, item) {
 
 function loadCustomModules(settings) {
 
-  if (connectionStore.compute_type == "sbc" && Object.keys(rosStore.peripherals).length == 0) return
+  if (connectionStore.compute_type == "sbc" && Object.keys(peripheralStore.peripherals).length == 0) return
   if (connectionStore.compute_type == "mcu" && connectionStore.status != "connected") return
 
+  toolBox = getToolbox()
   for (const module of Object.values(customBlockModules)) {
     const module_type = module.getType()
     let dropdown_instances = []
@@ -135,10 +135,10 @@ function restoreWorkspace() {
 // - First time (with nothing in localStorage)
 // - At a language/rosstate change
 // - After refresh (or any revisit, so with something in localStorage)
-function initBlockly(reason = "") {
+function initBlockly(reason = "clean") {
 
   // Set workspaceDOM from previous session
-  if (codeStore.blockly && (Object.keys(rosStore.peripherals).length != 0 || connectionStore.status == "connected")) {
+  if (codeStore.blockly && (Object.keys(peripheralStore.peripherals).length != 0 || connectionStore.status == "connected")) {
     workspaceDOM = Blockly.utils.xml.textToDom(codeStore.blockly)
   }
 
@@ -148,7 +148,7 @@ function initBlockly(reason = "") {
   }
 
   // Clear workspace on any change
-  if (reason != "") {
+  if (reason != "clean") {
     workspace.dispose()
   }
 
@@ -211,7 +211,8 @@ function initBlockly(reason = "") {
 }
 
 onMounted(() => {
-  loadCustomModules(settingsState.value)
+  peripheralStore.loadFromLocalStorage()
+  loadCustomModules(peripheralStore.peripherals)
   codeStore.loadFromLocalStorage()
   initBlockly()
 })
@@ -242,13 +243,6 @@ watch(() => codeStore.active, (newVal) => {
   }
 })
 
-watch(settingsState, (newState) => {
-  // TODO: check if this is working at all. does not seem to work
-  // when settings change due to connecting
-  loadCustomModules(newState)
-  initBlockly("serial_connection")
-})
-
 watch(() => connectionStore.status, (newStatus) => {
   if (newStatus == "disconnected") {
     suppressStore = true
@@ -260,11 +254,6 @@ watch(() => connectionStore.status, (newStatus) => {
       suppressStore = false
     }, 50)
   }
-})
-
-watch(() => rosStore.peripherals, () => {
-  loadCustomModules()
-  initBlockly("ros_change")
 })
 
 watch(() => codeStore.reinit_blockly, () => {
