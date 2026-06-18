@@ -54,10 +54,26 @@ export class MCUDevice {
   }
 
   async loadSettings() {
+    const { addToast } = useToast()
+    const { $i18n } = useNuxtApp()
+
     // read settings from MCU
-    const file = await this.fs.readFile("settings.yaml")
-    const settings = JSON.parse(file)
-    this.peripheralStore.setPeripherals(settings)
+    const file = await this.fs.readFile(".settings.json")
+    let settings = {}
+    if (file.trim() !== "") { settings = JSON.parse(file) }
+
+    // TODO: this needs to be a userchoice
+    if (this.peripheralStore.peripherals == {}) {
+      this.peripheralStore.setPeripherals(settings)
+      addToast($i18n.t('toast.downloading_mirte_config'), 'info')
+    } else {
+      if (JSON.stringify(this.peripheralStore.peripherals) !== JSON.stringify(settings)) {
+        addToast($i18n.t('toast.downloading_mirte_config_error'), 'error')
+        this.peripheralStore.setPeripherals(settings)
+      }
+    }
+
+
   }
 
   async uploadFile(path, content) {
@@ -88,7 +104,7 @@ export class MCUDevice {
 
     // numbers.py this is needed for generated blockly varibale change by block
     await this.uploadFile("/numbers.py", pythonNumbersCode)
-    await this.uploadFile("/settings.yaml", "")
+    await this.uploadFile("/.settings.json", "")
     await this.uploadFile("/mirte.py", "")
 
     // MIRTE python api
@@ -96,7 +112,7 @@ export class MCUDevice {
     await this.uploadFile("/mirte_robot/robot.py", pythonRobotCode)
     await this.uploadFile("/mirte_robot/__main__.py", "")
     // add peripherals (TODO: only when in code)
-    await this.uploadFile("/hcsr04.py", pythonDistanceCode) 
+    await this.uploadFile("/hcsr04.py", pythonDistanceCode)
 
     useState("programming-state").value = "idle"
 

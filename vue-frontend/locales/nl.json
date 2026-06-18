@@ -124,6 +124,7 @@
   },
   "toast": {
     "saved_settings_success": "Instellingen opgeslagen.",
+    "saved_settings_locally": "Geen verbonden device. Instellingen alleen lokaal opgeslagen.",
     "ble_connecting": "Verbinden met Bluetooth.....",
     "ble_not_supported": "Web Bluetooth wordt niet onderstuend in deze browser.",
     "ble_gatt_unavaiable": "Bluetooth GATT niet gevonden.",
@@ -141,6 +142,8 @@
     "connected": "Verbonden met robot.",
     "uploading_code": "Code versturen naar robot....",
     "uploading_mirte_scripts": "Installeert MIRTE scripts.",
-    "uploading_mirte_scripts_error": "Fout tijdens installeren van MIRTE scripts."
+    "uploading_mirte_scripts_error": "Fout tijdens installeren van MIRTE scripts.",
+    "downloading_mirte_config_error": "Verbonden device heeft een andere instellingen, die van de device wordt gebruikt.",
+    "downloading_mirte_config": "Instellingen geladen van device."
   }
 }

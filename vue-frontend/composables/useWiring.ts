@@ -58,7 +58,7 @@ export function useWiring(peripheralsDef: any, microcontrollers: any) {
     const json = UItoJSON()
     const yaml = YAML.dump(json)
 
-    if (isConnected) {
+    if (connectionStore.status == "connected") {
       const { uploadFile } = useConnection()
       await uploadFile('/settings.yaml', yaml)
 
@@ -70,16 +70,20 @@ export function useWiring(peripheralsDef: any, microcontrollers: any) {
 
   async function saveJSON() {
     const json = UItoJSON()
+    const { addToast } = useToast()
+    const { $i18n } = useNuxtApp()
 
     // locally save the settings
     peripheralStore.setPeripherals(json)
 
-    // and store to the 
-    if (isConnected) {
-      const { addToast } = useToast()
+    // and store to the robot
+    if (connectionStore.status == "connected") {
+
       const { uploadFile } = useConnection()
       await uploadFile('/.settings.json', JSON.stringify(json, null, 2))
-      addToast( $i18n.t('toast.saved_settings_success'), 'success', 'upload-settings')
+      addToast($i18n.t('toast.saved_settings_success'), 'success', 'save-settings')
+    } else {
+      addToast($i18n.t('toast.saved_settings_locally'), 'info', 'save-settings')
     }
   }
 
@@ -109,7 +113,7 @@ export function useWiring(peripheralsDef: any, microcontrollers: any) {
 
 
   function loadFromYAML(data: any) {
-    
+
     const list: PeripheralInstance[] = []
 
     // device info

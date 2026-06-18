@@ -90,11 +90,11 @@ function redo() {
             </div>
 
             <div class="layoutbox-content" style="flex: 1 1 auto; min-height: 0; padding: 0; margin: 0;">
-               <div v-if="isBlockly" class="h-100">
+               <div v-show="isBlockly" class="h-100">
                   <Blockly ref="blocklyEditor" />
                </div>
 
-               <div v-if="!isBlockly" class="h-100">
+               <div v-show="!isBlockly" class="h-100">
                   <Codemirror ref="pythonEditor" />
                </div>
             </div>

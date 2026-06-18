@@ -12,7 +12,6 @@ import { pythonGenerator } from "blockly/python"
 import { getToolbox } from '@/assets/blockly/toolbox'
 import { useCodeStore } from "@/stores/user_code"
 import { usePeripheralStore } from '@/stores/peripherals'
-import { useConnectionStore } from "@/stores/connection"
 
 import CustomNl from "@/locales/nl.json"
 import CustomEn from "@/locales/en.json"
@@ -29,7 +28,6 @@ const customBlockModules = import.meta.glob('@/assets/blockly/*.js', { eager: tr
 const { locale } = useI18n()
 const codeStore = useCodeStore()
 const peripheralStore = usePeripheralStore()
-const connectionStore = useConnectionStore()
 const isMounted = ref(false)
 
 
@@ -56,9 +54,6 @@ function addToToolbox(type, item) {
 }
 
 function loadCustomModules(settings) {
-
-  if (connectionStore.compute_type == "sbc" && Object.keys(peripheralStore.peripherals).length == 0) return
-  if (connectionStore.compute_type == "mcu" && connectionStore.status != "connected") return
 
   // start with a clean toolbox
   toolBox = getToolbox()
@@ -139,12 +134,13 @@ function restoreWorkspace() {
 
 // There are three options that this function can be called:
 // - First time (with nothing in localStorage)
-// - At a language/rosstate change
+// - At a language/settings change
 // - After refresh (or any revisit, so with something in localStorage)
+// STATES: keep state (flyout, blokcl location, zoomlevel) or not
 function initBlockly(reason = "clean") {
 
   // Set workspaceDOM from previous session
-  if (codeStore.blockly && connectionStore.status == "connected") {
+  if (codeStore.blockly) {
     workspaceDOM = Blockly.utils.xml.textToDom(codeStore.blockly)
   } else {
     workspaceDOM = null
@@ -235,6 +231,7 @@ onBeforeUnmount(() => {
   Blockly.hideChaff()
 })
 
+// When user changes locale
 watch(locale, () => {
   initBlockly("lang_change")
 })
@@ -243,6 +240,7 @@ watch(locale, () => {
 // need to do Blockly.resizeSvg() in these two watches.
 // Only the lang_change, really needs a re-init of the
 // whole blockly workspace.
+/*
 watch(() => codeStore.active, (newVal) => {
   // TODO: check if this is working at all. does not seem to work
   // when settings change due to connecting
@@ -252,14 +250,12 @@ watch(() => codeStore.active, (newVal) => {
     })
   }
 })
+*/
 
-watch(() => connectionStore.status, (newStatus) => {
-  if (isMounted.value) {
-    if (newStatus == "disconnected") {
-      loadCustomModules()
-    }
-    initBlockly("serial_connection")
-  }
+// When in Blocky, and user connects (ie settings change)
+watch(() => peripheralStore.peripherals, (newStatus) => {
+  loadCustomModules(peripheralStore.peripherals)
+  initBlockly("tab_change")
 })
 
 // TODO: we need to rethink if we really need codeStore changes.

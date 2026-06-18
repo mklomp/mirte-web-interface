@@ -13,8 +13,7 @@ const editorContainer = ref(null)
 let editor = null // could not be ref due to undo/redo
 let suppressStore = false
 const codeStore = useCodeStore()
-const connectionStore = useConnectionStore()
-let pythonCode = (connectionStore.status == "connected") ? codeStore.python : ""
+let pythonCode = codeStore.python
 
 function undoAction() {
   undo(editor)
@@ -51,7 +50,7 @@ watch(
   () => codeStore.python,
   (newCode) => {
 
-    if (!editor || connectionStore.status != "connected") return
+    if (!editor) return
 
     const current = editor.state.doc.toString()
 
@@ -66,27 +65,6 @@ watch(
     }
   }
 )
-
-watch(() => connectionStore.status, () => {
-  if (!editor) return
-
-  let code = ""
-  if (connectionStore.status == "connected") {
-    code = codeStore.python
-  }
-
-  suppressStore = true
-
-  editor.dispatch({
-    changes: {
-      from: 0,
-      to: editor.state.doc.length,
-      insert: code
-    }
-  })
-
-  suppressStore = false
-})
 
 defineExpose({
   undoAction,

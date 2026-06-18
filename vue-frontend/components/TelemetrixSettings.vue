@@ -97,7 +97,7 @@ function isUsableMC(name) {
 }
 
 function isUsablePeripheral(key){
-  return ['motor', 'intensity', 'servo', 'keypad', 'distance'].includes(key)
+  return ['motor', 'intensity', 'servo', 'keypad', 'distance', 'line', 'object'].includes(key)
 }
 
 onMounted(() => {
