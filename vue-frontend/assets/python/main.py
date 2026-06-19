@@ -11,6 +11,7 @@ def stop():
 def run():
   try:  
     print("__START__")
+    print("----STARTED----")
     exec(open('./mirte.py').read(),globals())
   except KeyboardInterrupt:
     stop()
@@ -21,6 +22,7 @@ def run():
   finally:
     if 'main.py' in os.listdir():
       stop()
+      print("----STOPPED----") #user info
       print("__STOP__")
 
 # Note that web interface is killing this script
