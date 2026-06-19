@@ -54,7 +54,6 @@ export class SerialTransport {
         return {connected: false}
       }
     }
-    addToast($i18n.t('toast.usb_connecting'), 'info', 'connection-status')
 
     // Nicely disconnect when a USB cable was unplugged
     this.disconnectHandler = () => {

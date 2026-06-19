@@ -136,7 +136,6 @@
     "usb_unable_connect_known_connection": "Unable to connect to known connections.",
     "usb_no_device_selected": "No devices selected. Make sure MicroPython is installed, and the robot is plugged in.",
     "usb_unable_to_open_device": "Unable to open device. Make sure the device is not connected in another program by replugging the USB cable.",
-    "usb_connecting": "Connecting to USB.....",
     "usb_disconnected": "USB disconnected",
     "automatically_connected": "Automatically connected to known robot.",
     "connected": "Connected to robot.",
