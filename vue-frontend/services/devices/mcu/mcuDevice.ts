@@ -57,19 +57,24 @@ export class MCUDevice {
     const { addToast } = useToast()
     const { $i18n } = useNuxtApp()
 
-    // read settings from MCU
+    // read settings from MCU and local
     const file = await this.fs.readFile(".settings.json")
-    let settings = {}
-    if (file.trim() !== "") { settings = JSON.parse(file) }
+    let robotSettings = {}
+    if (file.trim() !== "") { robotSettings = JSON.parse(file) }
+    const localsettings = this.peripheralStore.peripherals
 
     // TODO: this needs to be a userchoice
-    if (this.peripheralStore.peripherals == {}) {
-      this.peripheralStore.setPeripherals(settings)
-      addToast($i18n.t('toast.downloading_mirte_config'), 'info')
-    } else {
-      if (JSON.stringify(this.peripheralStore.peripherals) !== JSON.stringify(settings)) {
-        addToast($i18n.t('toast.downloading_mirte_config_error'), 'error')
-        this.peripheralStore.setPeripherals(settings)
+    if (Object.keys(robotSettings).length > 1) { // robot settings are not empty
+      if (Object.keys(localsettings).length < 2) { // local setting is empty or just "device"
+        // save the robot settings to local settings
+        this.peripheralStore.setPeripherals(robotSettings)
+        addToast($i18n.t('toast.downloading_mirte_config'), 'info')
+      } else { // localsettings is not empty
+        if (JSON.stringify(localsettings) !== JSON.stringify(robotSettings)) { // local and robot setting are not the same
+          // save the robot settings to local settings
+          addToast($i18n.t('toast.downloading_mirte_config_error'), 'error')
+          this.peripheralStore.setPeripherals(robotSettings)
+        }
       }
     }
 
