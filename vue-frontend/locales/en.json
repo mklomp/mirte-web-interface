@@ -144,7 +144,8 @@
     "uploading_mirte_scripts": "Installing MIRTE scripts.",
     "uploading_mirte_scripts_error": "Failed to install MIRTE scripts.",
     "downloading_mirte_config_error": "Connected device has different settings than local, using the one from connected device",
-    "downloading_mirte_config": "Settings loaded from device"
+    "downloading_mirte_config": "Settings loaded from device",
+    "loading_blocks_error": "Found blocks that are not in settings. Cleared your workspace."
   },
   "modals": {
     "load-settings": {

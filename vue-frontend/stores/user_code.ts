@@ -26,6 +26,10 @@ export const useCodeStore = defineStore('user_code', {
     setActive(value) {
       this.active = value
       localStorage.setItem('active', value)
+    },
+    clear(){
+      this.setPython("")
+      this.setBlockly("")
     }
   }
 })

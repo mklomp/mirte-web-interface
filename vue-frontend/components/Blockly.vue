@@ -15,6 +15,7 @@ import { usePeripheralStore } from '@/stores/peripherals'
 
 import CustomNl from "@/locales/nl.json"
 import CustomEn from "@/locales/en.json"
+const { t } = useI18n()
 
 // Blockly languages
 import * as En from 'blockly/msg/en'
@@ -27,6 +28,7 @@ const customBlockModules = import.meta.glob('@/assets/blockly/*.js', { eager: tr
 
 const { locale } = useI18n()
 const codeStore = useCodeStore()
+const { addToast } = useToast()
 const peripheralStore = usePeripheralStore()
 const isMounted = ref(false)
 
@@ -126,7 +128,14 @@ function saveWorkspace() {
 function restoreWorkspace() {
   if (!workspaceDOM) return
 
-  Blockly.Xml.domToWorkspace(workspaceDOM, workspace)
+  try {
+    Blockly.Xml.domToWorkspace(workspaceDOM, workspace)
+  } catch{
+    // TODO: this needs to be a userchoice
+    addToast(t('toast.loading_blocks_error'), 'error')
+    codeStore.clear()
+    initBlockly()
+  }
   workspace.setScale(scale)
   workspace.scroll(scrollX, scrollY)
   workspace.getToolbox().setSelectedItem(flyout_visible)
