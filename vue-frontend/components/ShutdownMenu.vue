@@ -6,6 +6,7 @@ const connectionStore = useConnectionStore()
 const { connect, disconnect } = useConnection()
 
 const isConnected = computed(() => connectionStore.status == "connected")
+const connectionType = computed(() => connectionStore.device)
 
 const { t } = useI18n()
 
@@ -39,12 +40,13 @@ function shutdown() {
   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="localeDropdown">
     <li>
       <button class="dropdown-item" @click="connect('mcu', 'serial')" :disabled="mounted && isConnected">
-        USB
+        USB <ClientOnly><FontAwesomeIcon v-if="isConnected && connectionType == 'serial'" icon="check"/></ClientOnly>
       </button>
+      
     </li>
     <li>
       <button class="dropdown-item" @click="connect('mcu', 'ble')" :disabled="mounted && isConnected">
-        Bluetooth
+        Bluetooth <ClientOnly><FontAwesomeIcon v-if="isConnected && connectionType == 'ble'" icon="check"/></ClientOnly>
       </button>
     </li>
 
