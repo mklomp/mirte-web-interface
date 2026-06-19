@@ -20,7 +20,8 @@ html, body {
 }
 
 main {
-  margin-top: 82px; // account for fixed navbar
+  margin-top: 80px; // account for fixed navbar
+  position: relative;
 }
 
 footer {

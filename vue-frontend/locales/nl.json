@@ -145,5 +145,18 @@
     "uploading_mirte_scripts_error": "Fout tijdens installeren van MIRTE scripts.",
     "downloading_mirte_config_error": "Verbonden device heeft een andere instellingen, die van de device wordt gebruikt.",
     "downloading_mirte_config": "Instellingen geladen van device."
+  },
+  "modals": {
+    "load-settings": {
+      "recommended": "aanbevolen",
+      "welcome-title": "Welkom bij MIRTE",
+      "welcome-text": "Hoe wil je aan de slag?",
+      "mirte-title": "Standaard MIRTE",
+      "mirte-text": "Gebruik de aanbevolen instellingen voor de MIRTE Basic",
+      "custom-title": "Eigen instellingen",
+      "custom-text": "Configureer je eigen hardware instellingen",
+      "connect-title": "Laden van de Robot",
+      "connect-text":"Laad de instellingen rechtsreeks van je robot"
+    }
   }
 }

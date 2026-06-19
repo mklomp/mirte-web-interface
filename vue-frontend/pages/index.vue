@@ -9,15 +9,32 @@ useHead({
    ]
 })
 
+
+import { usePeripheralStore } from '@/stores/peripherals'
+import { useConnectionStore } from '@/stores/connection'
+import { useModal } from '~/composables/useModal'
+import IntroModal from '~/components/modals/intro.vue'
 import { useCodeStore } from "@/stores/user_code"
+
+
+const connectionStore = useConnectionStore()
+const { openModal, closeModal } = useModal()
 const codeStore = useCodeStore()
+const peripheralStore = usePeripheralStore()
 
 const isBlockly = ref(true)
 const blocklyEditor = ref(null)
 const pythonEditor = ref(null)
 
 onMounted(() => {
-   isBlockly.value = codeStore.active == "blockly"
+  isBlockly.value = codeStore.active == "blockly"
+  const settings = peripheralStore.peripherals
+
+  if (Object.keys(settings).length < 2) { // none or "devices"
+    openModal(IntroModal)
+  } else {
+    closeModal()
+  }
 })
 
 watch(() => codeStore.active, (newVal) => {
@@ -44,7 +61,7 @@ function redo() {
 </script>
 
 <template>
-
+   <ModalContainer />
 
    <div class="row p-4 h-100">
 

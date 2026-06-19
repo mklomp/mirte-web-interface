@@ -145,5 +145,18 @@
     "uploading_mirte_scripts_error": "Failed to install MIRTE scripts.",
     "downloading_mirte_config_error": "Connected device has different settings than local, using the one from connected device",
     "downloading_mirte_config": "Settings loaded from device"
+  },
+  "modals": {
+    "load-settings": {
+      "recommended": "recommended",
+      "welcome-title": "Welcome to MIRTE",
+      "welcome-text": "How would you like to get started?",
+      "mirte-title": "Default MIRTE",
+      "mirte-text": "Use the recommended settings for the MIRTE Basic",
+      "custom-title": "Custom settings",
+      "custom-text": "Configure your own hardware",
+      "connect-title": "Load from Robot",
+      "connect-text":"Load settings directly from your robot"
+    }
   }
 }

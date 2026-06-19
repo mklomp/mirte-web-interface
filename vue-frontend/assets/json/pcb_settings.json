@@ -1,0 +1,103 @@
+{
+  "device": {
+    "mirte": {
+      "type": "breadboard",
+      "board": "pico"
+    }
+  },
+  "servo": {
+    "two": {
+      "name": "two",
+      "device": "mirte",
+      "pins": {
+        "pin": "GP15"
+      }
+    },
+    "one": {
+      "name": "one",
+      "device": "mirte",
+      "pins": {
+        "pin": "GP14"
+      }
+    }
+  },
+  "object": {
+    "right": {
+      "name": "right",
+      "device": "mirte",
+      "pins": {
+        "digital": "GP12"
+      }
+    },
+    "left": {
+      "name": "left",
+      "device": "mirte",
+      "pins": {
+        "digital": "GP13"
+      }
+    }
+  },
+  "keypad": {
+    "yellow": {
+      "name": "yellow",
+      "device": "mirte",
+      "pins": {
+        "pin": "GP28"
+      }
+    }
+  },
+  "distance": {
+    "right": {
+      "name": "right",
+      "device": "mirte",
+      "pins": {
+        "trigger": "GP7",
+        "echo": "GP6"
+      }
+    },
+    "left": {
+      "name": "left",
+      "device": "mirte",
+      "pins": {
+        "trigger": "GP9",
+        "echo": "GP8"
+      }
+    }
+  },
+  "line": {
+    "left": {
+      "name": "left",
+      "device": "mirte",
+      "pins": {
+        "digital": "GP17",
+        "analog": "GP27"
+      }
+    },
+    "right": {
+      "name": "right",
+      "device": "mirte",
+      "pins": {
+        "digital": "GP16",
+        "analog": "GP26"
+      }
+    }
+  },
+  "motor": {
+    "left": {
+      "name": "left",
+      "device": "mirte",
+      "pins": {
+        "p1": "GP18",
+        "p2": "GP19"
+      }
+    },
+    "right": {
+      "name": "right",
+      "device": "mirte",
+      "pins": {
+        "p1": "GP20",
+        "p2": "GP21"
+      }
+    }
+  }
+}
