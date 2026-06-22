@@ -69,8 +69,6 @@ export class ConnectionManager {
       // "__STOP__": detecting when execution stopped (see main.py)
       this.transport?.onData((data) => {
 
-        if (!this.term) return
-
         this.buffer += data
 
         // detecting heartbeat __HB__, and removing if found
