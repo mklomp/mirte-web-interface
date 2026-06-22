@@ -145,7 +145,7 @@ export class BLETransport {
     const connectionStore = useConnectionStore()
 
     if (connectionLost) {
-      $i18n.t('toast.ble_disonnected')
+      $i18n.t('toast.ble_disconnected')
       addToast($i18n.t('toast.ble_connection_lost'), 'error', 'connection-status')
       connectionStore.setConnectionStatus('disconnected')
     }
