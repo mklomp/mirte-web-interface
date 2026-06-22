@@ -28,14 +28,19 @@ const pythonEditor = ref(null)
 
 onMounted(() => {
   isBlockly.value = codeStore.active == "blockly"
-  const settings = peripheralStore.peripherals
-
-  if (Object.keys(settings).length < 2) { // none or "devices"
-    openModal(IntroModal)
-  } else {
-    closeModal()
-  }
 })
+
+watch(
+  () => peripheralStore.peripherals,
+  (settings) => {
+    if (Object.keys(settings).length < 2) {
+      openModal(IntroModal)
+    } else {
+      closeModal()
+    }
+  },
+  { deep: true, immediate: true }
+)
 
 watch(() => codeStore.active, (newVal) => {
    isBlockly.value = newVal == "blockly"

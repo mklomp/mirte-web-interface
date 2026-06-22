@@ -58,13 +58,19 @@ export class MCUDevice {
     const { $i18n } = useNuxtApp()
 
     // read settings from MCU and local
-    const file = await this.fs.readFile(".settings.json")
+    const file = await this.downloadFile(".settings.json")
     let robotSettings = {}
     if (file.trim() !== "") { robotSettings = JSON.parse(file) }
     const localsettings = this.peripheralStore.peripherals
 
-    // TODO: this needs to be a userchoice
-    if (Object.keys(robotSettings).length > 1) { // robot settings are not empty
+    if (Object.keys(robotSettings).length < 2) { // robot settings are empty or just "device"
+      if (Object.keys(localsettings).length < 2) { // local setting is empty or just "device"
+        // NOP
+      } else {
+        // upload localSettings to robotSettings
+        this.uploadFile(".settings.json", JSON.stringify(localsettings))
+      }
+    } else {
       if (Object.keys(localsettings).length < 2) { // local setting is empty or just "device"
         // save the robot settings to local settings
         this.peripheralStore.setPeripherals(robotSettings)
@@ -79,6 +85,11 @@ export class MCUDevice {
     }
 
 
+  }
+
+  async downloadFile(file){
+    const data = await this.fs.readFile(file)
+    return data
   }
 
   async uploadFile(path, content) {
