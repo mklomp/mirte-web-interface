@@ -60,7 +60,14 @@ export class MCUDevice {
     // read settings from MCU and local
     const file = await this.downloadFile(".settings.json")
     let robotSettings = {}
-    if (file.trim() !== "") { robotSettings = JSON.parse(file) }
+    if (file.trim() !== "") {
+      try {
+        robotSettings = JSON.parse(file)
+      } catch {
+        addToast($i18n.t('toast.downloading_mirte_config_error'), 'error')
+      }
+    }
+
     const localsettings = this.peripheralStore.peripherals
 
     if (Object.keys(robotSettings).length < 2) { // robot settings are empty or just "device"
@@ -78,7 +85,7 @@ export class MCUDevice {
       } else { // localsettings is not empty
         if (JSON.stringify(localsettings) !== JSON.stringify(robotSettings)) { // local and robot setting are not the same
           // save the robot settings to local settings
-          addToast($i18n.t('toast.downloading_mirte_config_error'), 'error')
+          addToast($i18n.t('toast.downloading_mirte_config_compare_error'), 'error')
           this.peripheralStore.setPeripherals(robotSettings)
         }
       }
@@ -87,7 +94,7 @@ export class MCUDevice {
 
   }
 
-  async downloadFile(file){
+  async downloadFile(file) {
     const data = await this.fs.readFile(file)
     return data
   }
