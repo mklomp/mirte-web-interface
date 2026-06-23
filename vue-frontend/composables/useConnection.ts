@@ -5,7 +5,7 @@ const manager = new ConnectionManager()
 export function useConnection() {
 
   async function connect(type: "mcu" | "sbc", transport: "serial" | "ble", autoconnect = false) {
-    await manager.connect(type, transport, autoconnect)
+    return await manager.connect(type, transport, autoconnect)
   }
 
   async function disconnect() {

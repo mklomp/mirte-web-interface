@@ -182,7 +182,7 @@ export class ConnectionManager {
       connectionStore.setConnectionStatus("connected")
       useState("programming-state").value = "idle"
       useConnectionStore().setConnectionType(transport, type)
-
+      return true
     }
 
     /*if (type === "sbc") {
@@ -193,7 +193,7 @@ export class ConnectionManager {
     }*/
 
     // 
-
+    return false
   }
 
   attachTerminal(term, debug) {

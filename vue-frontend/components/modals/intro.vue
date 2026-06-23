@@ -120,8 +120,8 @@ function setMethod(m: 'serial' | 'ble') {
 }
 
 async function connectSelected() {
-  await connect('mcu', method.value)
-  emit('close')
+  let connection = await connect('mcu', method.value)
+  if (connection) { emit('close') }
 }
 
 function selectDefault() {
