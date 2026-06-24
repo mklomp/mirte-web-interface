@@ -29,7 +29,7 @@ const pythonEditor = ref(null)
 const blocklyContainer = ref()
 
 
-const split = ref(60)
+const split = ref(0)
 const lastSplit = ref(60)
 
 
@@ -91,7 +91,7 @@ watch(
          closeModal()
       }
    },
-   { deep: true, immediate: true }
+   { deep: true, immediate: false }
 )
 
 function undo() {
