@@ -37,6 +37,11 @@ const splitThemeClass = computed(() =>
    split.value != 0 && split.value != 100 ? 'default-theme' : ''
 )
 
+const pythonReadOnly = computed(() =>
+   split.value != 0
+)
+
+
 const viewMode = computed({
    get() {
       if (split.value == 100) return 'blockly'
@@ -183,7 +188,7 @@ function redo() {
                   </Pane>
                   <Pane :size="100 - split">
                      <div class="h-100">
-                        <Codemirror ref="pythonEditor" />
+                        <Codemirror :read_only="pythonReadOnly" ref="pythonEditor" />
                      </div>
                   </Pane>
                </Splitpanes>

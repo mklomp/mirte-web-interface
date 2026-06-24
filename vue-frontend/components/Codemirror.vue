@@ -10,11 +10,22 @@ import { python } from "@codemirror/lang-python"
 import { EditorState } from "@codemirror/state"
 import { useCodeStore } from "@/stores/user_code"
 
+import { Compartment } from "@codemirror/state"
+
+const readOnlyCompartment = new Compartment()
+const editableCompartment = new Compartment()
+
+
 const editorContainer = ref(null)
 let editor = null // could not be ref due to undo/redo
 let suppressStore = false
 const codeStore = useCodeStore()
 let pythonCode = codeStore.python
+
+const props = defineProps({
+  read_only: Boolean
+})
+
 
 function undoAction() {
   undo(editor)
@@ -29,17 +40,16 @@ onMounted(() => {
   editor = new EditorView({
     parent: editorContainer.value,
     doc: pythonCode,
-    
+
     extensions: [
       basicSetup,
       python(),
-      EditorState.readOnly.of(true),
-      EditorView.editable.of(false),
+      readOnlyCompartment.of(EditorState.readOnly.of(props.read_only)),
+      editableCompartment.of(EditorView.editable.of(!props.read_only)),
       EditorView.updateListener.of(update => {
         if (suppressStore) return
         const newCode = update.state.doc.toString()
         if (update.docChanged &&
-          codeStore.active == "python" &&
           newCode != codeStore.python) {
           codeStore.setPython(newCode)
         }
@@ -48,6 +58,24 @@ onMounted(() => {
   })
 
 })
+
+watch(
+  () => props.read_only,
+  (newVal) => {
+    if (!editor) return
+
+    editor.dispatch({
+      effects: [
+        readOnlyCompartment.reconfigure(
+          EditorState.readOnly.of(newVal)
+        ),
+        editableCompartment.reconfigure(
+          EditorView.editable.of(!newVal)
+        )
+      ]
+    })
+  }
+)
 
 watch(
   () => codeStore.python,
