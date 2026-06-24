@@ -7,6 +7,7 @@ import { ref, onMounted } from 'vue'
 import { EditorView, basicSetup } from "codemirror"
 import { undo, redo } from "@codemirror/commands"
 import { python } from "@codemirror/lang-python"
+import { EditorState } from "@codemirror/state"
 import { useCodeStore } from "@/stores/user_code"
 
 const editorContainer = ref(null)
@@ -28,10 +29,12 @@ onMounted(() => {
   editor = new EditorView({
     parent: editorContainer.value,
     doc: pythonCode,
-
+    
     extensions: [
       basicSetup,
       python(),
+      EditorState.readOnly.of(true),
+      EditorView.editable.of(false),
       EditorView.updateListener.of(update => {
         if (suppressStore) return
         const newCode = update.state.doc.toString()

@@ -101,6 +101,12 @@ function redo() {
   workspace.undo(true)
 }
 
+function resize() {
+  if (workspace) {
+    Blockly.svgResize(workspace)
+  }
+}
+
 // Store code to Pinia store (which saves it to localStorage)
 function storeCode() {
   if (!workspace) return
@@ -130,7 +136,7 @@ function restoreWorkspace() {
 
   try {
     Blockly.Xml.domToWorkspace(workspaceDOM, workspace)
-  } catch{
+  } catch {
     // TODO: this needs to be a userchoice
     addToast(t('toast.loading_blocks_error'), 'error')
     codeStore.clear()
@@ -278,7 +284,8 @@ watch(() => codeStore.reinit_blockly, () => {
 
 defineExpose({
   undo,
-  redo
+  redo,
+  resize
 })
 
 </script>
