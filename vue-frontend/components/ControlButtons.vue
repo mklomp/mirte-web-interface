@@ -71,7 +71,8 @@ function control(command) {
 
 
 function save() {
-    if (codeStore.active == 'blockly') {
+    console.log(codeStore.split)
+    if (codeStore.split != 0) {
         var text = codeStore.blockly;
         var filename = "mirte.xml";
     } else {
@@ -99,7 +100,7 @@ function openFileWindow() {
 
     file_input.value.value = ""
 
-    file_input.value.accept = codeStore.active === "blockly" ? ".xml" : ".py"
+    file_input.value.accept = codeStore.split != 0 ? ".xml" : ".py"
     file_input.value.click()
 }
 
@@ -112,7 +113,7 @@ function upload(event) {
     const fr = new FileReader()
 
     fr.onload = () => {
-        if (codeStore.active === 'blockly') {
+        if (codeStore.split != 0) {
             codeStore.setBlockly(fr.result, true)
         } else {
             codeStore.setPython(fr.result)
