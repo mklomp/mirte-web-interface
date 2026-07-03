@@ -34,23 +34,29 @@ function shutdown() {
 <template>
   <a class="nav-link dropdown-toggle" href="#" id="localeDropdown" role="button" data-bs-toggle="dropdown"
     aria-expanded="false">
-    {{ $t("main.connection." + connectionStore.status) }}
+    <ClientOnly>
+      {{ $t("main.connection." + connectionStore.status) }}
+    </ClientOnly>
   </a>
 
   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="localeDropdown">
     <li>
       <button class="dropdown-item" @click="connect('mcu', 'serial')" :disabled="mounted && isConnected">
-        USB <ClientOnly><FontAwesomeIcon v-if="isConnected && connectionType == 'serial'" icon="check"/></ClientOnly>
+        USB <ClientOnly>
+          <FontAwesomeIcon v-if="isConnected && connectionType == 'serial'" icon="check" />
+        </ClientOnly>
       </button>
-      
+
     </li>
     <li>
       <button class="dropdown-item" @click="connect('mcu', 'ble')" :disabled="mounted && isConnected">
-        Bluetooth <ClientOnly><FontAwesomeIcon v-if="isConnected && connectionType == 'ble'" icon="check"/></ClientOnly>
+        Bluetooth <ClientOnly>
+          <FontAwesomeIcon v-if="isConnected && connectionType == 'ble'" icon="check" />
+        </ClientOnly>
       </button>
     </li>
 
-<!--
+    <!--
     <li>
       <button class="dropdown-item" @click="connect('sbc', 'usb')">
         MIRTE Pioneer
@@ -66,7 +72,7 @@ function shutdown() {
         Disconnect
       </button>
     </li>
-<!--
+    <!--
     <li>
       <button class="dropdown-item" @click="shutdown">
         Shutdown
