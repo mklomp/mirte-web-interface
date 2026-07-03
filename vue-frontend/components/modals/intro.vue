@@ -32,7 +32,7 @@
 
         <!-- Show status -->
         <p v-if="isConnected">
-          Already connected
+          {{ $t("modals.load-settings.alread-connected") }}
         </p>
 
         <!-- Dropdown selector (hidden if connected) -->

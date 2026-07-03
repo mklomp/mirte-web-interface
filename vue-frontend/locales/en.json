@@ -158,7 +158,8 @@
       "custom-title": "Custom settings",
       "custom-text": "Configure your own hardware",
       "connect-title": "Load from Robot",
-      "connect-text":"Load settings directly from your robot"
+      "connect-text":"Load settings directly from your robot",
+      "alread-connected": "Already connected"
     }
   }
 }

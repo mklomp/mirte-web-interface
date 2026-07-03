@@ -158,7 +158,8 @@
       "custom-title": "Eigen instellingen",
       "custom-text": "Configureer je eigen hardware instellingen",
       "connect-title": "Laden van de Robot",
-      "connect-text":"Laad de instellingen rechtsreeks van je robot"
+      "connect-text": "Laad de instellingen rechtsreeks van je robot",
+      "alread-connected": "Al verbonden"
     }
   }
 }
