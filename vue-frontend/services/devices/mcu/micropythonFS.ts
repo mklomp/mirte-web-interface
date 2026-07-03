@@ -70,6 +70,14 @@ export class MicroPythonFS {
     })
   }
 
+  async removeFile(path: string) {
+    await this.writeLine(`os.remove('${path}')`)
+  }
+
+  async removeFolder(path: string) {
+    await this.writeLine(`os.rmdir('${path}')`)
+  }
+
   async writeFile(path: string, content: string) {
     const cleaned = content.replace(/\r/g, '')
 

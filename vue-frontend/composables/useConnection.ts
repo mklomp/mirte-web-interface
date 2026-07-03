@@ -32,6 +32,10 @@ export function useConnection() {
     await manager.stopCode()
   }
 
+  async function reinstallMIRTE() {
+    await manager.reinstallMIRTE()
+  }
+
   return {
     connect,
     disconnect,
@@ -39,6 +43,7 @@ export function useConnection() {
     uploadFile,
     runCommand,
     startCode,
-    stopCode
+    stopCode,
+    reinstallMIRTE
   }
 }

@@ -107,6 +107,36 @@ export class MCUDevice {
     await this.fs.writeLine(cmd)
   }
 
+  async reinstallMIRTE() {
+    const { addToast } = useToast()
+    const { $i18n } = useNuxtApp()
+    addToast($i18n.t('toast.uploading_mirte_scripts'), 'info', 'connection-status')
+    try {
+      await this.clearFiles()
+      await this.uploadMIRTEapi()
+    } catch {
+      addToast($i18n.t('toast.uploading_mirte_scripts_error'), 'error', 'connection-status')
+    }
+  }
+
+  async clearFiles() {
+    await this.fs.removeFile("mirte.py")
+    await this.fs.removeFile("settings.yaml")
+    await this.fs.removeFile("mirte_robot/__main__.py")
+    await this.fs.removeFile("mirte_robot/robot.py")
+    await this.fs.removeFolder("mirte_robot")
+    await this.fs.removeFile(".settings.json")
+    await this.fs.removeFile("boot.py")
+    await this.fs.removeFile("hcsr04.py")
+    await this.fs.removeFile("main.py")
+    await this.fs.removeFile("numbers.py")
+    await this.fs.removeFile("ble/__main__.py")
+    await this.fs.removeFile("ble/ble_advertising.py")
+    await this.fs.removeFile("ble/ble_uart_repl.py")
+    await this.fs.removeFile("ble/ble_uart_peripheral.py")
+    await this.fs.removeFolder("ble")
+  }
+
   async startCode(toast = false) {
     const { addToast, removeToast } = useToast()
     const { $i18n } = useNuxtApp()

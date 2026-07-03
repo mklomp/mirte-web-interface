@@ -218,6 +218,10 @@ export class ConnectionManager {
     this.device.stopCode()
   }
 
+  async reinstallMIRTE(){
+    await this.device.reinstallMIRTE()
+  }
+
   async uploadFile(path, content) {
     await this.device.uploadFile(path, content)
   }

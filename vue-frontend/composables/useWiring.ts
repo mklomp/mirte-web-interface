@@ -130,6 +130,11 @@ export function useWiring(peripheralsDef: any, microcontrollers: any) {
     loadFromYAML(input)
   }
 
+  function reinstallMIRTE(){
+    const { reinstallMIRTE } = useConnection()
+    reinstallMIRTE()
+  }
+
   return {
     state,
     addPeripheral,
@@ -138,6 +143,7 @@ export function useWiring(peripheralsDef: any, microcontrollers: any) {
     loadFromYAML,
     saveYAML,
     saveJSON,
-    JSONtoUI
+    JSONtoUI,
+    reinstallMIRTE
   }
 }

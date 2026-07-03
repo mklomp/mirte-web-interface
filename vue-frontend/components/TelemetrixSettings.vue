@@ -11,6 +11,9 @@
           <button @click="save" class="btn btn-mirte float-end">
             {{ $t("settings.save") }}
           </button>
+          <button @click="reinstall" class="btn btn-mirte float-end" v-if="connectionType == 'serial' && isConnected">
+            {{ $t("settings.reinstall") }}
+          </button>
         </div>
 
         <!-- BOARD -->
@@ -87,16 +90,19 @@ const {
   removePeripheral,
   getValidPins,
   JSONtoUI,
-  saveJSON
+  saveJSON,
+  reinstallMIRTE
 } = useWiring(peripheralsDef, microcontrollers)
 
 const connectionStore = useConnectionStore()
+const isConnected = computed(() => connectionStore.status == "connected")
+const connectionType = computed(() => connectionStore.device)
 
 function isUsableMC(name) {
   return name === "pico"
 }
 
-function isUsablePeripheral(key){
+function isUsablePeripheral(key) {
   return ['motor', 'intensity', 'servo', 'keypad', 'distance', 'line', 'object'].includes(key)
 }
 
@@ -112,6 +118,10 @@ watch(
 )
 
 const busy = ref(false)
+
+async function reinstall() {
+  await reinstallMIRTE()
+}
 
 async function save() {
   busy.value = true
