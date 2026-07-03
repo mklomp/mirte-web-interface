@@ -87,6 +87,10 @@ export class ConnectionManager {
             const idx = this.buffer.indexOf(marker)
             this.buffer = this.buffer.slice(idx + marker.length) // throw away everyting before __START__
             this.next_status = "print"
+            // Just start printing, as long as it does not seem to be the start of an exception
+            if (this.buffer.length > 0 && this.buffer[0] != "_"){
+              this.buffer_status = "print"
+            }
           }
 
           // detecting __START_EXCEPTION__, strip from buffer but keep exception
