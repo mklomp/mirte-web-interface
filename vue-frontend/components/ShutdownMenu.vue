@@ -48,13 +48,13 @@ function shutdown() {
       </button>
 
     </li>
-    <li>
+  <!--  <li>
       <button class="dropdown-item" @click="connect('mcu', 'ble')" :disabled="mounted && isConnected">
         Bluetooth <ClientOnly>
           <FontAwesomeIcon v-if="isConnected && connectionType == 'ble'" icon="check" />
         </ClientOnly>
       </button>
-    </li>
+    </li> -->
 
     <!--
     <li>

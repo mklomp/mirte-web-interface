@@ -175,7 +175,7 @@ export class MCUDevice {
     await this.uploadFile("/ble/ble_uart_peripheral.py", blePeripheralCode)
     await this.uploadFile("/ble/ble_uart_repl.py", bleREPLCode)
     await this.uploadFile("/ble/__main__.py", "")
-    await this.uploadFile("/boot.py", bootCode)
+    //await this.uploadFile("/boot.py", bootCode)
 
   }
 
