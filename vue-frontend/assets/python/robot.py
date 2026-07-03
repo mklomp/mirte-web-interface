@@ -18,7 +18,7 @@ class Robot():
       pass
     
     # TODO: add motor initialization 
-    if (self.config['distance']):
+    if (self.config.get('distance')):
         from hcsr04 import HCSR04
         for sensor in self.config['distance']:
             sensor_obj = self.config['distance'][sensor]
