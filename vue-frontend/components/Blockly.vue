@@ -70,11 +70,14 @@ function loadCustomModules(settings) {
       dropdown_instances = instances.map(n => [n, n])
     }
 
+    // Unregister all modules
+    let extensionName = 'dynamic_instances_extension_' + module_type?.type
+    if (Blockly.Extensions.isRegistered(extensionName)) {
+      Blockly.Extensions.unregister(extensionName)
+    }
+
+    // Register all active modules
     if (instances.length != 0) { // default_blocks are already in the toolbox
-      let extensionName = 'dynamic_instances_extension_' + module_type?.type
-      if (Blockly.Extensions.isRegistered(extensionName)) {
-        Blockly.Extensions.unregister(extensionName)
-      }
       const custom_module = module.load(Blockly, pythonGenerator, dropdown_instances)
       addToToolbox(custom_module.type, custom_module.contents)
     }
@@ -140,12 +143,43 @@ function restoreWorkspace() {
     // TODO: this needs to be a userchoice
     addToast(t('toast.loading_blocks_error'), 'error')
     codeStore.clear()
-    initBlockly()
+    workspace.dispose()
+    workspace = getCleanWorkspace()
+    workspaceDOM = Blockly.Xml.workspaceToDom(workspace)
   }
   workspace.setScale(scale)
   workspace.scroll(scrollX, scrollY)
   workspace.getToolbox().setSelectedItem(flyout_visible)
 }
+
+function getCleanWorkspace() {
+  return Blockly.inject(blocklyDiv.value, {
+    toolbox: toolBox,
+    media: 'blockly/media',
+    zoom: {
+      controls: true,
+      wheel: true,
+      startScale: scale,
+      maxScale: 3,
+      minScale: 0.3,
+      scaleSpeed: 1.2
+    },
+    theme: Blockly.Theme.defineTheme("customTheme", {
+      base: Blockly.Themes.Zelos,
+      blockStyles: {
+        loop_blocks: { colourPrimary: Blockly.Msg.FLOW_RGB, colourSecondary: "", colourTertiary: "" },
+        procedure_blocks: { colourPrimary: Blockly.Msg.FLOW_RGB, colourSecondary: "", colourTertiary: "" },
+        logic_blocks: { colourPrimary: Blockly.Msg.DATA_RGB, colourSecondary: "", colourTertiary: "" },
+        math_blocks: { colourPrimary: Blockly.Msg.DATA_RGB, colourSecondary: "", colourTertiary: "" },
+        text_blocks: { colourPrimary: Blockly.Msg.DATA_RGB, colourSecondary: "", colourTertiary: "" },
+        list_blocks: { colourPrimary: Blockly.Msg.DATA_RGB, colourSecondary: "", colourTertiary: "" },
+        variable_blocks: { colourPrimary: Blockly.Msg.DATA_RGB, colourSecondary: "", colourTertiary: "" },
+      },
+    }),
+    renderer: 'zelos'
+  })
+}
+
 
 // There are three options that this function can be called:
 // - First time (with nothing in localStorage)
@@ -176,41 +210,17 @@ function initBlockly(reason = "clean") {
   // Load default_blocks.js
   customBlockModules['/assets/blockly/default_blocks.js'].load(Blockly, pythonGenerator, [])
 
-  workspace = Blockly.inject(blocklyDiv.value, {
-    toolbox: toolBox,
-    media: 'blockly/media',
-    zoom: {
-      controls: true,
-      wheel: true,
-      startScale: scale,
-      maxScale: 3,
-      minScale: 0.3,
-      scaleSpeed: 1.2
-    },
-    theme: Blockly.Theme.defineTheme("customTheme", {
-      base: Blockly.Themes.Zelos,
-      blockStyles: {
-        loop_blocks: { colourPrimary: Blockly.Msg.FLOW_RGB, colourSecondary: "", colourTertiary: "" },
-        procedure_blocks: { colourPrimary: Blockly.Msg.FLOW_RGB, colourSecondary: "", colourTertiary: "" },
-        logic_blocks: { colourPrimary: Blockly.Msg.DATA_RGB, colourSecondary: "", colourTertiary: "" },
-        math_blocks: { colourPrimary: Blockly.Msg.DATA_RGB, colourSecondary: "", colourTertiary: "" },
-        text_blocks: { colourPrimary: Blockly.Msg.DATA_RGB, colourSecondary: "", colourTertiary: "" },
-        list_blocks: { colourPrimary: Blockly.Msg.DATA_RGB, colourSecondary: "", colourTertiary: "" },
-        variable_blocks: { colourPrimary: Blockly.Msg.DATA_RGB, colourSecondary: "", colourTertiary: "" },
-      },
-    }),
-    renderer: 'zelos'
-  })
+  workspace = getCleanWorkspace()
+
+  // Restore workspace (including location), or scroll to center
+  if (workspaceDOM) restoreWorkspace()
+  if (reason != "lang_change" && reason != "tab_change") workspace.scrollCenter()
 
   // Set color of control_if, since it is part of the logic_blocks
   const i = Blockly.Blocks['controls_if'].init;
   Blockly.Blocks['controls_if'].init = function () { i.call(this); this.setColour(Blockly.Msg.FLOW_RGB); };
   const j = Blockly.Blocks['text_print'].init;
   Blockly.Blocks['text_print'].init = function () { j.call(this); this.setColour(Blockly.Msg.ACTIONS_RGB); };
-
-  // Restore workspace (including location), or scroll to center
-  if (workspaceDOM) restoreWorkspace()
-  if (reason != "lang_change" && reason != "tab_change") workspace.scrollCenter()
 
   workspace.addChangeListener((event) => {
     // Ignore UI events (scroll, selection, toolbox open, etc.)
