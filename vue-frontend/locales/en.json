@@ -137,15 +137,15 @@
     "usb_unable_connect_known_connection": "Unable to connect to known connections.",
     "usb_no_device_selected": "No devices selected. Make sure MicroPython is installed, and the robot is plugged in.",
     "usb_unable_to_open_device": "Unable to open device. Make sure the device is not connected in another program by replugging the USB cable.",
-    "usb_disconnected": "USB disconnected",
+    "usb_disconnected": "USB disconnected.",
     "automatically_connected": "Automatically connected to known robot.",
     "connected": "Connected to robot.",
     "uploading_code": "Sending code to robot....",
     "uploading_mirte_scripts": "Installing MIRTE scripts.",
     "uploading_mirte_scripts_error": "Failed to install MIRTE scripts.",
     "downloading_mirte_config_error": "Connected device has corrupt settings, did not load them.",
-    "downloading_mirte_config_compare_error": "Connected device has different settings than local, using the one from connected device",
-    "downloading_mirte_config": "Settings loaded from device",
+    "downloading_mirte_config_compare_error": "Connected device has different settings than local, using the one from connected device.",
+    "downloading_mirte_config": "Settings loaded from device.",
     "loading_blocks_error": "Found blocks that are not in settings. Cleared your workspace."
   },
   "modals": {

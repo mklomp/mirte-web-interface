@@ -137,7 +137,7 @@
     "usb_unable_connect_known_connection": "Niet gelukt om met bekende verbinding te verbinden.",
     "usb_no_device_selected": "Geen devices geselecteerd. Zorg er voor dat MicroPython is geinstaleerd, en de robot aangesloten is.",
     "usb_unable_to_open_device": "Niet gelukt om device te openen. Zorg er voor dat het device niet via een ander programme verbonden is door deze opnieuw in te pluggen.",
-    "usb_disconnected": "USB verbinding verbroken",
+    "usb_disconnected": "USB verbinding verbroken.",
     "automatically_connected": "Automatisch verbonden met bekende robot.",
     "connected": "Verbonden met robot.",
     "uploading_code": "Code versturen naar robot....",
