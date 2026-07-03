@@ -121,6 +121,7 @@ const busy = ref(false)
 
 async function reinstall() {
   await reinstallMIRTE()
+  await save()
 }
 
 async function save() {

@@ -130,9 +130,9 @@ export function useWiring(peripheralsDef: any, microcontrollers: any) {
     loadFromYAML(input)
   }
 
-  function reinstallMIRTE(){
+  async function reinstallMIRTE(){
     const { reinstallMIRTE } = useConnection()
-    reinstallMIRTE()
+    await reinstallMIRTE()
   }
 
   return {
