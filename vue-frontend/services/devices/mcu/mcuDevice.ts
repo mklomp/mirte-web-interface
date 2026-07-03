@@ -86,7 +86,7 @@ export class MCUDevice {
         if (JSON.stringify(localsettings) !== JSON.stringify(robotSettings)) { // local and robot setting are not the same
           // save the robot settings to local settings
           addToast($i18n.t('toast.downloading_mirte_config_compare_error'), 'error')
-          this.peripheralStore.setPeripherals(robotSettings)
+          this.peripheralStore.setPeripherals(robotSettings, false)
         }
       }
     }

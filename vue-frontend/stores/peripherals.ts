@@ -18,7 +18,7 @@ export const usePeripheralStore = defineStore('peripherals', {
       }
     },
 
-    async setPeripherals(value) {
+    async setPeripherals(value, showToast = true) {
       const { addToast } = useToast()
       const { $i18n } = useNuxtApp()
       const connectionStore = useConnectionStore()
@@ -33,7 +33,9 @@ export const usePeripheralStore = defineStore('peripherals', {
         await uploadFile('/.settings.json', JSON.stringify(value, null, 2))
         addToast($i18n.t('toast.saved_settings_success'), 'success', 'save-settings')
       } else {
-        addToast($i18n.t('toast.saved_settings_locally'), 'info', 'save-settings')
+        if (showToast) {
+          addToast($i18n.t('toast.saved_settings_locally'), 'info', 'save-settings')
+        }
       }
     }
   }
