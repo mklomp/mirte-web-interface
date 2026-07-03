@@ -1,14 +1,14 @@
 <script setup>
 import { useI18n } from 'vue-i18n'
-import { useSwitchLocalePath } from '#i18n'
 import nlFlag from 'flag-icons/flags/4x3/nl.svg?url'
 import gbFlag from 'flag-icons/flags/4x3/gb.svg?url'
 
-const { locale } = useI18n()
+const { locale, setLocale } = useI18n()
 
-function changeLocale(code) {
-  locale.value = code
+async function changeLocale(code) {
+  await setLocale(code)
 }
+
 
 const langs = [
   { code: "en", text: "English", flag: gbFlag },
