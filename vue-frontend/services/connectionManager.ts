@@ -112,7 +112,7 @@ export class ConnectionManager {
             this.buffer = this.buffer.slice(idx + marker.length)
             this.next_status = "print"
 
-            addToast(this.exception_buffer, 'error', 'code-error', -1)
+            addToast(this.exception_buffer, 'error', 'code-error')
             this.exception_buffer = ""
           }
 

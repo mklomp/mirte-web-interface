@@ -21,6 +21,7 @@ export function useToast() {
     id?: string,
     duration = 5
   ) {
+    if (type == "error") { duration = -1 }
     const toastId = id ?? `${Date.now()}`
 
     const formattedMessage = message.replace(/\n/g, '<br>')
