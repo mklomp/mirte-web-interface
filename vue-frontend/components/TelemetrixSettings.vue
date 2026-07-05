@@ -154,6 +154,20 @@ const validationErrors = computed(() => {
   const errors = {}
   const nameRegex = /^[A-Za-z0-9_-]+$/
 
+  // Count names per type
+  const namesPerType = new Map()
+
+  for (const peripheral of (state.value.peripherals || [])) {
+    const type = peripheral.type
+    const name = peripheral.name?.trim() ?? ""
+
+    if (!type || !name) continue
+
+    const key = `${type}:${name}`
+
+    namesPerType.set(key, (namesPerType.get(key) || 0) + 1)
+  }
+
   for (const peripheral of (state.value.peripherals || [])) {
     const peripheralErrors = {}
 
@@ -166,9 +180,16 @@ const validationErrors = computed(() => {
       peripheralErrors.name =
         "Alleen letters, cijfers, - en _ zijn toegestaan"
     }
+    else {
+      const key = `${peripheral.type}:${name}`
+
+      if (namesPerType.get(key) > 1) {
+        peripheralErrors.name =
+          `De naam '${name}' wordt al gebruikt voor een andere ${peripheral.type}`
+      }
+    }
 
     for (const [pinName, pin] of Object.entries(peripheral.pins || {})) {
-
       if (pin === undefined || pin === null || pin === "") {
         peripheralErrors[pinName] =
           `Pin '${pinName}' is niet ingevuld`
