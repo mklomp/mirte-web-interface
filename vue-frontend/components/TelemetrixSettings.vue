@@ -56,8 +56,15 @@
             </thead>
 
             <tbody>
-              <PeripheralRow v-for="item in state.peripherals" :key="item.id" :item="item"
-                :peripheralsDef="peripheralsDef" :getValidPins="getValidPins" @remove="removePeripheral" />
+              <PeripheralRow
+                v-for="item in state.peripherals"
+                :key="item.id"
+                :item="item"
+                :errors="validationErrors[item.id] || {}"
+                :peripheralsDef="peripheralsDef"
+                :getValidPins="getValidPins"
+                @remove="removePeripheral"
+              />
             </tbody>
 
           </table>
@@ -69,14 +76,16 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue"
-
+import { ref, watch, computed } from "vue"
 
 import properties_ph from "~/assets/json/properties_ph.json"
 import properties_mc from "~/assets/json/properties_mc.json"
 
 import { useWiring } from "~/composables/useWiring"
 import { usePeripheralStore } from '@/stores/peripherals'
+import { useToast } from '~/composables/useToast'
+
+const { addToast } = useToast()
 
 import PeripheralRow from "~/components/PeripheralRow.vue"
 
@@ -117,6 +126,60 @@ watch(
   }
 )
 
+const validationErrors = computed(() => {
+  const errors = {}
+
+  const usedPins = new Map()
+  const nameRegex = /^[A-Za-z0-9_-]+$/
+
+  for (const peripheral of (state.value.peripherals || [])) {
+
+    const peripheralErrors = {}
+
+    // Naam controleren
+
+    const name = peripheral.name?.trim() ?? ""
+
+    if (!name) {
+      peripheralErrors.name =
+        "Naam mag niet leeg zijn"
+    }
+    else if (!nameRegex.test(name)) {
+      peripheralErrors.name =
+        "Alleen letters, cijfers, - en _ zijn toegestaan"
+    }
+
+    // Alle pins controleren
+
+    for (const [pinName, pin] of Object.entries(peripheral.pins || {})) {
+
+      if (pin === undefined || pin === null || pin === "") {
+        peripheralErrors[pinName] =
+          `Pin '${pinName}' is niet ingevuld`
+        continue
+      }
+
+      if (usedPins.has(pin)) {
+        peripheralErrors[pinName] =
+          `Pin ${pin} wordt meerdere keren gebruikt`
+      }
+      else {
+        usedPins.set(pin, peripheral.id)
+      }
+    }
+
+    if (Object.keys(peripheralErrors).length > 0) {
+      errors[peripheral.id] = peripheralErrors
+    }
+  }
+
+  return errors
+})
+
+const hasErrors = computed(() =>
+  Object.keys(validationErrors.value).length > 0
+)
+
 const busy = ref(false)
 
 async function reinstall() {
@@ -125,8 +188,19 @@ async function reinstall() {
 }
 
 async function save() {
+
+  if (hasErrors.value) {
+    addToast("Er zijn configuratiefouten aanwezig. Controleer de oranje velden.", "error", "setting-error")
+    return
+  }
+
   busy.value = true
-  await saveJSON()
-  //location.reload()
+
+  try {
+    await saveJSON()
+  }
+  finally {
+    busy.value = false
+  }
 }
 </script>
