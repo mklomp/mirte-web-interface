@@ -152,7 +152,7 @@ const validationErrors = computed(() => {
 
   for (const peripheral of (state.value.peripherals || [])) {
     const type = peripheral.type
-    const name = peripheral.name?.trim() ?? ""
+    const name = peripheral.name ?? ""
 
     if (!type || !name) continue
 
@@ -164,7 +164,7 @@ const validationErrors = computed(() => {
   for (const peripheral of (state.value.peripherals || [])) {
     const peripheralErrors = {}
 
-    const name = peripheral.name?.trim() ?? ""
+    const name = peripheral.name ?? ""
 
     if (!name) {
       peripheralErrors.name = "Naam mag niet leeg zijn"
