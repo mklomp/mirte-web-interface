@@ -11,9 +11,6 @@
           <button @click="save" class="btn btn-mirte float-end">
             {{ $t("settings.save") }}
           </button>
-          <button @click="reinstall" class="btn btn-mirte float-end" v-if="connectionType == 'serial' && isConnected">
-            {{ $t("settings.reinstall") }}
-          </button>
         </div>
 
         <!-- BOARD -->
@@ -26,13 +23,18 @@
               </option>
             </select>
           </div>
+
+          <button @click="reinstall" class="btn btn-mirte float-end mx-2"
+            v-if="connectionType == 'serial' && isConnected">
+            {{ $t("settings.reinstall") }}
+          </button>
         </div>
 
         <!-- TABLE -->
-        <div class="h-100" style="overflow-y: auto">
+        <div class="h-100 table-scroll">
           <table class="table table-striped">
 
-            <thead>
+            <thead class="sticky-header">
               <tr>
                 <th>
                   <div class="dropdown">
@@ -56,16 +58,9 @@
             </thead>
 
             <tbody>
-              <PeripheralRow
-                v-for="item in state.peripherals"
-                :key="item.id"
-                :item="item"
-                :errors="validationErrors[item.id] || {}"
-                :peripheralsDef="peripheralsDef"
-                :usedPins="usedPins"
-                :getValidPins="getValidPins"
-                @remove="removePeripheral"
-              />
+              <PeripheralRow v-for="item in state.peripherals" :key="item.id" :item="item"
+                :errors="validationErrors[item.id] || {}" :peripheralsDef="peripheralsDef" :usedPins="usedPins"
+                :getValidPins="getValidPins" @remove="removePeripheral" />
             </tbody>
 
           </table>
@@ -74,6 +69,7 @@
       </div>
     </div>
   </div>
+
 </template>
 
 <script setup>
@@ -116,7 +112,6 @@ function isUsablePeripheral(key) {
   return ['motor', 'intensity', 'servo', 'keypad', 'distance', 'line', 'object'].includes(key)
 }
 
-
 const usedPins = computed(() => {
   const map = new Map()
 
@@ -138,7 +133,6 @@ const usedPins = computed(() => {
   return map
 })
 
-
 onMounted(() => {
   peripheralStore.loadFromLocalStorage()
 })
@@ -154,7 +148,6 @@ const validationErrors = computed(() => {
   const errors = {}
   const nameRegex = /^[A-Za-z0-9_-]+$/
 
-  // Count names per type
   const namesPerType = new Map()
 
   for (const peripheral of (state.value.peripherals || [])) {
@@ -238,3 +231,22 @@ async function save() {
   }
 }
 </script>
+
+<style scoped>
+.table-scroll {
+  overflow-y: auto;
+}
+
+.layoutbox-title {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.sticky-header th {
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  background: white;
+}
+</style>
