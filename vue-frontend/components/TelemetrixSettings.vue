@@ -25,7 +25,7 @@
           </div>
 
           <button @click="reinstall" class="btn btn-mirte float-end mx-2"
-            v-if="connectionType == 'serial' && isConnected">
+            :disabled="connectionType !== 'serial' || !isConnected">
             {{ $t("settings.reinstall") }}
           </button>
         </div>
