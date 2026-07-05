@@ -62,6 +62,7 @@
                 :item="item"
                 :errors="validationErrors[item.id] || {}"
                 :peripheralsDef="peripheralsDef"
+                :usedPins="usedPins"
                 :getValidPins="getValidPins"
                 @remove="removePeripheral"
               />
@@ -115,6 +116,29 @@ function isUsablePeripheral(key) {
   return ['motor', 'intensity', 'servo', 'keypad', 'distance', 'line', 'object'].includes(key)
 }
 
+
+const usedPins = computed(() => {
+  const map = new Map()
+
+  for (const peripheral of (state.value.peripherals || [])) {
+    for (const [pinName, pin] of Object.entries(peripheral.pins || {})) {
+      if (pin !== undefined && pin !== null && pin !== "") {
+        if (!map.has(pin)) {
+          map.set(pin, [])
+        }
+
+        map.get(pin).push({
+          peripheralId: peripheral.id,
+          pinName
+        })
+      }
+    }
+  }
+
+  return map
+})
+
+
 onMounted(() => {
   peripheralStore.loadFromLocalStorage()
 })
@@ -128,28 +152,20 @@ watch(
 
 const validationErrors = computed(() => {
   const errors = {}
-
-  const usedPins = new Map()
   const nameRegex = /^[A-Za-z0-9_-]+$/
 
   for (const peripheral of (state.value.peripherals || [])) {
-
     const peripheralErrors = {}
-
-    // Naam controleren
 
     const name = peripheral.name?.trim() ?? ""
 
     if (!name) {
-      peripheralErrors.name =
-        "Naam mag niet leeg zijn"
+      peripheralErrors.name = "Naam mag niet leeg zijn"
     }
     else if (!nameRegex.test(name)) {
       peripheralErrors.name =
         "Alleen letters, cijfers, - en _ zijn toegestaan"
     }
-
-    // Alle pins controleren
 
     for (const [pinName, pin] of Object.entries(peripheral.pins || {})) {
 
@@ -159,12 +175,9 @@ const validationErrors = computed(() => {
         continue
       }
 
-      if (usedPins.has(pin)) {
+      if (usedPins.value.get(pin)?.length > 1) {
         peripheralErrors[pinName] =
           `Pin ${pin} wordt meerdere keren gebruikt`
-      }
-      else {
-        usedPins.set(pin, peripheral.id)
       }
     }
 
