@@ -1,4 +1,5 @@
 import { useToast } from '~/composables/useToast'
+import { useConnectionStore } from '../../stores/connection'
 
 export class NetworkTransport {
   ip: string = '192.168.0.24'
@@ -22,8 +23,8 @@ export class NetworkTransport {
 
     // Shell connection
     this.socket = new WebSocket(`ws://${this.ip}/ws/shell`)
-
-    useConnectionStore().setConnectionIP(this.ip)
+    const connectionStore = useConnectionStore()
+    connectionStore.setConnectionIP(this.ip)
 
     /*
     this.socket.onopen = () => {
@@ -50,6 +51,9 @@ export class NetworkTransport {
 
     this.socket.onclose = () => {
       //console.log('Shell disconnected')
+      if (connectionStore.status == "connected") {
+        addToast("WebSocket connection lost.", "error", "connection-lost")
+      }
     }
 
     this.ros.on('connection', () => {
@@ -62,6 +66,9 @@ export class NetworkTransport {
 
     this.ros.on('close', () => {
       //console.log('ROS disconnected')
+      if (connectionStore.status == "connected") {
+        addToast("ROS disconnected.", "error", "connection-lost")
+      }
     })
     return this.socket
   }

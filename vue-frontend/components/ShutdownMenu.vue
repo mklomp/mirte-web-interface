@@ -1,6 +1,8 @@
 <script setup>
 import { useI18n } from 'vue-i18n'
 import { computed } from "vue"
+const { addToast } = useToast()
+const { $i18n } = useNuxtApp()
 
 const connectionStore = useConnectionStore()
 const { connect, disconnect } = useConnection()
@@ -12,20 +14,34 @@ const { t } = useI18n()
 
 const mounted = ref(false)
 
+let socket = null
+
+watch(
+  connectionStore,
+  (val) => {
+    if (val.status == "connected" && val.transport == "network" && val.ip_address != "") {
+      socket = new WebSocket(`ws://${val.ip_address}/ws/shell`)
+    }
+  }
+)
+
 onMounted(() => {
   mounted.value = true
 })
 
 function shutdown() {
   if (confirm(t('main.shutdown_confirm'))) {
-    busy.value = true
+    socket.send("sudo shutdown now\n")
+    addToast("Shutting down.", "success")
+    connectionStore.setConnectionStatus("disconnected")
+  }
+}
 
-    fetch(`http://192.168.43.1/api/shutdown`)
-      .then(res => res.text())
-      .then(() => {
-        alert(t('main.shutdown_success'))
-        busy.value = false
-      })
+function reboot() {
+  if (confirm(t('main.reboot_confirm'))) {
+    socket.send("sudo reboot now\n")
+    addToast("Rebooting robot.", "success")
+    connectionStore.setConnectionStatus("disconnected")
   }
 }
 
@@ -48,7 +64,7 @@ function shutdown() {
       </button>
 
     </li>
-  <!--  <li>
+    <!--  <li>
       <button class="dropdown-item" @click="connect('mcu', 'ble')" :disabled="mounted && isConnected">
         Bluetooth <ClientOnly>
           <FontAwesomeIcon v-if="isConnected && connectionType == 'ble'" icon="check" />
@@ -56,7 +72,7 @@ function shutdown() {
       </button>
     </li> -->
 
-    
+
     <li>
       <button class="dropdown-item" @click="connect('sbc', 'network')" :disabled="mounted && isConnected">
         WiFi/Network <ClientOnly>
@@ -65,27 +81,35 @@ function shutdown() {
       </button>
     </li>
 
+    <ClientOnly>
+      <li v-if="connectionType == 'network'">
+        <hr class="dropdown-divider">
+      </li>
+
+      <li v-if="connectionType == 'network'">
+        <button class="dropdown-item" @click="shutdown" :disabled="mounted && !isConnected">
+          {{ $t("main.connection.shutdown") }}
+        </button>
+      </li>
+
+      <li v-if="connectionType == 'network'">
+        <button class="dropdown-item" @click="reboot" :disabled="mounted && !isConnected">
+          {{ $t("main.connection.reboot") }}
+        </button>
+      </li>
+    </ClientOnly>
+    
     <li>
       <hr class="dropdown-divider">
     </li>
 
     <li>
       <button class="dropdown-item" @click="disconnect" :disabled="mounted && !isConnected">
-        Disconnect
-      </button>
-    </li>
-    <!--
-    <li>
-      <button class="dropdown-item" @click="shutdown">
-        Shutdown
+        {{ $t("main.connection.disconnect") }}
       </button>
     </li>
 
-    <li>
-      <button class="dropdown-item" @click="shutdown">
-        Reboot
-      </button>
-    </li>
-    -->
+
+
   </ul>
 </template>

@@ -8,10 +8,14 @@
     "shutdown": "afsluiten",
     "shutdown_confirm": "Weet je zeker dat je wilt afsluiten?",
     "shutdown_success": "Wacht nu totdat de lampjes op de computer van de robot uit is. Daarna kan je de schakelaar op de PCB uitzetten.",
+    "reboot_confirm": "Weet je zeker dat je wilt herstarten?",
     "connection": {
       "disconnected": "Niet verbonden",
       "connecting": "Verbinding maken...",
-      "connected": "Verbonden"
+      "connected": "Verbonden",
+      "disconnect": "Disconnect",
+      "reboot": "Herstart",
+      "shutdown": "Afsluiten"
     }
   },
   "settings": {

@@ -8,10 +8,14 @@
     "shutdown": "shutdown",
     "shutdown_confirm": "Are you sure you want to shutdown?",
     "shutdown_success": "Wait until the LED on the computer turns off. Only after that you can switch off the PCB",
+    "reboot_confirm": "Are you sure you want to reboot?",
     "connection": {
-       "disconnected": "Disconnected",
-       "connecting": "Connecting...",
-       "connected": "Connected"
+      "disconnected": "Disconnected",
+      "connecting": "Connecting...",
+      "connected": "Connected",
+      "disconnect": "Disconnect",
+      "reboot": "Reboot",
+      "shutdown": "Shutdown"
     }
   },
   "settings": {
@@ -39,7 +43,7 @@
     "output": "Output",
     "control": "Control",
     "speed": "Speed",
-    "angular_speed":  "Angular speed",
+    "angular_speed": "Angular speed",
     "move_forward": "Forward",
     "move_backward": "Backward",
     "move_left": "Turn left",
@@ -159,7 +163,7 @@
       "custom-title": "Custom settings",
       "custom-text": "Configure your own hardware",
       "connect-title": "Load from Robot",
-      "connect-text":"Load settings directly from your robot",
+      "connect-text": "Load settings directly from your robot",
       "alread-connected": "Already connected"
     }
   }
