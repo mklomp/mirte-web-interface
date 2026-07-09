@@ -70,6 +70,7 @@ export function useWiring(peripheralsDef: any, microcontrollers: any) {
 
   async function saveJSON() {
     // locally save the settings
+    // note: will be stored to robots in the store
     const json = UItoJSON()
     peripheralStore.setPeripherals(json)
   }

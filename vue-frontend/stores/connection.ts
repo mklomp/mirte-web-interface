@@ -4,7 +4,7 @@ export const useConnectionStore = defineStore('connection', {
   state: () => ({
     transport: "",
     device: "",
-    ip_address: "192.168.43.1",
+    ip_address: "",
     status: "disconnected"
   }),
 
@@ -26,7 +26,7 @@ export const useConnectionStore = defineStore('connection', {
         // This happens when someone resets the known deviced while the status
         // was still connected
         const ports = await navigator.serial.getPorts()
-        if (ports.length == 0){ this.setConnectionStatus("disconnected")}
+        if (ports.length == 0) { this.setConnectionStatus("disconnected") }
 
       } catch (e) {
         console.warn("Failed to parse connection from localStorage", e)
@@ -43,7 +43,15 @@ export const useConnectionStore = defineStore('connection', {
       connection.device = device
       localStorage.setItem('connection', JSON.stringify(connection))
     },
-    setConnectionStatus(status){
+    setConnectionIP(ip) {
+      this.ip_address = ip
+
+      // update localstorage
+      const connection = JSON.parse(localStorage.getItem('connection')) || {};
+      connection.ip_address = ip
+      localStorage.setItem('connection', JSON.stringify(connection))
+    },
+    setConnectionStatus(status) {
       // update store
       this.status = status
 

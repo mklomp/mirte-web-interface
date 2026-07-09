@@ -140,6 +140,7 @@
     "usb_disconnected": "USB verbinding verbroken.",
     "automatically_connected": "Automatisch verbonden met bekende robot.",
     "connected": "Verbonden met robot.",
+    "connected_and_initializing": "Verbonden met robot. Terminal is aan het initialiseren.",
     "uploading_code": "Code versturen naar robot....",
     "uploading_mirte_scripts": "Installeert MIRTE scripts.",
     "uploading_mirte_scripts_error": "Fout tijdens installeren van MIRTE scripts.",

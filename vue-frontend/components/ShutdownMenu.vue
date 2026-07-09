@@ -6,7 +6,7 @@ const connectionStore = useConnectionStore()
 const { connect, disconnect } = useConnection()
 
 const isConnected = computed(() => connectionStore.status == "connected")
-const connectionType = computed(() => connectionStore.device)
+const connectionType = computed(() => connectionStore.transport)
 
 const { t } = useI18n()
 
@@ -56,13 +56,15 @@ function shutdown() {
       </button>
     </li> -->
 
-    <!--
+    
     <li>
-      <button class="dropdown-item" @click="connect('sbc', 'usb')">
-        MIRTE Pioneer
+      <button class="dropdown-item" @click="connect('sbc', 'network')" :disabled="mounted && isConnected">
+        WiFi/Network <ClientOnly>
+          <FontAwesomeIcon v-if="isConnected && connectionType == 'network'" icon="check" />
+        </ClientOnly>
       </button>
     </li>
--->
+
     <li>
       <hr class="dropdown-divider">
     </li>

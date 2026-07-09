@@ -1,234 +1,228 @@
 <template>
-      <div class="layoutbox-content" style="height: 100% !important">
+  <div class="layoutbox-content" style="height: 100% !important">
 
 
 
-      <div>
-        <Xterm/>
+    <div>
+      <Xterm />
+    </div>
+
+
+    <div v-if="false" class="rounded background-tertiary p-3 mb-2" @contextmenu.prevent>
+      <div class="h5">{{ $t('actuators.control') }}</div>
+
+      <div class="row mb-4">
+
+        <div class="col-1 offset-6">
+          <button class="btn btn-mirte-control mr-2 background-actuator" :title="$t('actuators.move_forward')"
+            @mousedown="control('forward_down')" @mouseup="control('forward_up')"
+            @contextmenu.prevent="control('forward_down')">
+            <ClientOnly>
+              <FontAwesomeIcon :icon="['fas', 'arrow-up']" />
+            </ClientOnly>
+          </button>
+        </div>
       </div>
-  
 
-           <div v-if="false" class="rounded background-tertiary p-3 mb-2"  @contextmenu.prevent >
-              <h5>{{ $t('actuators.control') }}</h5> 
+      <div class="row mb-4">
+        <div class="col-1 offset-4">
+          <button class="btn btn-mirte-control mr-2 background-actuator" :title="$t('actuators.move_left')"
+            @mousedown="control('left_down')" @mouseup="control('left_up')" @contextmenu.prevent="control('left_down')">
+            <ClientOnly>
+              <FontAwesomeIcon :icon="['fas', 'arrow-left']" />
+            </ClientOnly>
+          </button>
+        </div>
 
-               <div class="row mb-4">
+        <div class="col-2 offset-1">
+          <button class="btn btn-mirte-control mr-2 background-actuator" :title="$t('actuators.move_stop')"
+            @click="control('stop')" @contextmenu.prevent="control('stop')">
+            <ClientOnly>
+              <FontAwesomeIcon :icon="['fas', 'times-circle']" />
+            </ClientOnly>
+          </button>
+        </div>
 
-                <div class="col-1 offset-6">
-                <button class="btn btn-mirte-control mr-2 background-actuator"
-                 
-                   :title="$t('actuators.move_forward')"
-                   @mousedown="control('forward_down')"
-                   @mouseup="control('forward_up')"
-                   @contextmenu.prevent="control('forward_down')"
-                 >
-                 <ClientOnly><FontAwesomeIcon :icon="['fas', 'arrow-up']" /></ClientOnly>
-                 </button>
-                 </div>
-               </div>
-
-               <div class="row mb-4">
-                <div class="col-1 offset-4">
-                <button class="btn btn-mirte-control mr-2 background-actuator"
-                 
-                   :title="$t('actuators.move_left')"
-                   @mousedown="control('left_down')"
-                   @mouseup="control('left_up')"
-                   @contextmenu.prevent="control('left_down')"
-                 >
-                 <ClientOnly><FontAwesomeIcon :icon="['fas', 'arrow-left']" /></ClientOnly>
-                </button>
-                </div>
-
-                <div class="col-2 offset-1">
-                <button class="btn btn-mirte-control mr-2 background-actuator"
-                
-                   :title="$t('actuators.move_stop')"
-                   @click="control('stop')"
-                   @contextmenu.prevent="control('stop')"
-                 >
-                 <ClientOnly><FontAwesomeIcon :icon="['fas', 'times-circle']" /></ClientOnly>
-                </button>
-                </div>
-
-                <div class="col-1 mb-2">
-                <button class="btn btn-mirte-control mr-2 background-actuator"
-                
-                   :title="$t('actuators.move_right')"
-                   @mousedown="control('right_down')"
-                   @mouseup="control('right_up')"
-                   @contextmenu.prevent="control('right_down')"
-                 >
-                 <ClientOnly><FontAwesomeIcon :icon="['fas', 'arrow-right']" /></ClientOnly>
-                </button>
-                </div>
+        <div class="col-1 mb-2">
+          <button class="btn btn-mirte-control mr-2 background-actuator" :title="$t('actuators.move_right')"
+            @mousedown="control('right_down')" @mouseup="control('right_up')"
+            @contextmenu.prevent="control('right_down')">
+            <ClientOnly>
+              <FontAwesomeIcon :icon="['fas', 'arrow-right']" />
+            </ClientOnly>
+          </button>
+        </div>
 
 
-               </div>
+      </div>
 
 
-               <div class="row mb-4">
+      <div class="row mb-4">
 
-                <div class="col-1 offset-6">
-                <button class="btn btn-mirte-control mr-2 background-actuator"
-               
-                   :title="$t('actuators.move_backward')"
-                   @mousedown="control('backward_down')"
-                   @mouseup="control('backward_up')"
-                   @contextmenu.prevent="control('backward_down')"
-                 >
-                 <ClientOnly><FontAwesomeIcon :icon="['fas', 'arrow-down']" /></ClientOnly>
-                 </button>
-                 </div>
-               </div>
+        <div class="col-1 offset-6">
+          <button class="btn btn-mirte-control mr-2 background-actuator" :title="$t('actuators.move_backward')"
+            @mousedown="control('backward_down')" @mouseup="control('backward_up')"
+            @contextmenu.prevent="control('backward_down')">
+            <ClientOnly>
+              <FontAwesomeIcon :icon="['fas', 'arrow-down']" />
+            </ClientOnly>
+          </button>
+        </div>
+      </div>
 
-  
-              <div class="rounded background-actuator p-2 text-white mb-2">
-                  <div class="row">
-                     <div class="col-4">
-                       {{ $t('actuators.speed') }}: {{ linear_speed }}
-                     </div>
-                     <div class="col-8">
-                         <input class="form-range" id="range-1" v-model="linear_speed" type="range" min="0" max=".1" step="0.01" @contextmenu.prevent ></input>
-                     </div>
-                  </div>
-               </div>
 
-               <div class="rounded background-actuator p-2 text-white mb-2">
-                  <div class="row">
-                     <div class="col-4">
-                       {{ $t('actuators.angular_speed') }}: {{ angular_speed }}
-                     </div>
-                     <div class="col-8">
-                         <input class="form-range" id="range-1" v-model="angular_speed" type="range" min="0" max="1" step="0.01" @contextmenu.prevent ></input>
-                     </div>
-                  </div>
+      <div class="rounded background-actuator p-2 text-white mb-2">
+        <div class="row">
+          <div class="col-4">
+            {{ $t('actuators.speed') }}: {{ linear_speed }}
+          </div>
+          <div class="col-8">
+            <input class="form-range" id="range-1" v-model="linear_speed" type="range" min="0" max=".1" step="0.01"
+              @contextmenu.prevent></input>
+          </div>
+        </div>
+      </div>
 
-              </div>  
+      <div class="rounded background-actuator p-2 text-white mb-2">
+        <div class="row">
+          <div class="col-4">
+            {{ $t('actuators.angular_speed') }}: {{ angular_speed }}
+          </div>
+          <div class="col-8">
+            <input class="form-range" id="range-1" v-model="angular_speed" type="range" min="0" max="1" step="0.01"
+              @contextmenu.prevent></input>
+          </div>
+        </div>
 
-           </div>
+      </div>
+
+    </div>
 
 
 
-      <div v-for="actuator in getActuators()"  class="rounded background-tertiary p-3 mb-2" @contextmenu.prevent >
-              <h5>{{ $t('peripherals.' + peripherals[actuator].text) }}</h5> 
-                  <div v-for="instance in getInstances(actuator)" class="rounded background-actuator p-2 text-white mb-2">
-                     <div v-if="actuator === 'servo'">
-                          <div>
-                            {{instance}}: {{ actuator_values[actuator][instance] }}
-                          </div>
-                          <div>
-                              <input class="form-range" id="range-1" v-model="actuator_values[actuator][instance]" @update="sendData(actuator, instance)" type="range" min="0" max="180" @contextmenu.prevent ></input>
-                          </div>
-                     </div>
+    <div v-if="isSBC()" v-for="actuator in getActuators()" class="rounded background-tertiary p-3 mb-2" @contextmenu.prevent>
+      <div class="h5">{{ $t('peripherals.' + peripherals[actuator].text) }}</div>
+      <div v-for="instance in getInstances(actuator)" class="rounded background-actuator p-2 text-white mb-2">
+        <div v-if="actuator === 'servo'">
+          <div>
+            {{ instance }}: {{ actuator_values[actuator][instance] }}
+          </div>
+          <div>
+            <input class="form-range" id="range-1" v-model="actuator_values[actuator][instance]"
+              @change="sendData(actuator, instance)" type="range" min="0" max="180" @contextmenu.prevent></input>
+          </div>
+        </div>
 
-                     <div v-if="actuator === 'oled'">
-                       <div class="row">
-                         <div class="col-2">
-                           {{instance}}
-                         </div>
-<!--
+        <div v-if="actuator === 'oled'">
+          <div class="row">
+            <div class="col-2">
+              {{ instance }}
+            </div>
+            <!--
                          <div class="col-5">
                              <b-form-select v-model="actuator_values[actuator][instance].type" :options="oled_options"></b-form-select>
                          </div>
 -->
-                         <div class="col-10">
-                             <input class="form-text" v-model="actuator_values[actuator][instance].text" @change="set_oled(actuator, instance)" placeholder=""></input>
-                         </div>
-                       </div>
-                     </div>
+            <div class="col-10">
+              <input class="form-text" v-model="actuator_values[actuator][instance].text"
+                @change="set_oled(actuator, instance)" placeholder=""></input>
+            </div>
+          </div>
+        </div>
 
-                     <div v-if="actuator === 'pp_motor' || actuator === 'dp_motor' || actuator === 'ddp_motor'">
-                          <div>
-                            {{instance}}: {{ actuator_values[actuator][instance] }}
-                          </div>
-                          <div>
-                              <input class="form-range" id="range-1" v-model="actuator_values[actuator][instance]" @update="sendData(actuator, instance)" type="range" min="-100" max="100" @contextmenu.prevent ></input>
-                          </div>
-                     </div>
-
-                  </div>
-           </div>
-
+        <div v-if="actuator == 'motor'">
+          <div>
+            {{ instance }}: {{ actuator_values[actuator][instance] }}
+          </div>
+          <div>
+            <input class="form-range" id="motor-range" v-model="actuator_values[actuator][instance]"
+              @change="sendData(actuator, instance)" type="range" min="-100" max="100" @contextmenu.prevent></input>
+          </div>
+        </div>
 
       </div>
+    </div>
+
+
+  </div>
 
 </template>
 
 <script>
 import * as ROSLIB from 'roslib'
-//import ros from '../ws-connection/ROS-connection.js'
-//import Xterm from '@/components/Xterm.vue'
 import properties_ph from "../assets/json/properties_ph.json"
-//import Vue from 'vue'
 
 
 export default {
   name: 'actuators',
   components: {
-  //  Xterm
+    //  Xterm
   },
   methods: {
-        getActuators() {
-          return Object.keys(this.actuators);
-        },
-        getInstances(type){
-          return Object.keys(this.actuators[type]);
-        },
-        sendData(actuator, instance){
-           var request = {};
-           request[this.peripherals[actuator].service_value] = parseInt(this.actuator_values[actuator][instance]);
-           this.actuator_services[actuator][instance].callService(request, function(result) {});
-        },
-        set_oled(actuator, instance){
-           var request = { text: this.actuator_values[actuator][instance].text };
-           this.actuator_services[actuator][instance].callService(request, function(result) {});
-        },
-        control(command) {
-          switch(command) {
-              case "forward_down":
-                this.current_linear_speed = this.linear_speed;
-                break;
-              case "backward_down":
-                this.current_linear_speed = -this.linear_speed;
-                break;
-              case "left_down":
-                this.current_angular_speed = this.angular_speed;
-                break;
-              case "right_down":
-                this.current_angular_speed = -this.angular_speed;
-                break;
-              case "stop":
-                this.current_linear_speed = 0.0;
-                this.current_angular_speed = 0.0;
-                break;
-              case "left_up":
-              case "right_up":
-                this.current_angular_speed = 0.0;
-                break;
-              case "forward_up":
-              case "backward_up":
-                this.current_linear_speed = 0.0;
-                break;
-              default:
-                break;
-          }
+    getActuators() {
+      return Object.keys(this.actuators);
+    },
+    getInstances(type) {
+      return Object.keys(this.actuators[type]);
+    },
+    isSBC() {
+      return useConnectionStore().device == "sbc"
+    },
+    sendData(actuator, instance) {
+      var request = {};
+      request[this.peripherals[actuator].service_value] = parseInt(this.actuator_values[actuator][instance]);
+      this.actuator_services[actuator][instance].callService(request, function (result) { });
+    },
+    set_oled(actuator, instance) {
+      var request = { text: this.actuator_values[actuator][instance].text };
+      this.actuator_services[actuator][instance].callService(request, function (result) { });
+    },
+    control(command) {
+      switch (command) {
+        case "forward_down":
+          this.current_linear_speed = this.linear_speed;
+          break;
+        case "backward_down":
+          this.current_linear_speed = -this.linear_speed;
+          break;
+        case "left_down":
+          this.current_angular_speed = this.angular_speed;
+          break;
+        case "right_down":
+          this.current_angular_speed = -this.angular_speed;
+          break;
+        case "stop":
+          this.current_linear_speed = 0.0;
+          this.current_angular_speed = 0.0;
+          break;
+        case "left_up":
+        case "right_up":
+          this.current_angular_speed = 0.0;
+          break;
+        case "forward_up":
+        case "backward_up":
+          this.current_linear_speed = 0.0;
+          break;
+        default:
+          break;
+      }
 
-            var twist = {
-              linear : {
-                x : parseFloat(this.current_linear_speed),
-                y : 0.0,
-                z : 0.0
-              },
-              angular : {
-                x : 0.0,
-                y : 0.0,
-                z : parseFloat(this.current_angular_speed)
-              }
-            };
-
-            this.cmd_vel.publish(twist);
-
+      var twist = {
+        linear: {
+          x: parseFloat(this.current_linear_speed),
+          y: 0.0,
+          z: 0.0
         },
+        angular: {
+          x: 0.0,
+          y: 0.0,
+          z: parseFloat(this.current_angular_speed)
+        }
+      };
+
+      this.cmd_vel.publish(twist);
+
+    },
   },
   data() {
     return {
@@ -247,59 +241,60 @@ export default {
       ros: {} // TODO: check if this is needed?
     }
   },
-  mounted(){
+  mounted() {
 
     const peripheralStore = usePeripheralStore()
     const { peripherals: storePeripherals } = storeToRefs(peripheralStore)
-    const { $ros } = useNuxtApp() // get ros from plugin
+    const connectionStore = useConnectionStore()
+    const { status } = storeToRefs(connectionStore)
 
     watch(
-      storePeripherals,
+      status,
       (newVal) => {
-          // NOTE: this one should only be called once after
-          // the app is loaded and the ROS paramters have
-          // been set.
+        if (newVal != "connected") { return }
+        
+        let peripherals = peripheralStore.peripherals
+        for (const [actuator_type, peripheral] of Object.entries(peripherals)) {
+          if (actuator_type == "device" || properties_ph[actuator_type].rel_path.split("\\")[0] != "Actuators") { continue }
 
-          let actuators = newVal.actuators;
+          // Initialize objects directly
+          this.actuators[actuator_type] = {}
+          this.actuator_values[actuator_type] = {}
+          this.actuator_services[actuator_type] = {}
 
-          for (let actuator_type in actuators) {
+          for (const instance in peripheral) {
 
-            // Initialize objects directly
-            this.actuators[actuator_type] = {}
-            this.actuator_values[actuator_type] = {}
-            this.actuator_services[actuator_type] = {}
-
-            for (let instance in actuators[actuator_type]) {
-
-              if (actuator_type === "oled") {
-                this.actuator_values["oled"][instance] = { text: '' }
-              } else {
-                this.actuator_values[actuator_type][instance] = 0
-              }
-
-              this.actuators[actuator_type][instance] = {}
-              this.actuator_services[actuator_type][instance] = {}
-
-              let real_actuator_type = actuator_type.includes("motor") ? "motor" : actuator_type
-
-              
-              this.actuator_services[actuator_type][instance] = new ROSLIB.Service({
-                ros: $ros,
-                name: `/io/${real_actuator_type}/${instance}/${this.peripherals[actuator_type].service_name}`,
-                serviceType: this.peripherals[actuator_type].service_type
-              })
+            if (actuator_type === "oled") {
+              this.actuator_values["oled"][instance] = { text: '' }
+            } else {
+              this.actuator_values[actuator_type][instance] = 0
             }
+
+            this.actuators[actuator_type][instance] = {}
+            this.actuator_services[actuator_type][instance] = {}
+
+            let real_actuator_type = actuator_type.includes("motor") ? "motor" : actuator_type
+
+            let ros = useRos()
+            this.actuator_services[actuator_type][instance] = new ROSLIB.Service({
+              ros: ros,
+              name: `/io/${real_actuator_type}/${instance}/${this.peripherals[actuator_type].service_name}`,
+              serviceType: this.peripherals[actuator_type].service_type
+            })
           }
-    });
+        }
+      },
+      { immediate: true }
+    )
 
     let self = this;
 
-    window.addEventListener('keydown', function(ev) {
+    window.addEventListener('keydown', function (ev) {
       // Rather than wasd or ijkl, we use the
       // same keys as the teleopkey node
       let nodeName = ev.target.nodeName;
-      if (nodeName != "TEXTAREA" && nodeName != "INPUT"){
-        switch (ev.keyCode){
+      if (nodeName != "TEXTAREA" && nodeName != "INPUT") {
+        switch (ev.keyCode) {
           case 73: //i
             self.control('forward_down');
             break;
@@ -316,29 +311,30 @@ export default {
       }
     });
 
-    window.addEventListener('keyup', function(ev) {
-        // Rather than wasd or ijkl, we use the
-        // same keys as the teleopkey node
-        switch (ev.keyCode){
-          case 73: //i
-            self.control('forward_up');
-            break;
-          case 74: //j
-            self.control('left_up');
-            break;
-          case 76: //l
-            self.control('right_up');
-            break;
-          case 188: //,
-            self.control('backward_up');
-            break;
-        }
+    window.addEventListener('keyup', function (ev) {
+      // Rather than wasd or ijkl, we use the
+      // same keys as the teleopkey node
+      switch (ev.keyCode) {
+        case 73: //i
+          self.control('forward_up');
+          break;
+        case 74: //j
+          self.control('left_up');
+          break;
+        case 76: //l
+          self.control('right_up');
+          break;
+        case 188: //,
+          self.control('backward_up');
+          break;
+      }
     });
 
+    let ros = useRos()
     this.cmd_vel = new ROSLIB.Topic({
-       ros : $ros,
-       name : '/mirte_base_controller/cmd_vel',
-       messageType : 'geometry_msgs/Twist'
+      ros: ros,
+      name: '/mirte_base_controller/cmd_vel',
+      messageType: 'geometry_msgs/Twist'
     });
 
   }

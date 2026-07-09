@@ -41,6 +41,19 @@ const pythonReadOnly = computed(() =>
    split.value != 0
 )
 
+const showSensors = computed(() => {
+   return connectionStore.status == "connected" && connectionStore.transport == 'network'
+})
+
+const showActuators = computed(() => {
+   return connectionStore.status == "connected"
+})
+
+const programmingClass = computed(() => {
+   if (showSensors.value && showActuators.value) { return 'col-8' }
+   if (!showSensors.value && showActuators.value) { return 'col-10' }
+   return 'col-12'
+})
 
 const viewMode = computed({
    get() {
@@ -110,7 +123,7 @@ function redo() {
 
    <div class="row p-4 h-100">
 
-      <div v-if="false" class="col-3 p-2 h-100" style="overflow: hidden;">
+      <div v-show="showSensors" class="col-2 p-2 h-100" style="overflow: hidden;">
          <div class="layoutbox rounded h-100" style="overflow: hidden; display: flex; flex-flow: column;">
 
             <div class="text-black p-2 h3 m-0 layoutbox-title w-100 background-secondary">
@@ -124,7 +137,7 @@ function redo() {
          </div>
       </div>
 
-      <div class="col-9 p-2 h-100" style="overflow: hidden;">
+      <div :class="[programmingClass, 'p-2 h-100']" style="overflow: hidden;">
          <div class="layoutbox rounded" style="overflow: hidden; display: flex; flex-direction: column; height: 100%">
 
             <div class="layoutbox-title text-black p-2 h3 m-0 w-100 background-secondary" style="flex: 0 0 auto;">
@@ -197,7 +210,7 @@ function redo() {
          </div>
       </div>
 
-      <div class="col-3 p-2 h-100" style="overflow: hidden;">
+      <div v-show="showActuators" class="col-2 p-2 h-100" style="overflow: hidden;">
          <div class="layoutbox rounded h-100" style="overflow: hidden; display: flex; flex-flow: column;">
 
             <div class="text-black p-2 h3 m-0 layoutbox-title w-100 background-secondary">

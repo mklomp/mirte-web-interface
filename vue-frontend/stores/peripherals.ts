@@ -28,9 +28,8 @@ export const usePeripheralStore = defineStore('peripherals', {
 
       // and store to the robot
       if (connectionStore.status == "connected") {
-
-        const { uploadFile } = useConnection()
-        await uploadFile('/.settings.json', JSON.stringify(value, null, 2))
+        const { uploadSettings } = useConnection()
+        await uploadSettings(value)
         addToast($i18n.t('toast.saved_settings_success'), 'success', 'save-settings')
       } else {
         if (showToast) {

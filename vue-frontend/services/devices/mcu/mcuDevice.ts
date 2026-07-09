@@ -75,7 +75,7 @@ export class MCUDevice {
         // NOP
       } else {
         // upload localSettings to robotSettings
-        this.uploadFile(".settings.json", JSON.stringify(localsettings))
+        this.uploadSettings(localsettings)
       }
     } else {
       if (Object.keys(localsettings).length < 2) { // local setting is empty or just "device"
@@ -97,6 +97,10 @@ export class MCUDevice {
   async downloadFile(file) {
     const data = await this.fs.readFile(file)
     return data
+  }
+
+  async uploadSettings(content) {
+    await this.uploadFile(".settings.json", JSON.stringify(content, null, 2))
   }
 
   async uploadFile(path, content) {

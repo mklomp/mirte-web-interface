@@ -16,6 +16,10 @@ export function useConnection() {
     manager.attachTerminal(term, debug)
   }
 
+  async function uploadSettings(content) {
+    await manager.uploadSettings(content)
+  }
+
   async function uploadFile(path: string, content) {
     await manager.uploadFile(path, content)
   }
@@ -44,6 +48,7 @@ export function useConnection() {
     runCommand,
     startCode,
     stopCode,
-    reinstallMIRTE
+    reinstallMIRTE,
+    uploadSettings
   }
 }

@@ -1,9 +1,10 @@
 import { SerialTransport } from "@/services/transports/serialTransport"
-import { BLETransport } from "~/services/transports/BLETransport"
-//import { USBTransport } from "./transports/usbTransport"
+import { BLETransport } from "@/services/transports/BLETransport"
+import { NetworkTransport } from "@/services/transports/networkTransport"
 
 import { MCUDevice } from "./devices/mcu/mcuDevice"
-//import { SBCDevice } from "./devices/sbc/sbcDevice"
+import { SBCDevice } from "./devices/sbc/sbcDevice"
+import { useXtermConnection } from "~/composables/useRos"
 
 export class ConnectionManager {
 
@@ -43,7 +44,111 @@ export class ConnectionManager {
     }
   }
 
-  async connect(type: "mcu" | "sbc", transport: "serial" | "ble", autoconnect = false) {
+
+  parseData(data) {
+
+    const { addToast } = useToast()
+    const { $i18n } = useNuxtApp()
+
+    this.buffer += data
+
+    // detecting heartbeat __HB__, and removing if found
+    if (this.transporttype == "ble" && this.buffer.includes("__HB__\r\n")) {
+      this.buffer = this.buffer.replaceAll("__HB__\r\n", "") // remove all heartbeats (except when in debug)
+      this.lastHeartbeat = Date.now()
+    }
+
+    // make sure not to print the output of the main.py
+    // code which was started on boot of the MCU
+    if (this.running) {
+
+      // detecting __START__, only stripping the buffer
+      if (this.buffer.includes("__START__\r\n")) {
+        const marker = "__START__\r\n"
+        const idx = this.buffer.indexOf(marker)
+        this.buffer = this.buffer.slice(idx + marker.length) // throw away everyting before __START__
+        this.next_status = "print"
+        // Just start printing, as long as it does not seem to be the start of an exception
+        if (this.buffer.length > 0 && this.buffer[0] != "_") {
+          this.buffer_status = "print"
+        }
+      }
+
+      
+      // detecting __START_EXCEPTION__, strip from buffer but keep exception
+      else if (this.buffer.includes("__START_EXCEPTION__\r\n")) {
+        const marker = "__START_EXCEPTION__\r\n"
+        const idx = this.buffer.indexOf(marker)
+
+        this.exception_buffer = this.exception_buffer + this.buffer.slice(idx + marker.length)
+        this.buffer = this.buffer.slice(0, idx) // keep everything before
+        this.next_status = "exception"
+      }
+
+      // detecting __STOP_EXCEPTION__, only stripping the buffer
+      else if (this.buffer.includes("__STOP_EXCEPTION__\r\n")) {
+        const marker = "__STOP_EXCEPTION__\r\n"
+        const idx = this.buffer.indexOf(marker)
+
+        this.exception_buffer = this.exception_buffer + this.buffer.slice(0, idx)
+        this.buffer = this.buffer.slice(idx + marker.length)
+        this.next_status = "print"
+
+        addToast(this.exception_buffer, 'error', 'code-error')
+        this.exception_buffer = ""
+      }
+
+      // detecting __STOP__, only stripping the buffer
+      else if (this.buffer.includes("__STOP__\r\n")) {
+        const marker = "__STOP__\r\n"
+        const idx = this.buffer.indexOf(marker)
+
+
+        this.next_status = "filter"
+        this.stopped_found = true
+        this.buffer = this.buffer.slice(0, idx) // throw away everything after __STOP__
+
+        useState("programming-state").value = "idle"
+      }
+
+      // write and remove all newlines in the buffer
+      if (this.buffer_status == "print") {
+        let index
+        while ((index = this.buffer.indexOf("\r\n")) !== -1) {
+          const line = this.buffer.slice(0, index + 2)
+          this.buffer = this.buffer.slice(index + 2)
+          if (!this.debug) {
+            this.term.write(line)
+          }
+        }
+      }
+    }
+
+    // clear the buffer after __STOP__ or when not running
+    if (this.stopped_found || !this.running) {
+      const marker = "__HB__\r\n"
+      const idx = this.buffer.indexOf(marker)
+      if (this.transporttype == "ble" && idx > 0) {
+        this.buffer = this.buffer.slice(idx + marker.length)
+      } else {
+        this.buffer = ""
+      }
+
+      this.stopped_found = false
+      this.running = false
+    }
+
+    this.buffer_status = this.next_status
+
+    if (this.debug) {
+      this.term.write(data)
+    }
+
+  }
+
+
+
+  async connect(type: "mcu" | "sbc", transport: "serial" | "ble" | "network", autoconnect = false) {
     this.transporttype = transport
     const { addToast } = useToast()
     const { $i18n } = useNuxtApp()
@@ -68,99 +173,8 @@ export class ConnectionManager {
       // "__START__": detecting when execution started (see main.py)
       // "__STOP__": detecting when execution stopped (see main.py)
       this.transport?.onData((data) => {
-
-        this.buffer += data
-
-        // detecting heartbeat __HB__, and removing if found
-        if (this.transporttype == "ble" && this.buffer.includes("__HB__\r\n")) {
-          this.buffer = this.buffer.replaceAll("__HB__\r\n", "") // remove all heartbeats (except when in debug)
-          this.lastHeartbeat = Date.now()
-        }
-
-        // make sure not to print the output of the main.py
-        // code which was started on boot of the MCU
-        if (this.running) {
-
-          // detecting __START__, only stripping the buffer
-          if (this.buffer.includes("__START__\r\n")) {
-            const marker = "__START__\r\n"
-            const idx = this.buffer.indexOf(marker)
-            this.buffer = this.buffer.slice(idx + marker.length) // throw away everyting before __START__
-            this.next_status = "print"
-            // Just start printing, as long as it does not seem to be the start of an exception
-            if (this.buffer.length > 0 && this.buffer[0] != "_"){
-              this.buffer_status = "print"
-            }
-          }
-
-          // detecting __START_EXCEPTION__, strip from buffer but keep exception
-          else if (this.buffer.includes("__START_EXCEPTION__\r\n")) {
-            const marker = "__START_EXCEPTION__\r\n"
-            const idx = this.buffer.indexOf(marker)
-
-            this.exception_buffer = this.exception_buffer + this.buffer.slice(idx + marker.length)
-            this.buffer = this.buffer.slice(0, idx) // keep everything before
-            this.next_status = "exception"
-          }
-
-          // detecting __STOP_EXCEPTION__, only stripping the buffer
-          else if (this.buffer.includes("__STOP_EXCEPTION__\r\n")) {
-            const marker = "__STOP_EXCEPTION__\r\n"
-            const idx = this.buffer.indexOf(marker)
-
-            this.exception_buffer = this.exception_buffer + this.buffer.slice(0, idx)
-            this.buffer = this.buffer.slice(idx + marker.length)
-            this.next_status = "print"
-
-            addToast(this.exception_buffer, 'error', 'code-error')
-            this.exception_buffer = ""
-          }
-
-          // detecting __STOP__, only stripping the buffer
-          else if (this.buffer.includes("__STOP__\r\n")) {
-            const marker = "__STOP__\r\n"
-            const idx = this.buffer.indexOf(marker)
-
-            this.next_status = "filter"
-            this.stopped_found = true
-            this.buffer = this.buffer.slice(0, idx) // throw away everything after __STOP__
-
-            useState("programming-state").value = "idle"
-          }
-
-          // write and remove all newlines in the buffer
-          if (this.buffer_status == "print") {
-            let index
-            while ((index = this.buffer.indexOf("\r\n")) !== -1) {
-              const line = this.buffer.slice(0, index + 2)
-              this.buffer = this.buffer.slice(index + 2)
-              if (!this.debug) {
-                this.term.write(line)
-              }
-            }
-          }
-        }
-
-        // clear the buffer after __STOP__ or when not running
-        if (this.stopped_found || !this.running) {
-          const marker = "__HB__\r\n"
-          const idx = this.buffer.indexOf(marker)
-          if (this.transporttype == "ble" && idx > 0) {
-            this.buffer = this.buffer.slice(idx + marker.length)
-          } else {
-            this.buffer = ""
-          }
-
-          this.stopped_found = false
-          this.running = false
-        }
-
-        this.buffer_status = this.next_status
-
-        if (this.debug) {
-          this.term.write(data)
-        }
-
+        this.term.write(data)
+        //this.parseData(data)
       })
 
       // make sure the terminal is in a determined state
@@ -185,16 +199,31 @@ export class ConnectionManager {
 
       connectionStore.setConnectionStatus("connected")
       useState("programming-state").value = "idle"
-      useConnectionStore().setConnectionType(transport, type)
+      useConnectionStore().setConnectionType(type, transport)
       return true
     }
 
-    /*if (type === "sbc") {
-      this.transport = new USBTransport()
-      await this.transport.connect()
-   
+    // TODO: these should be no difference between sbc and mcu. Just different transport and devices.
+    if (type === "sbc") {
+      this.transport = new NetworkTransport()
+      let socket = this.transport.connect()
+      addToast($i18n.t('toast.connected_and_initializing'), 'info', 'connection-status', -1)
+
+      this.transport?.onData((data) => {
+        this.parseData(data)
+      })
+
+
       this.device = new SBCDevice(this.transport)
-    }*/
+      await this.device.initialize(socket)
+      connectionStore.setConnectionStatus("connected")
+      useConnectionStore().setConnectionType(type, transport)
+      await this.device.waitForPrompt()
+      useState("programming-state").value = "idle"
+      addToast($i18n.t('toast.connected'), 'success', 'connection-status')
+      return true
+      //}
+    }
 
     // 
     return false
@@ -222,8 +251,12 @@ export class ConnectionManager {
     this.device.stopCode()
   }
 
-  async reinstallMIRTE(){
+  async reinstallMIRTE() {
     await this.device.reinstallMIRTE()
+  }
+
+  async uploadSettings(content) {
+    await this.device.uploadSettings(content)
   }
 
   async uploadFile(path, content) {

@@ -140,6 +140,7 @@
     "usb_disconnected": "USB disconnected.",
     "automatically_connected": "Automatically connected to known robot.",
     "connected": "Connected to robot.",
+    "connected_and_initializing": "Connected to robot. Terminal is initializing.",
     "uploading_code": "Sending code to robot....",
     "uploading_mirte_scripts": "Installing MIRTE scripts.",
     "uploading_mirte_scripts_error": "Failed to install MIRTE scripts.",
