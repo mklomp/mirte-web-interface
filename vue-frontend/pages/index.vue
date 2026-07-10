@@ -98,12 +98,13 @@ watch(split, (val) => {
 watch(
    () => peripheralStore.peripherals,
    (settings) => {
+  /*    console.log("hier....")
       if (Object.keys(settings).length < 2) {
          openModal(IntroModal)
       } else {
          closeModal()
       }
-   },
+*/   },
    { deep: true, immediate: false }
 )
 
@@ -119,8 +120,9 @@ function redo() {
 </script>
 
 <template>
+   
    <ModalContainer />
-
+   
    <div class="row p-4 h-100">
 
       <div v-show="showSensors" class="col-2 p-2 h-100" style="overflow: hidden;">

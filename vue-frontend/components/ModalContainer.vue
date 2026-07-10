@@ -1,19 +1,15 @@
 <template>
   <div v-if="modals.length" class="modal-overlay">
-    <div
-      v-for="modal in modals"
-      :key="modal.id"
-      class="modal-wrapper"
-    >
-      <div class="modal-content">
-        <button class="modal-close" @click="closeModal(modal.id)">×</button>
+    <div v-for="modal in modals" :key="modal.id" class="modal-wrapper">
 
-        <component
-          :is="modal.component"
-          v-bind="modal.props"
-          @close="closeModal(modal.id)"
-        />
+
+
+      <div class="modal-content">
+        <div class="modal-body">
+          <component :is="modal.component" v-bind="modal.props" @close="closeModal(modal.id)" />
+        </div>
       </div>
+
     </div>
   </div>
 </template>
@@ -32,8 +28,10 @@ const { modals, closeModal } = useModal()
   width: 100%;
   height: 100%;
 
-  background: rgba(0, 0, 0, 0.5); /* opaque background */
-  z-index: 100; /* below navbar */
+  background: rgba(0, 0, 0, 0.5);
+  /* opaque background */
+  z-index: 100;
+  /* below navbar */
 
   display: flex;
   justify-content: center;
@@ -45,26 +43,24 @@ const { modals, closeModal } = useModal()
 }
 
 .modal-content {
-  position: relative;
-
   width: 60vw;
   max-width: 900px;
+  height: 80vh;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
 
   background: white;
   border-radius: 12px;
-  padding: 24px;
-
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
 
-.modal-close {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-
-  border: none;
-  background: none;
-  font-size: 20px;
-  cursor: pointer;
+.modal-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 12px;
 }
+
 </style>

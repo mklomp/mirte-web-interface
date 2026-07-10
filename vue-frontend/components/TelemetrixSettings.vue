@@ -8,9 +8,14 @@
         <div class="text-white p-2 h3 layoutbox-title background-secondary">
           {{ $t("settings.wiring") }}
 
+          <button @click="closeModal" class="btn float-end">
+            x
+          </button>
+
           <button @click="save" class="btn btn-mirte float-end">
             {{ $t("settings.save") }}
           </button>
+
         </div>
 
         <!-- BOARD -->
@@ -81,8 +86,10 @@ import properties_mc from "~/assets/json/properties_mc.json"
 import { useWiring } from "~/composables/useWiring"
 import { usePeripheralStore } from '@/stores/peripherals'
 import { useToast } from '~/composables/useToast'
+import { useModal } from '~/composables/useModal'
 
 const { addToast } = useToast()
+const { closeModal } = useModal()
 
 import PeripheralRow from "~/components/PeripheralRow.vue"
 
@@ -217,7 +224,7 @@ async function reinstall() {
 async function save() {
 
   if (hasErrors.value) {
-    addToast("Er zijn configuratiefouten aanwezig. Controleer de oranje velden.", "error", "setting-error")
+    addToast("Er zijn configuratiefouten aanwezig. Controleer de oranje velden.", "error", "settings-status")
     return
   }
 

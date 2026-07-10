@@ -30,10 +30,10 @@ export const usePeripheralStore = defineStore('peripherals', {
       if (connectionStore.status == "connected") {
         const { uploadSettings } = useConnection()
         await uploadSettings(value)
-        addToast($i18n.t('toast.saved_settings_success'), 'success', 'save-settings')
+        addToast($i18n.t('toast.saved_settings_success'), 'success', 'settings-status')
       } else {
         if (showToast) {
-          addToast($i18n.t('toast.saved_settings_locally'), 'info', 'save-settings')
+          addToast($i18n.t('toast.saved_settings_locally'), 'info', 'settings-status')
         }
       }
     }

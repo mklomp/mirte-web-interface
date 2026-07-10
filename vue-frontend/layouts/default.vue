@@ -16,11 +16,24 @@ onMounted(async () => {
   peripheralStoreStore.loadFromLocalStorage()
 })
 
-useState('programming-state', () => "initializing") // ready (todo: rename idle), running, paused
-useState('ros-state', () => "disconnected") // connecting, connected
-useState('term-state', () => "disconnected") // initializing, initialized, python-active
 
-// TODO: watch op ros-state and term-state -> and set programming-state
+import { useModal } from '~/composables/useModal'
+import settingsModal from '~/components/TelemetrixSettings.vue'
+import networkModal from '~/components/NetworkSettings.vue'
+const { openModal, closeModal } = useModal()
+
+const isConnected = computed(() => connectionStore.status == "connected")
+const connectionType = computed(() => connectionStore.transport)
+
+
+function openSettings() {
+  openModal(settingsModal)
+}
+
+function openWifi() {
+  openModal(networkModal)
+}
+
 
 </script>
 
@@ -38,13 +51,26 @@ useState('term-state', () => "disconnected") // initializing, initialized, pytho
     </button>
     <div class="navbar-collapse" id="navbarNavDropdown">
       <ul class="navbar-nav ms-auto">
-        <li class="nav-item">
-          <NuxtLink :to="localePath({ path: '/' })" class="nav-link"> {{ $t("main.programming") }}
-          </NuxtLink>
-        </li>
-        <li class="nav-item">
-          <NuxtLink :to="localePath({ path: '/settings' })" class="nav-link"> {{ $t("main.settings") }}
-          </NuxtLink>
+        <li class="nav-item dropdown">
+
+          <a class="nav-link dropdown-toggle" href="#" id="settingsDropdown" role="button" data-bs-toggle="dropdown"
+            aria-expanded="false">
+            {{ $t("main.settings") }}
+          </a>
+
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="settingsDropdown">
+            <li>
+              <button class="dropdown-item" @click="openSettings">
+                Robot hardware
+              </button>
+            </li>
+
+            <li v-if="connectionType == 'network'">
+              <button class="dropdown-item" @click="openWifi" :disabled="!isConnected">
+                Network
+              </button>
+            </li>
+          </ul>
         </li>
         <li class="nav-item dropdown">
           <ShutdownMenu />
