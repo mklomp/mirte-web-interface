@@ -20,9 +20,14 @@ export function useModal() {
     modals.value = []
   }
 
+  function isOpen(){
+    return modals.value.length > 0
+  }
+
   return {
     modals,
     openModal,
-    closeModal
+    closeModal,
+    isOpen
   }
 }

@@ -142,12 +142,15 @@ const usedPins = computed(() => {
 
 onMounted(() => {
   peripheralStore.loadFromLocalStorage()
+  JSONtoUI(peripheralStore.peripherals)
 })
 
+// when connected. TODO: maybe explicitly check connectionStatus rather than
+// peripherla?
 watch(
-  peripheralStore,
+ () => peripheralStore.peripherals,
   (val) => {
-    if (val) JSONtoUI(val.peripherals)
+    if (val) JSONtoUI(val)
   }
 )
 

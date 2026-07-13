@@ -81,8 +81,10 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { useToast } from '~/composables/useToast'
 import { useConnectionStore } from '~/stores/connection'
+import { useModal } from '~/composables/useModal'
 
 import { usePeripheralStore } from '@/stores/peripherals'
+import settingsModal from '~/components/TelemetrixSettings.vue'
 import defaultSettings from '@/assets/json/pcb_settings.json?raw'
 
 import { ref, computed } from 'vue'
@@ -92,6 +94,7 @@ import { ref, computed } from 'vue'
 const peripheralStore = usePeripheralStore()
 const connectionStore = useConnectionStore()
 const { connect } = useConnection()
+const { closeModal, openModal } = useModal()
 
 const { t } = useI18n()
 const emit = defineEmits(['close'])
@@ -132,8 +135,9 @@ function selectDefault() {
 }
 
 function selectCustom() {
-  emit('close')
-  router.push('/settings')
+  //emit('close')
+  closeModal()
+  openModal(settingsModal)
 }
 </script>
 

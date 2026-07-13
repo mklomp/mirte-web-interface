@@ -19,6 +19,7 @@ export const usePeripheralStore = defineStore('peripherals', {
     },
 
     async setPeripherals(value, showToast = true) {
+
       const { addToast } = useToast()
       const { $i18n } = useNuxtApp()
       const connectionStore = useConnectionStore()

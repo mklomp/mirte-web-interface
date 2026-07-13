@@ -65,11 +65,13 @@ function openWifi() {
               </button>
             </li>
 
-            <li v-if="connectionType == 'network'">
-              <button class="dropdown-item" @click="openWifi" :disabled="!isConnected">
-                Network
-              </button>
-            </li>
+            <ClientOnly>
+              <li v-if="connectionType == 'network'">
+                <button class="dropdown-item" @click="openWifi" :disabled="!isConnected">
+                  Network
+                </button>
+              </li>
+            </ClientOnly>
           </ul>
         </li>
         <li class="nav-item dropdown">

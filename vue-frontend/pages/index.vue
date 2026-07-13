@@ -20,7 +20,7 @@ import { Splitpanes, Pane } from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
 
 const connectionStore = useConnectionStore()
-const { openModal, closeModal } = useModal()
+const { openModal, closeModal, isOpen} = useModal()
 const codeStore = useCodeStore()
 const peripheralStore = usePeripheralStore()
 
@@ -79,6 +79,11 @@ onMounted(() => {
    })
 
    observer.observe(blocklyContainer.value)
+
+   // Open modal
+   if (Object.keys(peripheralStore.peripherals).length < 2) {
+      openModal(IntroModal)
+   }
 })
 
 function onResize(event) {
@@ -95,18 +100,27 @@ watch(split, (val) => {
    }
 })
 
+
+
 watch(
    () => peripheralStore.peripherals,
-   (settings) => {
-  /*    console.log("hier....")
-      if (Object.keys(settings).length < 2) {
-         openModal(IntroModal)
-      } else {
-         closeModal()
+   (newVal, oldVal) => {
+      if (JSON.stringify(newVal) != JSON.stringify(oldVal)) {
+         if (Object.keys(newVal).length < 2) {
+            openModal(IntroModal)
+         } 
       }
-*/   },
-   { deep: true, immediate: false }
+   }
 )
+
+
+watch(isOpen, (open) => {
+   if (!open && Object.keys(peripheralStore.peripherals).length < 2) {
+      openModal(IntroModal)
+   }
+})
+
+
 
 function undo() {
    blocklyEditor.value.undo()
@@ -120,9 +134,9 @@ function redo() {
 </script>
 
 <template>
-   
+
    <ModalContainer />
-   
+
    <div class="row p-4 h-100">
 
       <div v-show="showSensors" class="col-2 p-2 h-100" style="overflow: hidden;">
@@ -147,43 +161,29 @@ function redo() {
 
                <div class="btn-group" role="group" aria-label="View mode">
 
-                  <input
-                     type="radio"
-                     class="btn-check"
-                     name="viewMode"
-                     id="blockly"
-                     autocomplete="off"
-                     value="blockly"
-                     v-model="viewMode"
-                  >
-                  <label class="btn btn-outline-light" for="blockly" data-bs-toggle="tooltip" title="Visual block-based programming">
-                     <ClientOnly><FontAwesomeIcon icon="puzzle-piece" /></ClientOnly>
+                  <input type="radio" class="btn-check" name="viewMode" id="blockly" autocomplete="off" value="blockly"
+                     v-model="viewMode">
+                  <label class="btn btn-outline-light" for="blockly" data-bs-toggle="tooltip"
+                     title="Visual block-based programming">
+                     <ClientOnly>
+                        <FontAwesomeIcon icon="puzzle-piece" />
+                     </ClientOnly>
                   </label>
 
-                  <input
-                     type="radio"
-                     class="btn-check"
-                     name="viewMode"
-                     id="split"
-                     autocomplete="off"
-                     value="split"
-                     v-model="viewMode"
-                  >
+                  <input type="radio" class="btn-check" name="viewMode" id="split" autocomplete="off" value="split"
+                     v-model="viewMode">
                   <label class="btn btn-outline-light" for="split">
-                     <ClientOnly><FontAwesomeIcon icon="table-columns" /></ClientOnly>
+                     <ClientOnly>
+                        <FontAwesomeIcon icon="table-columns" />
+                     </ClientOnly>
                   </label>
 
-                  <input
-                     type="radio"
-                     class="btn-check"
-                     name="viewMode"
-                     id="python"
-                     autocomplete="off"
-                     value="python"
-                     v-model="viewMode"
-                  >
+                  <input type="radio" class="btn-check" name="viewMode" id="python" autocomplete="off" value="python"
+                     v-model="viewMode">
                   <label class="btn btn-outline-light" for="python">
-                     <ClientOnly><FontAwesomeIcon icon="code" /></ClientOnly>
+                     <ClientOnly>
+                        <FontAwesomeIcon icon="code" />
+                     </ClientOnly>
                   </label>
 
                </div>
