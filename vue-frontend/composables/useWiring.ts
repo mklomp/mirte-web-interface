@@ -75,8 +75,8 @@ export function useWiring(peripheralsDef: any, microcontrollers: any) {
     peripheralStore.setPeripherals(json)
   }
 
-
   function UItoJSON() {
+
     const result: any = {
       device: {
         mirte: {

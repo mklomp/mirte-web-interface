@@ -108,7 +108,10 @@ watch(
       if (JSON.stringify(newVal) != JSON.stringify(oldVal)) {
          if (Object.keys(newVal).length < 2) {
             openModal(IntroModal)
-         } 
+         } else {
+            console.log("cloding modal based on new settings")
+            closeModal(IntroModal)
+         }
       }
    }
 )

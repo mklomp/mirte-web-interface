@@ -5,71 +5,133 @@
       <div class="layoutbox rounded h-100 d-flex flex-column">
 
         <!-- HEADER -->
-        <div class="text-white p-2 h3 layoutbox-title background-secondary">
-          {{ $t("settings.wiring") }}
+        <div class="layoutbox-title background-secondary d-flex justify-content-between align-items-center px-2 py-2">
 
-          <button @click="closeModal" class="btn float-end">
-            x
-          </button>
+          <ul class="nav nav-tabs border-0">
+            <li class="nav-item">
+              <button class="nav-link" :class="{ active: activeTab === 'peripherals' }"
+                @click="activeTab = 'peripherals'">
+                {{ $t("settings.wiring") }}
+              </button>
+            </li>
 
-          <button @click="save" class="btn btn-mirte float-end">
-            {{ $t("settings.save") }}
-          </button>
+            <li class="nav-item">
+              <button class="nav-link" :class="{ active: activeTab === 'drive' }" @click="activeTab = 'drive'">
+                {{ $t("settings.drive") }}
+              </button>
+            </li>
+          </ul>
 
-        </div>
+          <div>
+            <button @click="save" class="btn btn-mirte me-2">
+              {{ $t("settings.save") }}
+            </button>
 
-        <!-- BOARD -->
-        <div class="p-2">
-          Microcontroller:
-          <div class="float-end">
-            <select v-model="state.board" class="form-control">
-              <option v-for="(mc, name) in microcontrollers" :key="name" :value="name" :disabled="!isUsableMC(name)">
-                {{ mc.text }}
-              </option>
-            </select>
+            <button @click="closeModal()" class="btn text-white">
+              x
+            </button>
           </div>
 
-          <button @click="reinstall" class="btn btn-mirte float-end mx-2"
-            :disabled="connectionType !== 'serial' || !isConnected">
-            {{ $t("settings.reinstall") }}
-          </button>
         </div>
 
-        <!-- TABLE -->
-        <div class="h-100 table-scroll">
-          <table class="table table-striped">
+        <!-- PERIPHERALS TAB -->
+        <template v-if="activeTab === 'peripherals'">
 
-            <thead class="sticky-header">
-              <tr>
-                <th>
-                  <div class="dropdown">
-                    <button class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
-                      {{ $t("settings.add") }}
-                    </button>
+          <!-- BOARD -->
+          <div class="p-2">
+            Microcontroller:
+            <div class="float-end">
+              <select v-model="state.board" class="form-control">
+                <option v-for="(mc, name) in microcontrollers" :key="name" :value="name" :disabled="!isUsableMC(name)">
+                  {{ mc.text }}
+                </option>
+              </select>
+            </div>
 
-                    <ul class="dropdown-menu">
-                      <li v-for="(p, key) in peripheralsDef" :key="key">
-                        <button class="dropdown-item" @click="addPeripheral(key)" :disabled="!isUsablePeripheral(key)">
-                          {{ $t("peripherals." + p.text) }}
-                        </button>
-                      </li>
-                    </ul>
-                  </div>
-                </th>
+            <button @click="reinstall" class="btn btn-mirte float-end mx-2"
+              :disabled="connectionType !== 'serial' || !isConnected">
+              {{ $t("settings.reinstall") }}
+            </button>
+          </div>
 
-                <th>{{ $t("settings.name") }}</th>
-                <th>{{ $t("settings.pin") }}</th>
-              </tr>
-            </thead>
+          <!-- TABLE -->
+          <div class="h-100 table-scroll">
+            <table class="table table-striped">
 
-            <tbody>
-              <PeripheralRow v-for="item in state.peripherals" :key="item.id" :item="item"
-                :errors="validationErrors[item.id] || {}" :peripheralsDef="peripheralsDef" :usedPins="usedPins"
-                :getValidPins="getValidPins" @remove="removePeripheral" />
-            </tbody>
+              <thead class="sticky-header">
+                <tr>
+                  <th>
+                    <div class="dropdown">
+                      <button class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                        {{ $t("settings.add") }}
+                      </button>
 
-          </table>
-        </div>
+                      <ul class="dropdown-menu">
+                        <li v-for="(p, key) in peripheralsDef" :key="key">
+                          <button class="dropdown-item" @click="addPeripheral(key)"
+                            :disabled="!isUsablePeripheral(key)">
+                            {{ $t("peripherals." + p.text) }}
+                          </button>
+                        </li>
+                      </ul>
+                    </div>
+                  </th>
+
+                  <th>{{ $t("settings.name") }}</th>
+                  <th>{{ $t("settings.pin") }}</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <PeripheralRow v-for="item in state.peripherals" :key="item.id" :item="item"
+                  :errors="validationErrors[item.id] || {}" :peripheralsDef="peripheralsDef" :usedPins="usedPins"
+                  :getValidPins="getValidPins" @remove="removePeripheral" />
+              </tbody>
+
+            </table>
+          </div>
+
+        </template>
+
+        <!-- DIFFERENTIAL DRIVE TAB -->
+        <template v-else>
+
+          <div class="p-3">
+
+            <div v-if="!hasEnoughMotors" class="alert alert-warning">
+              {{ $t("settings.drive_message") }}
+
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Left motor</label>
+
+              <select v-model="leftMotor" class="form-control" :class="{ 'warning-field': driveErrors.sameMotor }"
+                :disabled="!hasEnoughMotors">
+                <option v-for="motor in motors" :key="motor" :value="motor">
+                  {{ motor }}
+                </option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Right motor</label>
+
+              <select v-model="rightMotor" class="form-control" :class="{ 'warning-field': driveErrors.sameMotor }"
+                :disabled="!hasEnoughMotors">
+                <option v-for="motor in motors" :key="motor" :value="motor">
+                  {{ motor }}
+                </option>
+              </select>
+            </div>
+
+            <div v-if="driveErrors.sameMotor" class="alert alert-warning">
+              Left and right motor must be different motors.
+            </div>
+
+          </div>
+
+        </template>
 
       </div>
     </div>
@@ -78,7 +140,7 @@
 </template>
 
 <script setup>
-import { ref, watch, computed } from "vue"
+import { ref, watch, computed, onMounted } from "vue"
 
 import properties_ph from "~/assets/json/properties_ph.json"
 import properties_mc from "~/assets/json/properties_mc.json"
@@ -107,9 +169,68 @@ const {
   reinstallMIRTE
 } = useWiring(peripheralsDef, microcontrollers)
 
+const connection = useConnection()
 const connectionStore = useConnectionStore()
 const isConnected = computed(() => connectionStore.status == "connected")
 const connectionType = computed(() => connectionStore.device)
+
+const activeTab = ref("peripherals")
+
+const leftMotor = ref("")
+const rightMotor = ref("")
+
+const motors = computed(() =>
+  (state.value.peripherals || [])
+    .filter(peripheral => peripheral.type === "motor")
+    .map(peripheral => peripheral.name)
+    .filter(Boolean)
+)
+
+const hasEnoughMotors = computed(() =>
+  motors.value.length >= 2
+)
+
+const driveErrors = computed(() => ({
+  sameMotor:
+    hasEnoughMotors.value &&
+    leftMotor.value &&
+    rightMotor.value &&
+    leftMotor.value === rightMotor.value
+}))
+
+let socket = null
+
+watch(
+  connectionStore,
+  (val) => {
+    if (val.status == "connected" && val.transport == "network" && val.ip_address != "") {
+      socket = new WebSocket(`ws://${val.ip_address}/ws/shell`)
+    }
+  }
+)
+
+watch(
+  motors,
+  (motorNames) => {
+
+    if (motorNames.length < 2) {
+      leftMotor.value = ""
+      rightMotor.value = ""
+      return
+    }
+
+    if (!motorNames.includes(leftMotor.value)) {
+      leftMotor.value = motorNames[0]
+    }
+
+    if (!motorNames.includes(rightMotor.value)) {
+      rightMotor.value =
+        motorNames.find(m => m !== leftMotor.value) ??
+        motorNames[0]
+    }
+  },
+  { immediate: true }
+)
 
 function isUsableMC(name) {
   return name === "pico"
@@ -143,12 +264,14 @@ const usedPins = computed(() => {
 onMounted(() => {
   peripheralStore.loadFromLocalStorage()
   JSONtoUI(peripheralStore.peripherals)
+
+  if (connectionStore.status == "connected" && connectionStore.transport == "network" && connectionStore.ip_address != "") {
+    socket = new WebSocket(`ws://${connectionStore.ip_address}/ws/shell`)
+  }
 })
 
-// when connected. TODO: maybe explicitly check connectionStatus rather than
-// peripherla?
 watch(
- () => peripheralStore.peripherals,
+  () => peripheralStore.peripherals,
   (val) => {
     if (val) JSONtoUI(val)
   }
@@ -199,7 +322,7 @@ const validationErrors = computed(() => {
         continue
       }
 
-      if (usedPins.value.get(pin)?.length > 1) {
+      if (pin > 0 && usedPins.value.get(pin)?.length > 1) {
         peripheralErrors[pinName] =
           `Pin ${pin} wordt meerdere keren gebruikt`
       }
@@ -225,16 +348,43 @@ async function reinstall() {
 }
 
 async function save() {
-
   if (hasErrors.value) {
-    addToast("Er zijn configuratiefouten aanwezig. Controleer de oranje velden.", "error", "settings-status")
+    addToast(
+      "Er zijn configuratiefouten aanwezig. Controleer de oranje velden.",
+      "error",
+      "settings-status"
+    )
+    return
+  }
+
+  if (driveErrors.value.sameMotor) {
+    addToast(
+      "Left and right motor must be different motors.",
+      "error",
+      "settings-status"
+    )
     return
   }
 
   busy.value = true
 
+  socket.send("sed -i 's/left_motor_name:.*/left_motor_name: \"" + leftMotor.value +
+    "\"/' /home/mirte/mirte_ws/src/mirte-ros-packages/mirte_control/mirte_pioneer_control/bringup/config/mirte_diff_drive_controllers.yaml " +
+    " && sed -i 's/right_motor_name:.*/right_motor_name: \"" + rightMotor.value +
+    "\"/' /home/mirte/mirte_ws/src/mirte-ros-packages/mirte_control/mirte_pioneer_control/bringup/config/mirte_diff_drive_controllers.yaml " +
+    "\n")
+
   try {
     await saveJSON()
+    socket.send("sudo systemctl restart mirte-ros\n")
+    connection.getTransport().restartRos()
+    console.log("hierr........")
+    addToast(
+      "Restarting ROS.",
+      "warning",
+      "restart-ros",
+      "-1"
+    )
   }
   finally {
     busy.value = false
@@ -258,5 +408,25 @@ async function save() {
   top: 0;
   z-index: 90;
   background: white;
+}
+
+.nav-tabs {
+  border-bottom: none;
+}
+
+.nav-tabs .nav-link {
+  color: white;
+  border: none;
+  background: transparent;
+}
+
+.nav-tabs .nav-link.active {
+  color: black;
+  border: none;
+}
+
+.warning-field {
+  background-color: #fff3cd;
+  border-color: #ffc107;
 }
 </style>

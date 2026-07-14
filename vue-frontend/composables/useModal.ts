@@ -13,14 +13,20 @@ export function useModal() {
     modals.value = [{
       component: markRaw(component), // prevent reactivity issues
       props
-     }]
+    }]
   }
 
-  function closeModal() {
-    modals.value = []
+  function closeModal(component?: any) {
+    if (component) {
+      modals.value = modals.value.filter(
+        m => m.component !== component
+      )
+    } else {
+      modals.value = []
+    }
   }
 
-  function isOpen(){
+  function isOpen() {
     return modals.value.length > 0
   }
 

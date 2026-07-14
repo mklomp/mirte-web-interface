@@ -40,6 +40,10 @@ export function useConnection() {
     await manager.reinstallMIRTE()
   }
 
+  function getTransport(){
+    return manager.getTransport()
+  }
+
   return {
     connect,
     disconnect,
@@ -49,6 +53,7 @@ export function useConnection() {
     startCode,
     stopCode,
     reinstallMIRTE,
-    uploadSettings
+    uploadSettings,
+    getTransport
   }
 }

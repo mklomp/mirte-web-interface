@@ -5,7 +5,8 @@ export const useConnectionStore = defineStore('connection', {
     transport: "",
     device: "",
     ip_address: "",
-    status: "disconnected"
+    status: "disconnected",
+    ros_status: "disconnected"
   }),
 
   actions: {

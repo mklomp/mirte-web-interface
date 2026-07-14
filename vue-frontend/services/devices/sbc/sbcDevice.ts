@@ -18,7 +18,7 @@ export class SBCDevice {
     transport.onData((data: string) => this.parseData(data))
   }
 
-   parseData(data: string) {
+  parseData(data: string) {
     this.buffer += data
 
     if (this.buffer.includes(">>> ")) {
@@ -28,7 +28,7 @@ export class SBCDevice {
       }
       this.buffer = ""
     }
-   }
+  }
 
   async waitForPrompt() {
     return new Promise<void>((resolve) => {
@@ -45,6 +45,7 @@ export class SBCDevice {
     const { $i18n } = useNuxtApp()
 
     this.ros.on('connection', () => {
+      console.log("loading settings from ROS")
       this.loadSettings();
     })
 
@@ -98,7 +99,15 @@ export class SBCDevice {
     // Get all the parameters
     listParametersService.callService(request, (result) => {
 
-      let param_names = result.result.names;
+      //let param_names = result.result.names;
+      let param_names = result.result.names.filter(name => {
+        return (
+          name.endsWith('.name') ||
+          name.endsWith('.device') ||
+          name.includes('.pins.')
+        );
+      });
+
       var req = {
         names: param_names
       };
@@ -110,7 +119,9 @@ export class SBCDevice {
         for (let param_id in values) {
 
           let value = 0;
-          if (values[param_id].type == 2) {
+          if (values[param_id].type == 1) {
+            value = values[param_id].boolean_value;
+          } else if (values[param_id].type == 2) {
             value = values[param_id].integer_value;
           } else if (values[param_id].type == 3) {
             value = values[param_id].double_value;
@@ -142,13 +153,13 @@ export class SBCDevice {
     } else {
       if (Object.keys(localsettings).length < 2) { // local setting is empty or just "device"
         // save the robot settings to local settings
-        this.peripheralStore.setPeripherals(robotSettings)
+        this.peripheralStore.setPeripherals(robotSettings, true, true)
         addToast($i18n.t('toast.downloading_mirte_config'), 'info')
       } else { // localsettings is not empty
         if (JSON.stringify(localsettings) !== JSON.stringify(robotSettings)) { // local and robot setting are not the same
           // save the robot settings to local settings
           addToast($i18n.t('toast.downloading_mirte_config_compare_error'), 'error')
-          this.peripheralStore.setPeripherals(robotSettings, false)
+          this.peripheralStore.setPeripherals(robotSettings, false, true)
         }
       }
     }

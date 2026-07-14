@@ -1,5 +1,5 @@
 <template>
-  <div class="layoutbox-content" style="height: 100% !important">
+  <div class="layoutbox-content" style="height: 100% !important" :class="{ disabled: !isROSConnected() }">
 
 
 
@@ -100,7 +100,8 @@
 
 
 
-    <div v-if="isSBC()" v-for="actuator in getActuators()" class="rounded background-tertiary p-3 mb-2" @contextmenu.prevent>
+    <div v-if="isSBC()" v-for="actuator in getActuators()" class="rounded background-tertiary p-3 mb-2"
+      @contextmenu.prevent>
       <div class="h5">{{ $t('peripherals.' + peripherals[actuator].text) }}</div>
       <div v-for="instance in getInstances(actuator)" class="rounded background-actuator p-2 text-white mb-2">
         <div v-if="actuator === 'servo'">
@@ -168,6 +169,9 @@ export default {
     isSBC() {
       return useConnectionStore().device == "sbc"
     },
+    isROSConnected() {
+      return useConnectionStore().ros_status == "connected"
+    },
     sendData(actuator, instance) {
       var request = {};
       request[this.peripherals[actuator].service_value] = parseInt(this.actuator_values[actuator][instance]);
@@ -223,6 +227,40 @@ export default {
       this.cmd_vel.publish(twist);
 
     },
+
+
+    reloadActuator(peripherals) {
+
+      for (const [actuator_type, peripheral] of Object.entries(peripherals)) {
+        if (actuator_type == "device" || properties_ph[actuator_type].rel_path.split("\\")[0] != "Actuators") { continue }
+
+        // Initialize objects directly
+        this.actuators[actuator_type] = {}
+        this.actuator_values[actuator_type] = {}
+        this.actuator_services[actuator_type] = {}
+
+        for (const instance in peripheral) {
+
+          if (actuator_type === "oled") {
+            this.actuator_values["oled"][instance] = { text: '' }
+          } else {
+            this.actuator_values[actuator_type][instance] = 0
+          }
+
+          this.actuators[actuator_type][instance] = {}
+          this.actuator_services[actuator_type][instance] = {}
+
+          let real_actuator_type = actuator_type.includes("motor") ? "motor" : actuator_type
+
+          let ros = useRos()
+          this.actuator_services[actuator_type][instance] = new ROSLIB.Service({
+            ros: ros,
+            name: `/io/${real_actuator_type}/${instance}/${this.peripherals[actuator_type].service_name}`,
+            serviceType: this.peripherals[actuator_type].service_type
+          })
+        }
+      }
+    }
   },
   data() {
     return {
@@ -248,41 +286,20 @@ export default {
     const connectionStore = useConnectionStore()
     const { status } = storeToRefs(connectionStore)
 
+    // TODO: also watch eripheral chnages
     watch(
       status,
       (newVal) => {
         if (newVal != "connected") { return }
-        
-        let peripherals = peripheralStore.peripherals
-        for (const [actuator_type, peripheral] of Object.entries(peripherals)) {
-          if (actuator_type == "device" || properties_ph[actuator_type].rel_path.split("\\")[0] != "Actuators") { continue }
+        this.reloadActuator(peripheralStore.peripherals)
+      },
+      { immediate: true }
+    )
 
-          // Initialize objects directly
-          this.actuators[actuator_type] = {}
-          this.actuator_values[actuator_type] = {}
-          this.actuator_services[actuator_type] = {}
-
-          for (const instance in peripheral) {
-
-            if (actuator_type === "oled") {
-              this.actuator_values["oled"][instance] = { text: '' }
-            } else {
-              this.actuator_values[actuator_type][instance] = 0
-            }
-
-            this.actuators[actuator_type][instance] = {}
-            this.actuator_services[actuator_type][instance] = {}
-
-            let real_actuator_type = actuator_type.includes("motor") ? "motor" : actuator_type
-
-            let ros = useRos()
-            this.actuator_services[actuator_type][instance] = new ROSLIB.Service({
-              ros: ros,
-              name: `/io/${real_actuator_type}/${instance}/${this.peripherals[actuator_type].service_name}`,
-              serviceType: this.peripherals[actuator_type].service_type
-            })
-          }
-        }
+    watch(
+      storePeripherals,
+      (newVal) => {
+        this.reloadActuator(newVal)
       },
       { immediate: true }
     )
@@ -341,3 +358,11 @@ export default {
 
 }
 </script>
+
+<style scoped>
+.disabled {
+  pointer-events: none;
+  opacity: 0.5;
+  filter: grayscale(100%);
+}
+</style>

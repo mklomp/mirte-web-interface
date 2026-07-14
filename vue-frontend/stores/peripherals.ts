@@ -18,7 +18,7 @@ export const usePeripheralStore = defineStore('peripherals', {
       }
     },
 
-    async setPeripherals(value, showToast = true) {
+    async setPeripherals(value, showToast = true, onlyLocally = false) {
 
       const { addToast } = useToast()
       const { $i18n } = useNuxtApp()
@@ -29,9 +29,13 @@ export const usePeripheralStore = defineStore('peripherals', {
 
       // and store to the robot
       if (connectionStore.status == "connected") {
-        const { uploadSettings } = useConnection()
-        await uploadSettings(value)
-        addToast($i18n.t('toast.saved_settings_success'), 'success', 'settings-status')
+        console.trace()
+        console.log("hier: " + onlyLocally)
+        if (!onlyLocally) {
+          const { uploadSettings } = useConnection()
+          await uploadSettings(value)
+          addToast($i18n.t('toast.saved_settings_success'), 'success', 'settings-status')
+        }
       } else {
         if (showToast) {
           addToast($i18n.t('toast.saved_settings_locally'), 'info', 'settings-status')

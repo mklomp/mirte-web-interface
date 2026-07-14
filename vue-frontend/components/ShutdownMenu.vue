@@ -13,7 +13,11 @@ const connectionType = computed(() => connectionStore.transport)
 const { t } = useI18n()
 
 const mounted = ref(false)
-
+const connectedText = computed(() =>
+  connectionStore.status === "connected" && useState("programming-state").value == "idle"
+    ? "connected"
+    : "disconnected"
+);
 let socket = null
 
 watch(

@@ -2,7 +2,7 @@ import { useToast } from '~/composables/useToast'
 import { useConnectionStore } from '../../stores/connection'
 
 export class NetworkTransport {
-  ip: string = '192.168.0.24'
+  ip: string = '192.168.1.151'
 
   //socket: WebSocket | null = null
 
@@ -11,6 +11,9 @@ export class NetworkTransport {
 
   ros: ROSLIB.Ros = useRos()
   socket: WebSocket | null = null
+
+  restartingRos = false
+  private reconnectTimer: ReturnType<typeof setTimeout> | null = null
 
   connect(autoconnect = false) {
     const { addToast } = useToast()
@@ -57,21 +60,62 @@ export class NetworkTransport {
     }
 
     this.ros.on('connection', () => {
-      //console.log('ROS connected')
+      connectionStore.ros_status = "connected"
+      if (this.restartingRos){
+        addToast('ROS Restarted', 'success', 'ros-restarting')
+        this.restartingRos = false  
+      }
+      
     })
 
     this.ros.on('error', (error) => {
-      console.error('ROS error:', error)
+       console.error('ROS error:', error)
     })
 
     this.ros.on('close', () => {
-      //console.log('ROS disconnected')
-      if (connectionStore.status == "connected") {
-        addToast("ROS disconnected.", "error", "connection-lost")
+      connectionStore.ros_status = "disconnected"
+      if (this.restartingRos) {
+        this.tryReconnectRos()
+        return
+      }
+
+      if (connectionStore.status === 'connected') {
+        addToast('ROS disconnected.', 'error', 'connection-lost')
+        this.disconnect()
       }
     })
+
     return this.socket
   }
+
+
+  restartRos() {
+    const { addToast } = useToast()
+
+    this.restartingRos = true
+
+    addToast('Restarting ROS...', 'info', 'ros-restarting', -1)
+  }
+
+
+  private tryReconnectRos() {
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer)
+    }
+
+    this.reconnectTimer = setTimeout(() => {
+      //console.log('Trying ROS reconnect...')
+
+      try {
+        this.ros.connect(`ws://${this.ip}/ws/ros`)
+      }
+      catch (err) {
+        //console.error(err)
+        this.tryReconnectRos()
+      }
+    }, 2000)
+  }
+
 
   async disconnect(connectionLost = false) {
     this.ros.close()

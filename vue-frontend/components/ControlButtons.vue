@@ -62,8 +62,8 @@ const emit = defineEmits(['undo', 'redo'])
 
 const programmingState = useState('programming-state')
 
-const isPlayEnabled = computed(() => programmingState.value === 'idle' && connectionStore.status === "connected")
-const isStopEnabled = computed(() => programmingState.value === 'running' && connectionStore.status === "connected")
+const isPlayEnabled = computed(() => programmingState.value === 'idle' && connectionStore.status === "connected" && connectionStore.ros_status == "connected")
+const isStopEnabled = computed(() => programmingState.value === 'running' && connectionStore.status === "connected" && connectionStore.ros_status == "connected")
 
 function control(command) {
     programmingState.value = command;

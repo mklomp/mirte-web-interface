@@ -274,4 +274,8 @@ export class ConnectionManager {
     this.hbInterval = {}
     if (this.term) { this.term.write('\x1bc'); } // full terminal reset
   }
+
+  getTransport(){
+    return this.transport
+  }
 }

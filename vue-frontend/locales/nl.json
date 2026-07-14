@@ -21,6 +21,8 @@
   "settings": {
     "hardware_settings": "Hardware Instellingen",
     "wiring": "Bekabeling",
+    "drive": "Besturing", 
+    "drive_message": "Differential drive heeft twee motoren nodig. Zorg dat je twee motoren in de instelling hebt toegevoegd.",
     "microcontroller": "Microcontroller",
     "upload": "upload",
     "upload_confirm": "Weet je zeker dat je de microcontroller wilt uploaden? Na ongeveer 10 seconden zal de verandering zichtbaar zijn.",

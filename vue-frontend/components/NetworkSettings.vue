@@ -6,7 +6,7 @@
 				<div class="text-white p-2 h3 layoutbox-title w-100 background-secondary">
 					{{ $t('settings.wifi_header') }}
 
-					<button @click="close" class="btn float-end">
+					<button @click="close()" class="btn float-end">
 						x
 					</button>
 

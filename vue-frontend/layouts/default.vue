@@ -66,7 +66,7 @@ function openWifi() {
             </li>
 
             <ClientOnly>
-              <li v-if="connectionType == 'network'">
+              <li>
                 <button class="dropdown-item" @click="openWifi" :disabled="!isConnected">
                   Network
                 </button>
