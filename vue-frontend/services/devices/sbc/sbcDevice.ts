@@ -99,11 +99,12 @@ export class SBCDevice {
     // Get all the parameters
     listParametersService.callService(request, (result) => {
 
-      //let param_names = result.result.names;
       let param_names = result.result.names.filter(name => {
         return (
           name.endsWith('.name') ||
           name.endsWith('.device') ||
+          name.endsWith('.board') ||
+          (name.startsWith('device.') && name.endsWith('.type')) ||
           name.includes('.pins.')
         );
       });
@@ -156,13 +157,47 @@ export class SBCDevice {
         this.peripheralStore.setPeripherals(robotSettings, true, true)
         addToast($i18n.t('toast.downloading_mirte_config'), 'info')
       } else { // localsettings is not empty
-        if (JSON.stringify(localsettings) !== JSON.stringify(robotSettings)) { // local and robot setting are not the same
+        if (!this.deepEqual(localsettings, robotSettings)) { // local and robot setting are not the same
           // save the robot settings to local settings
           addToast($i18n.t('toast.downloading_mirte_config_compare_error'), 'error')
           this.peripheralStore.setPeripherals(robotSettings, false, true)
         }
       }
     }
+  }
+
+  deepEqual(a: any, b: any): boolean {
+    if (a === b) {
+      return true;
+    }
+
+    if (
+      a === null ||
+      b === null ||
+      typeof a !== "object" ||
+      typeof b !== "object"
+    ) {
+      return false;
+    }
+
+    const keysA = Object.keys(a);
+    const keysB = Object.keys(b);
+
+    if (keysA.length !== keysB.length) {
+      return false;
+    }
+
+    for (const key of keysA) {
+      if (!keysB.includes(key)) {
+        return false;
+      }
+
+      if (!deepEqual(a[key], b[key])) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   async uploadSettings(content) {
