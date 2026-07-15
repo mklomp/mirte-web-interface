@@ -19,20 +19,57 @@ export class NetworkTransport {
     const { addToast } = useToast()
     const { $i18n } = useNuxtApp()
 
+    const connectionStore = useConnectionStore()
+    connectionStore.setConnectionIP(this.ip)
+
     // ROS connection
     // TODO: in order fot this to work, we need to empty /etc/nginx/nginx_logon.conf
     // otherwise yo will get an error. 
     this.ros.connect(`ws://${this.ip}/ws/ros`)
 
+    this.connectTerminal()
+
+    this.ros.on('connection', () => {
+      connectionStore.ros_status = "connected"      
+      if (this.restartingRos) {
+        this.socket = new WebSocket(`ws://${this.ip}/ws/shell`)
+        addToast('ROS Restarted', 'success', 'ros-restarting')
+        this.restartingRos = false
+      }
+
+    })
+
+    this.ros.on('error', (error) => {
+      console.error('ROS error:', error)
+    })
+
+    this.ros.on('close', () => {
+      this.socket?.close()
+      connectionStore.ros_status = "disconnected"
+      if (this.restartingRos) {
+        this.tryReconnectRos()
+        return
+      }
+
+      if (connectionStore.status === 'connected') {
+        addToast('ROS disconnected.', 'error', 'connection-lost')
+        //this.disconnect()
+      }
+    })
+
+    return this.socket
+  }
+
+  getTermSocket(){
+    return this.socket
+  }
+
+  connectTerminal() {
+    const { addToast } = useToast()
     // Shell connection
     this.socket = new WebSocket(`ws://${this.ip}/ws/shell`)
     const connectionStore = useConnectionStore()
     connectionStore.setConnectionIP(this.ip)
-
-    /*
-    this.socket.onopen = () => {
-      //console.log('Shell connected')
-    }*/
 
     this.socket.onmessage = (event) => {
       const data = event.data as string
@@ -54,44 +91,16 @@ export class NetworkTransport {
 
     this.socket.onclose = () => {
       //console.log('Shell disconnected')
-      if (connectionStore.status == "connected") {
+      if (connectionStore.status == "connected" && !this.restartRos) {
         addToast("WebSocket connection lost.", "error", "connection-lost")
       }
     }
-
-    this.ros.on('connection', () => {
-      connectionStore.ros_status = "connected"
-      if (this.restartingRos){
-        addToast('ROS Restarted', 'success', 'ros-restarting')
-        this.restartingRos = false  
-      }
-      
-    })
-
-    this.ros.on('error', (error) => {
-       console.error('ROS error:', error)
-    })
-
-    this.ros.on('close', () => {
-      connectionStore.ros_status = "disconnected"
-      if (this.restartingRos) {
-        this.tryReconnectRos()
-        return
-      }
-
-      if (connectionStore.status === 'connected') {
-        addToast('ROS disconnected.', 'error', 'connection-lost')
-        this.disconnect()
-      }
-    })
-
-    return this.socket
   }
-
 
   restartRos() {
     const { addToast } = useToast()
 
+    this.socket?.close() // closed socket will make sure that mirte_python_api node is stopped
     this.restartingRos = true
 
     addToast('Restarting ROS...', 'info', 'ros-restarting', -1)

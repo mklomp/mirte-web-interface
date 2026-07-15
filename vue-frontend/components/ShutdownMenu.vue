@@ -14,7 +14,7 @@ const { t } = useI18n()
 
 const mounted = ref(false)
 const connectedText = computed(() =>
-  connectionStore.status === "connected" && useState("programming-state").value == "idle"
+  isConnected && useState("programming-state").value == "idle"
     ? "connected"
     : "disconnected"
 );
@@ -51,11 +51,11 @@ function reboot() {
 
 </script>
 
-<template>
+<template> 
   <a class="nav-link dropdown-toggle" href="#" id="localeDropdown" role="button" data-bs-toggle="dropdown"
     aria-expanded="false">
     <ClientOnly>
-      {{ $t("main.connection." + connectionStore.status) }}
+      {{ $t("main.connection." + connectedText) }}
     </ClientOnly>
   </a>
 

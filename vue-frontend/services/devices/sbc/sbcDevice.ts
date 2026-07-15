@@ -36,7 +36,7 @@ export class SBCDevice {
     })
   }
 
-  initialize(socket) {
+  initializeTerm(socket) {
     // Check if one of the (empty) MIRTE files are there
     // We should actually only do this in USB mode, but 
     // if it was able to connect to BLE the code should
@@ -44,16 +44,21 @@ export class SBCDevice {
     const { addToast } = useToast()
     const { $i18n } = useNuxtApp()
 
-    this.ros.on('connection', () => {
-      console.log("loading settings from ROS")
-      this.loadSettings();
-    })
-
     this.socket = socket
     socket.onopen = () => {
       this.prepareTerminal()
     }
+
+
   }
+
+  initializeROS(){
+    this.ros.on('connection', () => {
+      this.loadSettings();
+    })
+  }
+
+  
 
   mergeDeep(target, source) {
     for (const key in source) {
@@ -68,6 +73,75 @@ export class SBCDevice {
     return target;
   }
 
+
+  loadControlSettings() {
+    // TODO: or should we just get the YAML right away through http?
+    var listParametersService = new ROSLIB.Service({
+      ros: this.ros,
+      name: '/io/telemetrix/list_parameters',
+      serviceType: 'rcl_interfaces/srv/ListParameters'
+    });
+
+    var getParameterService = new ROSLIB.Service({
+      ros: this.ros,
+      name: '/io/telemetrix/get_parameters',
+      serviceType: 'rcl_interfaces/srv/GetParameters'
+    });
+
+    let peripheral_list = Object.keys(properties_ph);
+    let hardware_list = peripheral_list.filter(item => !item.includes("motor"));
+    hardware_list.push("motor");
+    hardware_list.push("device");
+    let peripherals = { 'sensors': {}, 'actuators': {}, 'devices': {} };
+    let params = {};
+
+    var request = {
+      prefixes: hardware_list,
+      depth: 0
+    };
+
+    // Get all the parameters
+    listParametersService.callService(request, (result) => {
+
+      let param_names = result.result.names.filter(name => {
+        return (
+          name.endsWith('.name') ||
+          name.endsWith('.device') ||
+          name.endsWith('.board') ||
+          (name.startsWith('device.') && name.endsWith('.type')) ||
+          name.includes('.pins.')
+        );
+      });
+
+      var req = {
+        names: param_names
+      };
+
+      // Get the values of all the parameters
+      getParameterService.callService(req, (res) => {
+
+        let values = res.values;
+        for (let param_id in values) {
+
+          let value = 0;
+          if (values[param_id].type == 1) {
+            value = values[param_id].boolean_value;
+          } else if (values[param_id].type == 2) {
+            value = values[param_id].integer_value;
+          } else if (values[param_id].type == 3) {
+            value = values[param_id].double_value;
+          } else if (values[param_id].type == 4) {
+            value = values[param_id].string_value;
+          }
+
+          let item = param_names[param_id].split(".").reduceRight((acc, key) => ({ [key]: acc }), value);
+          params = this.mergeDeep(params, item);
+        }
+
+        this.checkSettings(params)
+      });
+    });
+  }
 
 
   loadSettings() {
@@ -192,7 +266,7 @@ export class SBCDevice {
         return false;
       }
 
-      if (!deepEqual(a[key], b[key])) {
+      if (!this.deepEqual(a[key], b[key])) {
         return false;
       }
     }

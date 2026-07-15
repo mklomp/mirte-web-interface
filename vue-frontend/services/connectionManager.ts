@@ -74,7 +74,7 @@ export class ConnectionManager {
         }
       }
 
-      
+
       // detecting __START_EXCEPTION__, strip from buffer but keep exception
       else if (this.buffer.includes("__START_EXCEPTION__\r\n")) {
         const marker = "__START_EXCEPTION__\r\n"
@@ -213,9 +213,16 @@ export class ConnectionManager {
         this.parseData(data)
       })
 
+      // we need to reinitialize the terminal as soon as ROS is connected
+      let ros = useRos()
+      ros.on('connection', () => {
+        let socket = this.transport.connect()
+        this.device.initializeTerm(socket)
+      })
 
       this.device = new SBCDevice(this.transport)
-      await this.device.initialize(socket)
+      //this.device.initializeTerm(socket)
+      this.device.initializeROS()
       connectionStore.setConnectionStatus("connected")
       useConnectionStore().setConnectionType(type, transport)
       await this.device.waitForPrompt()
@@ -275,7 +282,7 @@ export class ConnectionManager {
     if (this.term) { this.term.write('\x1bc'); } // full terminal reset
   }
 
-  getTransport(){
+  getTransport() {
     return this.transport
   }
 }
