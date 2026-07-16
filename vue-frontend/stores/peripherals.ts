@@ -2,7 +2,8 @@ import { defineStore } from 'pinia'
 
 export const usePeripheralStore = defineStore('peripherals', {
   state: () => ({
-    peripherals: {}
+    peripherals: {},
+    controls: {'left_motor' : '', 'right_motor': ''}
   }),
 
   actions: {
@@ -16,6 +17,21 @@ export const usePeripheralStore = defineStore('peripherals', {
       } catch (e) {
         console.warn("Failed to parse peripherals from localStorage", e)
       }
+
+      try {
+        const stored = localStorage.getItem('controls');
+        if (!stored) return
+        this.controls = JSON.parse(stored)
+      } catch (e) {
+        console.warn("Failed to parse peripherals from localStorage", e)
+      }
+
+    },
+
+    setControl(left_motor, right_motor){
+      this.controls['left_motor'] = left_motor
+      this.controls['right_motor'] = right_motor
+      localStorage.setItem('controls', JSON.stringify(this.controls))
     },
 
     async setPeripherals(value, showToast = true, onlyLocally = false) {

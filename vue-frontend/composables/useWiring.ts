@@ -68,6 +68,10 @@ export function useWiring(peripheralsDef: any, microcontrollers: any) {
     }
   }
 
+  function saveControlJSON(left_motor, right_motor){
+    peripheralStore.setControl(left_motor, right_motor)
+  }
+
   async function saveJSON() {
     // locally save the settings
     // note: will be stored to robots in the store
@@ -146,6 +150,7 @@ export function useWiring(peripheralsDef: any, microcontrollers: any) {
     saveYAML,
     saveJSON,
     JSONtoUI,
-    reinstallMIRTE
+    reinstallMIRTE,
+    saveControlJSON
   }
 }

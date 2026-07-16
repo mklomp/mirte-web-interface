@@ -140,7 +140,6 @@ export default {
           return
         }
 
-        console.log(peripherals)
         this.reloadPeripherals(peripherals)
       },
       {
