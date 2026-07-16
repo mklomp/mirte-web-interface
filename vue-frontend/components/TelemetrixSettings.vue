@@ -166,7 +166,8 @@ const {
   getValidPins,
   JSONtoUI,
   saveJSON,
-  reinstallMIRTE
+  reinstallMIRTE,
+  saveControlJSON
 } = useWiring(peripheralsDef, microcontrollers)
 
 const connection = useConnection()
@@ -210,15 +211,29 @@ watch(
 )
 
 watch(
+  peripheralStore.controls,
+  (val) => {
+    leftMotor.value = val.left_motor
+    rightMotor.value = val.right_motor
+  },
+  { immediate: true }
+)
+
+
+
+watch(
   motors,
   (motorNames) => {
 
+    // If less that 2 motors, set to empty 
     if (motorNames.length < 2) {
       leftMotor.value = ""
       rightMotor.value = ""
       return
     }
 
+    // If the current control motors are not in the list anymore,
+    // just pick the first two motors.
     if (!motorNames.includes(leftMotor.value)) {
       leftMotor.value = motorNames[0]
     }
@@ -264,6 +279,10 @@ const usedPins = computed(() => {
 onMounted(() => {
   peripheralStore.loadFromLocalStorage()
   JSONtoUI(peripheralStore.peripherals)
+
+   leftMotor.value = peripheralStore.controls.left_motor
+   rightMotor.value = peripheralStore.controls.right_motor
+
 
   if (connectionStore.status == "connected" && connectionStore.transport == "network" && connectionStore.ip_address != "") {
     socket = new WebSocket(`ws://${connectionStore.ip_address}/ws/shell`)
@@ -368,17 +387,19 @@ async function save() {
 
   busy.value = true
 
-  socket.send("sed -i 's/left_motor_name:.*/left_motor_name: \"" + leftMotor.value +
-    "\"/' /home/mirte/mirte_ws/src/mirte-ros-packages/mirte_control/mirte_pioneer_control/bringup/config/mirte_diff_drive_controllers.yaml " +
-    " && sed -i 's/right_motor_name:.*/right_motor_name: \"" + rightMotor.value +
-    "\"/' /home/mirte/mirte_ws/src/mirte-ros-packages/mirte_control/mirte_pioneer_control/bringup/config/mirte_diff_drive_controllers.yaml " +
-    "\n")
+  if (leftMotor.value != "" && rightMotor.value != "") {
+    socket.send("sed -i 's/left_motor_name:.*/left_motor_name: \"" + leftMotor.value +
+      "\"/' /home/mirte/mirte_ws/src/mirte-ros-packages/mirte_control/mirte_pioneer_control/bringup/config/mirte_diff_drive_controllers.yaml " +
+      " && sed -i 's/right_motor_name:.*/right_motor_name: \"" + rightMotor.value +
+      "\"/' /home/mirte/mirte_ws/src/mirte-ros-packages/mirte_control/mirte_pioneer_control/bringup/config/mirte_diff_drive_controllers.yaml " +
+      "\n")
+  }
 
   try {
     await saveJSON()
+    saveControlJSON(leftMotor.value, rightMotor.value)
     socket.send("sudo systemctl restart mirte-ros\n")
     connection.getTransport().restartRos()
-    console.log("hierr........")
     addToast(
       "Restarting ROS.",
       "warning",
