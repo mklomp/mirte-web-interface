@@ -82,6 +82,7 @@ export default {
 
           let full_instance = instance
           if (sensor_type === "color") full_instance += "/hsl"
+          if (sensor_type === "line") full_instance += "/analog"
 
           const topic = new ROSLIB.Topic({
             ros: ros,
@@ -93,7 +94,7 @@ export default {
 
           topic.subscribe((message) => {
             let value = message[this.peripherals[sensor_type].message_value]
-            if (!value) value = "inf"
+            if (value === null) value = "inf"
             let string = ""
 
             if (typeof value === "object") {
@@ -104,8 +105,15 @@ export default {
                 string += "\t" + k + ": " + val + "\n"
               }
             } else {
-              if (typeof value === "number" && !Number.isInteger(value)) string = value.toFixed(4)
-              else string = value
+              if (typeof value === "number" && !Number.isInteger(value)) {
+                if (sensor_type === "distance") {
+                  string = value.toFixed(2)
+                } else {
+                  string = value.toFixed(4)
+                }
+              } else {
+                string = value
+              }
             }
 
             this.sensors[sensor_type][instance] = string

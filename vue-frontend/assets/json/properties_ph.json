@@ -43,7 +43,7 @@
       "get_value"
     ],
     "rel_path": "Sensors\\IR_sensor\\digital_ir_sensor\\digital_ir_sensor.py",
-    "message_type": "mirte_msgs/Intensity",
+    "message_type": "mirte_msgs/IntensityDigital",
     "message_value": "value"
   },
   "color": {
