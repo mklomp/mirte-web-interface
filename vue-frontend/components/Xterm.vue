@@ -2,7 +2,7 @@
   <div class="rounded background-tertiary h5 p-3 mb-2">
     {{ $t("actuators.output") }}
     <div>
-      <div id="terminal" ref="terminal" class="xterm"></div>
+      <div id="terminal" ref="terminal" class="xterm" style="height: 30vh"></div>
     </div>
   </div>
 </template>
