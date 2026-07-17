@@ -1,6 +1,12 @@
 <template>
 
-  <div class="layoutbox-content" :class="{ disabled: !isROSConnected() }">
+  <div class="layoutbox-content" :class="{ disabled: !isROSConnected }">
+
+    <div v-if="cameraAvailable" class="rounded background-tertiary p-3 mb-2" :key="cameraKey">
+      <div class="h5">Camera</div>
+      <img ref="camera" :src="`${cameraSrc}`" style="width: 100%; height: auto;">
+    </div>
+
     <div v-for="sensor_type in getSensorTypes()" class="rounded background-tertiary p-3 mb-2" :key="`${sensor_type}`">
       <div class="h5">{{ $t('peripherals.' + peripherals[sensor_type].text) }}</div>
       <div class="row">
@@ -19,6 +25,9 @@
         </div>
       </div>
     </div>
+
+
+
   </div>
 
 </template>
@@ -38,7 +47,20 @@ export default {
     return {
       peripherals: properties_ph,
       sensors: reactive({}),
-      topics: []
+      topics: [],
+      cameraAvailable: false,
+      cameraKey: 0,
+      cameraSrc: null
+    }
+  },
+
+  computed: {
+    isROSConnected() {
+      return useConnectionStore().ros_status === 'connected'
+    },
+
+    isConnected() {
+      return useConnectionStore().status === 'connected'
     }
   },
 
@@ -50,23 +72,30 @@ export default {
     getInstances(sensor_type) {
       return Object.keys(this.sensors[sensor_type])
     },
-
-    isConnected() {
-      return useConnectionStore().status == "connected"
-    },
-
-    isROSConnected() {
-      return useConnectionStore().ros_status == "connected"
-    },
-
     getSensorImage(type) {
       const images = import.meta.glob('../assets/images/*.jpg', { eager: true })
       const key = Object.keys(images).find(k => k.endsWith(type + ".jpg"))
       return key ? images[key].default : null
     },
 
+    checkCameraAvailability() {
+      const ros = useRos()
+
+      ros.getTopics(
+        (result) => {
+          this.cameraAvailable = result.topics.includes(
+            "/video1/image_raw/compressed"
+          )
+        },
+        (error) => {
+          console.error("Failed to get ROS topics:", error)
+          this.cameraAvailable = false
+        }
+      )
+    },
     reloadPeripherals(newVal) {
       let ros = useRos()
+      this.cameraKey++ // refresh the camera element
 
       this.topics.forEach(topic => topic.unsubscribe())
       this.topics = []
@@ -132,14 +161,24 @@ export default {
 
     watch(
       () => ({
+        status: connectionStore.status,
         rosStatus: connectionStore.ros_status,
         peripherals: peripheralsStore.peripherals
       }),
-      ({ rosStatus, peripherals }) => {
-        if (rosStatus !== "connected") {
+      ({ status, rosStatus, peripherals }) => {
+        if (status != "connected") {
+
+          // For some reasone we need to set both this.cameraScr, and
+          // via the ref. Otherwise the connection will stay and the 
+          // streams keeps connected (with cpu usage on the robot)
+          const img = this.$refs.camera
+          if (img) { img.src = ""; }
+          this.cameraSrc = ""
           return
         }
-
+        const ip = connectionStore.ip_address
+        this.cameraSrc = `http://${ip}/ros-video/stream?topic=/video1/image_raw&type=mjpeg`
+        this.checkCameraAvailability()
         this.reloadPeripherals(peripherals)
       },
       {
@@ -150,7 +189,6 @@ export default {
 
   },
 
-  // <-- added: cleanup when component is destroyed
   beforeUnmount() {
     this.topics.forEach(topic => topic.unsubscribe())
   }
