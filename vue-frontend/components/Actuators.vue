@@ -10,6 +10,10 @@
     <div v-if="isSBC()" class="rounded background-tertiary p-3 mb-2" @contextmenu.prevent>
       <div class="h5">{{ $t("settings.drive") }}
 
+        <NuxtLink to="/drive" class="btn btn-sm float-end">
+          <font-awesome-icon icon="fa-expand" />
+        </NuxtLink>
+
         <button class="btn btn-sm btn-outline-dark float-end" @click="toggleJoystickMode()">
           <font-awesome-icon :icon="joystickMode ? 'fa-solid fa-sliders' : 'fa-solid fa-gamepad'" />
         </button>

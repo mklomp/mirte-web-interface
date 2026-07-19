@@ -26,8 +26,10 @@ export const useConnectionStore = defineStore('connection', {
         // Reset status to disconnected if no previous connections were found
         // This happens when someone resets the known deviced while the status
         // was still connected
-        const ports = await navigator.serial.getPorts()
-        if (ports.length == 0) { this.setConnectionStatus("disconnected") }
+        if (this.device == "mcu") {
+          const ports = await navigator.serial.getPorts()
+          if (ports.length == 0) { this.setConnectionStatus("disconnected") }
+        }
 
       } catch (e) {
         console.warn("Failed to parse connection from localStorage", e)
@@ -53,6 +55,10 @@ export const useConnectionStore = defineStore('connection', {
       localStorage.setItem('connection', JSON.stringify(connection))
     },
     setConnectionStatus(status) {
+
+      console.trace()
+      console.log("chaning connectionstate")
+      console.log(status)
       // update store
       this.status = status
 

@@ -27,7 +27,7 @@ let isLoading = ref(true);
 //const { $attachContainer, $connect, $connectMCU } = useNuxtApp();
 let shell = null;
 
-connectionStore.loadFromLocalStorage()
+// connectionStore.loadFromLocalStorage()
 
 let debug = false
 
