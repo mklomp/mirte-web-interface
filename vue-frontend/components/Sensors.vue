@@ -2,9 +2,8 @@
 
   <div class="layoutbox-content" :class="{ disabled: !isROSConnected }">
 
-    <div v-if="cameraAvailable" class="rounded background-tertiary p-3 mb-2" :key="cameraKey">
-      <div class="h5">Camera</div>
-      <img ref="camera" :src="`${cameraSrc}`" style="width: 100%; height: auto;">
+    <div>
+      <Camera/>
     </div>
 
     <div v-for="sensor_type in getSensorTypes()" class="rounded background-tertiary p-3 mb-2" :key="`${sensor_type}`">
@@ -47,10 +46,7 @@ export default {
     return {
       peripherals: properties_ph,
       sensors: reactive({}),
-      topics: [],
-      cameraAvailable: false,
-      cameraKey: 0,
-      cameraSrc: null
+      topics: []
     }
   },
 
@@ -76,22 +72,6 @@ export default {
       const images = import.meta.glob('../assets/images/*.jpg', { eager: true })
       const key = Object.keys(images).find(k => k.endsWith(type + ".jpg"))
       return key ? images[key].default : null
-    },
-
-    checkCameraAvailability() {
-      const ros = useRos()
-
-      ros.getTopics(
-        (result) => {
-          this.cameraAvailable = result.topics.includes(
-            "/video1/image_raw/compressed"
-          )
-        },
-        (error) => {
-          console.error("Failed to get ROS topics:", error)
-          this.cameraAvailable = false
-        }
-      )
     },
     reloadPeripherals(newVal) {
       let ros = useRos()
@@ -167,18 +147,8 @@ export default {
       }),
       ({ status, rosStatus, peripherals }) => {
         if (status != "connected") {
-
-          // For some reasone we need to set both this.cameraScr, and
-          // via the ref. Otherwise the connection will stay and the 
-          // streams keeps connected (with cpu usage on the robot)
-          const img = this.$refs.camera
-          if (img) { img.src = ""; }
-          this.cameraSrc = ""
           return
         }
-        const ip = connectionStore.ip_address
-        this.cameraSrc = `http://${ip}/ros-video/stream?topic=/video1/image_raw&type=mjpeg`
-        this.checkCameraAvailability()
         this.reloadPeripherals(peripherals)
       },
       {
