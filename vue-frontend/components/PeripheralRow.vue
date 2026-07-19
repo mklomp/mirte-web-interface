@@ -21,9 +21,17 @@
     <!-- PINS -->
     <td>
       <div v-for="(pinType, pinName) in peripheralsDef[item.type].pins" :key="pinName" class="mb-2">
-        <select v-model="item.pins[pinName]" class="form-select" :class="{ 'is-invalid-custom': errors[pinName] }"
-          :title="errors[pinName]">
-          <option :value="null" disabled>
+
+        <select :value="item.pins[pinName]" class="form-select" :class="{ 'is-invalid-custom': errors[pinName] }"
+          :title="errors[pinName]" @change="
+            updatePeripheralPin(
+              item.id,
+              pinName,
+              $event.target.value
+            )
+            ">
+
+          <option value="" disabled>
             {{ pinName }}
           </option>
 
@@ -44,6 +52,7 @@ const props = defineProps({
   peripheralsDef: Object,
   getValidPins: Function,
   usedPins: Object,
+  updatePeripheralPin: Function,
 
   errors: {
     type: Object,

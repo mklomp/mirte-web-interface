@@ -37,14 +37,14 @@
         <!-- PERIPHERALS TAB -->
         <template v-if="activeTab === 'peripherals'">
 
-          <!-- BOARD -->
+
+          <!-- HARDWARE -->
           <div class="p-2">
-            Microcontroller:
+            Hardware:
             <div class="float-end">
-              <select v-model="state.board" class="form-control">
-                <option v-for="(mc, name) in microcontrollers" :key="name" :value="name" :disabled="!isUsableMC(name)">
-                  {{ mc.text }}
-                </option>
+              <select v-model="state.type" class="form-control">
+                <option value="pcb">MIRTE PCB</option>
+                <option value="breadboard">Rapberry Pi Pico</option>
               </select>
             </div>
 
@@ -53,6 +53,7 @@
               {{ $t("settings.reinstall") }}
             </button>
           </div>
+
 
           <!-- TABLE -->
           <div class="h-100 table-scroll">
@@ -68,7 +69,7 @@
 
                       <ul class="dropdown-menu">
                         <li v-for="(p, key) in peripheralsDef" :key="key">
-                          <button class="dropdown-item" @click="addPeripheral(key)"
+                          <button class="dropdown-item" @click="addPeripheral(key, usedPins)"
                             :disabled="!isUsablePeripheral(key)">
                             {{ $t("peripherals." + p.text) }}
                           </button>
@@ -84,7 +85,7 @@
 
               <tbody>
                 <PeripheralRow v-for="item in state.peripherals" :key="item.id" :item="item"
-                  :errors="validationErrors[item.id] || {}" :peripheralsDef="peripheralsDef" :usedPins="usedPins"
+                  :errors="validationErrors[item.id] || {}" :peripheralsDef="peripheralsDef" :usedPins="usedPins" :updatePeripheralPin="updatePeripheralPin"
                   :getValidPins="getValidPins" @remove="removePeripheral" />
               </tbody>
 
@@ -144,6 +145,7 @@ import { ref, watch, computed, onMounted } from "vue"
 
 import properties_ph from "~/assets/json/properties_ph.json"
 import properties_mc from "~/assets/json/properties_mc.json"
+import pcb_options from "~/assets/json/pcb_options.json"
 
 import { useWiring } from "~/composables/useWiring"
 import { usePeripheralStore } from '@/stores/peripherals'
@@ -157,6 +159,7 @@ import PeripheralRow from "~/components/PeripheralRow.vue"
 
 const peripheralsDef = properties_ph
 const microcontrollers = properties_mc
+const pcb_pin_defs = pcb_options
 const peripheralStore = usePeripheralStore()
 
 const {
@@ -167,8 +170,9 @@ const {
   JSONtoUI,
   saveJSON,
   reinstallMIRTE,
-  saveControlJSON
-} = useWiring(peripheralsDef, microcontrollers)
+  saveControlJSON,
+  updatePeripheralPin
+} = useWiring(peripheralsDef, microcontrollers, pcb_pin_defs)
 
 const connection = useConnection()
 const connectionStore = useConnectionStore()
@@ -247,13 +251,40 @@ watch(
   { immediate: true }
 )
 
-function isUsableMC(name) {
-  return name === "pico"
-}
 
 function isUsablePeripheral(key) {
-  return ['motor', 'intensity', 'servo', 'keypad', 'distance', 'line', 'object'].includes(key)
+  const allowed =
+    useConnectionStore().transport === "network"
+      ? ['motor', 'intensity', 'servo', 'keypad', 'distance', 'line', 'object', 'oled', 'color']
+      : ['motor', 'intensity', 'servo', 'keypad', 'distance', 'line', 'object']
+
+  if (!allowed.includes(key)) {
+    return false
+  }
+
+  if (state.value.type !== "pcb") {
+    return true
+  }
+
+  const config = pcb_pin_defs?.[key]?.pins
+
+  if (!config) {
+    return true
+  }
+
+  const existingCount = state.value.peripherals.filter(
+    p => p.type === key
+  ).length
+
+  const firstPinOptions = Object.values(config)[0]
+
+  const maxCount = Array.isArray(firstPinOptions)
+    ? firstPinOptions.length
+    : 1
+
+  return existingCount < maxCount
 }
+
 
 const usedPins = computed(() => {
   const map = new Map()
@@ -280,8 +311,8 @@ onMounted(() => {
   peripheralStore.loadFromLocalStorage()
   JSONtoUI(peripheralStore.peripherals)
 
-   leftMotor.value = peripheralStore.controls.left_motor
-   rightMotor.value = peripheralStore.controls.right_motor
+  leftMotor.value = peripheralStore.controls.left_motor
+  rightMotor.value = peripheralStore.controls.right_motor
 
 
   if (connectionStore.status == "connected" && connectionStore.transport == "network" && connectionStore.ip_address != "") {

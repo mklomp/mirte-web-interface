@@ -1,0 +1,89 @@
+{
+  "servo": {
+    "pins": {
+      "pin": [
+        "GP12",
+        "GP13",
+        "GP14",
+        "GP15"
+      ]
+    }
+  },
+  "object": {
+    "pins": {
+      "digital": [
+        "GP12",
+        "GP13"
+      ]
+    }
+  },
+  "keypad": {
+    "pins": {
+      "pin": "GP28"
+    }
+  },
+  "distance": {
+    "pins": {
+      "trigger": [
+        "GP7",
+        "GP9"
+      ],
+      "echo": [
+        "GP6",
+        "GP8"
+      ]
+    }
+  },
+  "line": {
+    "pins": {
+      "digital": [
+        "GP16",
+        "GP17"
+      ],
+      "analog": [
+        "GP26",
+        "GP27"
+      ]
+    }
+  },
+  "motor": {
+    "pins": {
+      "p1": [
+        "GP18",
+        "GP20",
+        "GP16",
+        "GP17"
+      ],
+      "p2": [
+        "GP19",
+        "GP21",
+        "GP26",
+        "GP27"
+      ]
+    }
+  },
+  "oled": {
+    "pins": {
+      "sda": [
+        "GP4",
+        "GP10"
+      ],
+      "scl": [
+        "GP5",
+        "GP11"
+      ]
+    }
+  },
+  "color": {
+    "pins": {
+      "sda": [
+        "GP4",
+        "GP10"
+      ],
+      "scl": [
+        "GP5",
+        "GP11"
+      ]
+    }
+  }
+}

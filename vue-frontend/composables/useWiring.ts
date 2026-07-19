@@ -1,5 +1,5 @@
 import { ref } from "vue"
-import { usePeripheralStore } from '@/stores/peripherals'
+import { usePeripheralStore } from "@/stores/peripherals"
 
 export type PeripheralInstance = {
   id: string
@@ -8,8 +8,11 @@ export type PeripheralInstance = {
   pins: Record<string, string | null>
 }
 
-export function useWiring(peripheralsDef: any, microcontrollers: any) {
-
+export function useWiring(
+  peripheralsDef: any,
+  microcontrollers: any,
+  pcbPins: any // <-- placeholder json
+) {
   const connectionStore = useConnectionStore()
   const peripheralStore = usePeripheralStore()
   const isConnected = connectionStore.status === "connected"
@@ -20,19 +23,103 @@ export function useWiring(peripheralsDef: any, microcontrollers: any) {
     peripherals: [] as PeripheralInstance[],
   })
 
-  function addPeripheral(type: string) {
+
+  function syncDependentPins(
+    peripheral: PeripheralInstance,
+    changedPin?: string
+  ) {
+    if (state.value.type !== "pcb") return
+
+    const config = pcbPins?.[peripheral.type]?.pins
+
+    if (!config) return
+
+    if (peripheral.type === "motor") {
+      syncPinPair(peripheral, config, "p1", "p2", changedPin)
+    }
+
+    if (peripheral.type === "distance") {
+      syncPinPair(peripheral, config, "trigger", "echo", changedPin)
+    }
+
+    if (peripheral.type === "line") {
+      syncPinPair(peripheral, config, "digital", "analog", changedPin)
+    }
+
+    if (
+      peripheral.type === "oled" ||
+      peripheral.type === "color"
+    ) {
+      syncPinPair(peripheral, config, "sda", "scl", changedPin)
+    }
+  }
+
+  function syncPinPair(
+    peripheral: PeripheralInstance,
+    config: any,
+    sourcePin: string,
+    targetPin: string,
+    changedPin: string
+  ) {
+    const source = config[sourcePin]
+    const target = config[targetPin]
+
+    if (!Array.isArray(source) || !Array.isArray(target)) return
+
+    if (changedPin === sourcePin) {
+      const idx = source.indexOf(peripheral.pins[sourcePin])
+
+      if (idx >= 0 && target[idx]) {
+        peripheral.pins[targetPin] = target[idx]
+      }
+    }
+
+    if (changedPin === targetPin) {
+      const idx = target.indexOf(peripheral.pins[targetPin])
+
+      if (idx >= 0 && source[idx]) {
+        peripheral.pins[sourcePin] = source[idx]
+      }
+    }
+  }
+
+  function updatePeripheralPin(
+    peripheralId: string,
+    pinName: string,
+    value: string
+  ) {
+    const peripheral = state.value.peripherals.find(
+      p => p.id === peripheralId
+    )
+
+    if (!peripheral) return
+
+    peripheral.pins[pinName] = value
+
+    syncDependentPins(peripheral, pinName)
+  }
+
+  function addPeripheral(
+    type: string,
+    usedPins: Map<string, any[]>
+  ) {
     const def = peripheralsDef[type]
 
     const pins = Object.fromEntries(
-      Object.keys(def.pins).map((k) => [k, null])
+      Object.keys(def.pins).map(pinName => [
+        pinName,
+        findAvailablePin(type, pinName, usedPins),
+      ])
     )
 
-    state.value.peripherals.unshift({
+    const peripheral: PeripheralInstance = {
       id: crypto.randomUUID(),
       type,
       name: "",
       pins,
-    })
+    }
+
+    state.value.peripherals.unshift(peripheral)
   }
 
   function removePeripheral(id: string) {
@@ -41,47 +128,81 @@ export function useWiring(peripheralsDef: any, microcontrollers: any) {
     )
   }
 
-  function getValidPins(type: string, pin: string) {
-    const board = microcontrollers[state.value.board]
-    let pinMap = Object.entries(board.pin_map)
 
-    if (peripheralsDef[type].pins[pin] === "analog") {
-      pinMap = pinMap.filter(([_, v]) => v >= board.analog_offset)
-    }
-
-    return pinMap.map(([value]) => ({ value, text: value }))
+  function isPinFree(pin: string, usedPins: Map<string, any[]>) {
+    return !usedPins.has(pin)
   }
 
 
-  async function saveYAML() {
+  function findAvailablePin(
+    type: string,
+    pinName: string,
+    usedPins: Map<string, any[]>
+  ) {
+    const validPins = getValidPins(type, pinName)
 
+    return validPins.find(p => isPinFree(p.value, usedPins))?.value ?? null
+  }
+
+
+  function getValidPins(type: string, pin: string) {
+    if (state.value.type === "pcb") {
+      const restrictedPins = pcbPins?.[type]?.pins?.[pin]
+
+      if (restrictedPins) {
+        const pins = Array.isArray(restrictedPins)
+          ? restrictedPins
+          : [restrictedPins]
+
+        return pins.map(value => ({
+          value,
+          text: value,
+        }))
+      }
+    }
+
+    const board = microcontrollers[state.value.board]
+
+    let pinMap = Object.entries(board.pin_map)
+
+    if (peripheralsDef[type].pins[pin] === "analog") {
+      pinMap = pinMap.filter(
+        ([_, v]) => Number(v) >= board.analog_offset
+      )
+    }
+
+    return pinMap.map(([value]) => ({
+      value,
+      text: value,
+    }))
+  }
+
+  async function saveYAML() {
     const json = UItoJSON()
     const yaml = YAML.dump(json)
 
     if (connectionStore.status == "connected") {
       const { uploadFile } = useConnection()
-      await uploadFile('/settings.yaml', yaml)
 
-      // but also store the json equivalent to be
-      // used by mircopython
-      await uploadFile('/.settings.json', JSON.stringify(json, null, 2))
+      await uploadFile("/settings.yaml", yaml)
+
+      await uploadFile(
+        "/.settings.json",
+        JSON.stringify(json, null, 2)
+      )
     }
   }
 
-  function saveControlJSON(left_motor, right_motor){
+  function saveControlJSON(left_motor, right_motor) {
     peripheralStore.setControl(left_motor, right_motor)
   }
 
   async function saveJSON() {
-    // locally save the settings
-    // note: will be stored to robots in the store
     const json = UItoJSON()
     peripheralStore.setPeripherals(json)
   }
 
   function UItoJSON() {
-
-
     const result: any = {
       device: {
         mirte: {
@@ -100,25 +221,21 @@ export function useWiring(peripheralsDef: any, microcontrollers: any) {
         pins: p.pins,
       }
     }
-
     return result
   }
 
-
   function loadFromYAML(data: any) {
-
     const list: PeripheralInstance[] = []
 
-    // device info
     if (data?.device?.mirte) {
       state.value.board = data.device.mirte.board || "pico"
-      state.value.type = data.device.mirte.type || "breadboard"
+      state.value.type = data.device.mirte.type || "pcb"
     }
 
-    // peripherals
     if (data) {
       for (const [type, group] of Object.entries(data)) {
         if (type === "device") continue
+
         for (const [name, item] of Object.entries(group as any)) {
           list.push({
             id: crypto.randomUUID(),
@@ -129,6 +246,7 @@ export function useWiring(peripheralsDef: any, microcontrollers: any) {
         }
       }
     }
+
     state.value.peripherals = list
   }
 
@@ -136,7 +254,7 @@ export function useWiring(peripheralsDef: any, microcontrollers: any) {
     loadFromYAML(input)
   }
 
-  async function reinstallMIRTE(){
+  async function reinstallMIRTE() {
     const { reinstallMIRTE } = useConnection()
     await reinstallMIRTE()
   }
@@ -146,11 +264,12 @@ export function useWiring(peripheralsDef: any, microcontrollers: any) {
     addPeripheral,
     removePeripheral,
     getValidPins,
+    updatePeripheralPin, // <-- use this in PeripheralRow
     loadFromYAML,
     saveYAML,
     saveJSON,
     JSONtoUI,
     reinstallMIRTE,
-    saveControlJSON
+    saveControlJSON,
   }
 }
