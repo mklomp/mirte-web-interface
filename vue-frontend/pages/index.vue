@@ -20,7 +20,7 @@ import { Splitpanes, Pane } from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
 
 const connectionStore = useConnectionStore()
-const { openModal, closeModal, isOpen} = useModal()
+const { openModal, closeModal, isOpen } = useModal()
 const codeStore = useCodeStore()
 const peripheralStore = usePeripheralStore()
 
@@ -139,12 +139,12 @@ function redo() {
 
    <ModalContainer />
 
-   <div class="row p-4 h-100">
+   <div class="main-layout h-100">
 
-      <div v-show="showSensors" class="col-2 p-2 h-100" style="overflow: hidden;">
+      <div v-show="showSensors" class="sidebar sensors" style="overflow: hidden;">
          <div class="layoutbox rounded h-100" style="overflow: hidden; display: flex; flex-flow: column;">
 
-            <div class="text-black p-2 h3 m-0 layoutbox-title w-100 background-secondary">
+            <div class="text-black p-1 h3 m-0 layoutbox-title w-100 background-secondary">
                {{ $t('main.sensors') }}
             </div>
 
@@ -155,10 +155,10 @@ function redo() {
          </div>
       </div>
 
-      <div :class="[programmingClass, 'p-2 h-100']" style="overflow: hidden;">
-         <div class="layoutbox rounded" style="overflow: hidden; display: flex; flex-direction: column; height: 100%">
+      <div class="programming-area" style="overflow: hidden;">
+         <div class="layoutbox rounded" style="overflow: hidden; display: flex; flex-direction: column;">
 
-            <div class="layoutbox-title text-black p-2 h3 m-0 w-100 background-secondary" style="flex: 0 0 auto;">
+            <div class="layoutbox-title text-black p-1 h3 m-0 w-100 background-secondary" style="flex: 0 0 auto;">
                {{ $t('main.programming') }}
 
                <div class="btn-group" role="group" aria-label="View mode">
@@ -214,10 +214,10 @@ function redo() {
          </div>
       </div>
 
-      <div v-show="showActuators" class="col-2 p-2 h-100" style="overflow: hidden;">
+      <div v-show="showActuators" class="sidebar" style="overflow: hidden;">
          <div class="layoutbox rounded h-100" style="overflow: hidden; display: flex; flex-flow: column;">
 
-            <div class="text-black p-2 h3 m-0 layoutbox-title w-100 background-secondary">
+            <div class="text-black p-1 h3 m-0 layoutbox-title w-100 background-secondary">
                {{ $t('main.actuators') }}
             </div>
 
@@ -230,3 +230,56 @@ function redo() {
 
    </div>
 </template>
+
+<style scoped>
+.main-layout {
+   display: flex;
+   height: 100%;
+   gap: 0.5rem;
+   padding: 0.5rem;
+}
+
+.sidebar {
+   width: 280px;
+   flex-shrink: 0;
+}
+
+.programming-area {
+   flex: 1;
+   min-width: 0;
+}
+
+.programming-area> :first-child {
+   height: 100%;
+}
+
+@media (max-width: 1200px) {
+   .main-layout {
+      flex-wrap: wrap;
+   }
+
+   .programming-area {
+      order: 1;
+      flex: 0 0 100%;
+      width: 100%;
+      min-height: 70vh;
+   }
+
+   .sidebar {
+      order: 2;
+      flex: 1 1 0;
+      width: auto;
+      min-width: 0;
+   }
+}
+
+
+@media (max-width: 768px) {
+   .sidebar {
+      flex: 0 0 100%;
+      width: 100%;
+   }
+}
+
+
+</style>

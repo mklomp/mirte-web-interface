@@ -40,9 +40,9 @@ body,
   height: 100vh;
 }
 
+
 main {
-  flex: 1;
-  overflow: hidden;
-  min-height: 0;
+  overflow: hidden*
 }
+
 </style>
