@@ -1,10 +1,24 @@
 <template>
   <div class="rounded background-tertiary p-3 mb-2" :key="cameraKey">
-    <div class="h5">Camera</div>
+    <div class="h5">Camera
+      <NuxtLink :to="expanded ? '/' : '/drive'" class="btn btn-sm float-end">
+        <font-awesome-icon :icon="expanded ? 'fa-compress' : 'fa-expand'" />
+      </NuxtLink>
+
+    </div>
     <img ref="camera" :src="`${cameraSrc}`" style="width: 100%; height: auto;" />
   </div>
 </template>
 
+
+<script setup>
+const props = defineProps({
+  expanded: {
+    type: Boolean,
+    default: false
+  }
+})
+</script>
 
 <script>
 

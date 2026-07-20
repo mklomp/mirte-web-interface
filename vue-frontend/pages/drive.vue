@@ -1,25 +1,24 @@
 <template>
+  <ModalContainer />
 
+  <div class="row m-0 align-items-stretch">
 
-  <NuxtLink to="/" class="btn btn-primary">
-    Back to programming
-  </NuxtLink>
-
-
-  <div class="row h-100 m-0">
-
-    <div class="col-6 p-2 h-100">
-      <div class="layoutbox h-100">
-        <Camera />
+    <div class="col-12 col-md-6 p-2 d-flex">
+      <div class="flex-fill">
+        <Camera :expanded="true" />
       </div>
     </div>
 
-    <div class="col-6 p-2 h-100">
-      <div class="layoutbox h-100">
+
+    <div class="col-12 col-md-6 p-2 d-flex">
+      <div class="rounded background-tertiary p-3 mb-2 flex-fill" @contextmenu.prevent>
+        <div class="h5">{{ $t("settings.drive") }}
+          <NuxtLink to="/" class="btn btn-sm float-end">
+            <font-awesome-icon icon="fa-compress" />
+          </NuxtLink>
+        </div>
         <DriveJoystick />
       </div>
     </div>
-
   </div>
-
 </template>
