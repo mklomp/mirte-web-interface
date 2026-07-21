@@ -41,14 +41,16 @@
       @contextmenu.prevent>
       <div class="h5">{{ $t('peripherals.' + peripherals[actuator].text) }}</div>
       <div v-for="instance in getInstances(actuator)" class="rounded background-actuator p-2 text-white mb-2">
+
+
         <div v-if="actuator === 'servo'">
-          <div>
+       
             {{ instance }}: {{ actuator_values[actuator][instance] }}
-          </div>
-          <div>
+      
+
             <input class="form-range" id="range-1" v-model="actuator_values[actuator][instance]"
               @change="sendData(actuator, instance)" type="range" min="0" max="180" @contextmenu.prevent></input>
-          </div>
+      
         </div>
 
         <div v-if="actuator === 'oled'">

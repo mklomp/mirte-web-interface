@@ -3,7 +3,7 @@
   <div class="layoutbox-content" :class="{ disabled: !isROSConnected }">
 
     <div>
-      <Camera/>
+      <Camera />
     </div>
 
     <div v-for="sensor_type in getSensorTypes()" class="rounded background-tertiary p-3 mb-2" :key="`${sensor_type}`">
@@ -16,9 +16,10 @@
 
         <div class="col-8">
 
-          <div v-for="instance in getInstances(sensor_type)" class="rounded background-sensor p-2 text-white mb-2"
+          <div v-for="instance in getInstances(sensor_type)" class="rounded background-sensor p-2 text-white mb-2 d-flex"
             style="white-space: pre;" :key="`${sensor_type}-${instance}`">
-            {{ instance }}: {{ sensors[sensor_type][instance] }}
+            <span>{{ instance }}:</span>
+            <span class="ms-auto">{{ sensors[sensor_type][instance] }}</span>
           </div>
 
         </div>
