@@ -63,4 +63,11 @@ const { modals, closeModal } = useModal()
   padding: 12px;
 }
 
+@media (max-width: 500px) {
+   .modal-content {
+      width: 100vw;
+   }
+}
+
+
 </style>
