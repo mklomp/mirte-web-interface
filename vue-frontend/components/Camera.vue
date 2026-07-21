@@ -1,12 +1,13 @@
 <template>
-  <div class="rounded background-tertiary p-3 mb-2" :key="cameraKey">
+  <div class="rounded background-tertiary p-3 mb-2 h-100 d-flex flex-column" :key="cameraKey">
     <div class="h5">Camera
       <NuxtLink :to="expanded ? '/' : '/drive'" class="btn btn-sm float-end">
         <font-awesome-icon :icon="expanded ? 'fa-compress' : 'fa-expand'" />
       </NuxtLink>
-
     </div>
-    <img ref="camera" :src="`${cameraSrc}`" style="width: 100%; height: auto;" />
+    <div class="camera-container" style="flex: 1;min-height: 0;overflow: hidden;">
+      <img ref="camera" :src="`${cameraSrc}`" style="width: 100%; height: 100%; object-fit: contain;" />
+    </div>
   </div>
 </template>
 

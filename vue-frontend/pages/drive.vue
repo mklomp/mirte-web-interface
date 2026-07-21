@@ -1,24 +1,50 @@
 <template>
   <ModalContainer />
 
-  <div class="row m-0 align-items-stretch">
-
-    <div class="col-12 col-md-6 p-2 d-flex">
-      <div class="flex-fill">
-        <Camera :expanded="true" />
-      </div>
+  <div class="control-layout">
+    <div class="pane">
+      <Camera :expanded="true" />
     </div>
 
+    <div class="pane">
+      <div class="rounded background-tertiary p-3 h-100" @contextmenu.prevent>
+        <div class="h5">
+          {{ $t("settings.drive") }}
 
-    <div class="col-12 col-md-6 p-2 d-flex">
-      <div class="rounded background-tertiary p-3 mb-2 flex-fill" @contextmenu.prevent>
-        <div class="h5">{{ $t("settings.drive") }}
           <NuxtLink to="/" class="btn btn-sm float-end">
             <font-awesome-icon icon="fa-compress" />
           </NuxtLink>
         </div>
+
         <DriveJoystick />
       </div>
     </div>
   </div>
 </template>
+
+<style scoped>
+.control-layout {
+  height: 100%;
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem;
+}
+
+.pane {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+@media (orientation: landscape) {
+  .control-layout {
+    flex-direction: row;
+  }
+}
+
+@media (orientation: portrait) {
+  .control-layout {
+    flex-direction: column;
+  }
+}
+</style>
