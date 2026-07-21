@@ -5,6 +5,8 @@ const head = useLocaleHead()
 const connectionStore = useConnectionStore()
 const peripheralStoreStore = usePeripheralStore()
 
+const visible = ref(false)
+
 onMounted(async () => {
   // autoconnect if there are existing connections 
   // and I was previously connected
@@ -46,10 +48,10 @@ function openWifi() {
       <h1>MIRTE</h1>
     </NuxtLink>
     <button aria-label="navbar-toggler" class="navbar-toggler" type="button" data-bs-toggle="collapse"
-      data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown">
+      data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" @click="visible = true">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="navbar-collapse" id="navbarNavDropdown">
+    <div class="navbar-collapse" :class="!visible ? 'collapse' : ''" id="navbarNavDropdown">
       <ul class="navbar-nav ms-auto">
         <li class="nav-item dropdown">
 
@@ -60,14 +62,14 @@ function openWifi() {
 
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="settingsDropdown">
             <li>
-              <button class="dropdown-item" @click="openSettings">
+              <button class="dropdown-item" @click="openSettings(); visible = false; ">
                 Robot hardware
               </button>
             </li>
 
             <ClientOnly>
               <li>
-                <button class="dropdown-item" @click="openWifi" :disabled="!isConnected">
+                <button class="dropdown-item" @click="openWifi(); visible = false;" :disabled="!isConnected">
                   Network
                 </button>
               </li>
@@ -75,7 +77,7 @@ function openWifi() {
           </ul>
         </li>
         <li class="nav-item dropdown">
-          <ShutdownMenu />
+          <ShutdownMenu v-model:visible="visible"/>
         </li>
         <li class="nav-item dropdown">
           <LocaleChanger />

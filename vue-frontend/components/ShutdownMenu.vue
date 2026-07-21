@@ -1,4 +1,6 @@
 <script setup>
+const visible = defineModel('visible')
+
 import { useI18n } from 'vue-i18n'
 import { computed } from "vue"
 const { addToast } = useToast()
@@ -61,7 +63,7 @@ function reboot() {
 
   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="localeDropdown">
     <li>
-      <button class="dropdown-item" @click="connect('mcu', 'serial')" :disabled="mounted && isConnected">
+      <button class="dropdown-item" @click="connect('mcu', 'serial'); visible = false;" :disabled="mounted && isConnected">
         USB <ClientOnly>
           <FontAwesomeIcon v-if="isConnected && connectionType == 'serial'" icon="check" />
         </ClientOnly>
@@ -78,7 +80,7 @@ function reboot() {
 
 
     <li>
-      <button class="dropdown-item" @click="connect('sbc', 'network')" :disabled="mounted && isConnected">
+      <button class="dropdown-item" @click="connect('sbc', 'network'); visible = false;" :disabled="mounted && isConnected">
         WiFi/Network <ClientOnly>
           <FontAwesomeIcon v-if="isConnected && connectionType == 'network'" icon="check" />
         </ClientOnly>
@@ -91,13 +93,13 @@ function reboot() {
       </li>
 
       <li v-if="connectionType == 'network'">
-        <button class="dropdown-item" @click="shutdown" :disabled="mounted && !isConnected">
+        <button class="dropdown-item" @click="shutdown(); visible = false;"  :disabled="mounted && !isConnected">
           {{ $t("main.connection.shutdown") }}
         </button>
       </li>
 
       <li v-if="connectionType == 'network'">
-        <button class="dropdown-item" @click="reboot" :disabled="mounted && !isConnected">
+        <button class="dropdown-item" @click="reboot(); visible = false;" :disabled="mounted && !isConnected">
           {{ $t("main.connection.reboot") }}
         </button>
       </li>
@@ -108,7 +110,7 @@ function reboot() {
     </li>
 
     <li>
-      <button class="dropdown-item" @click="disconnect" :disabled="mounted && !isConnected">
+      <button class="dropdown-item" @click="disconnect(); visible = false;" :disabled="mounted && !isConnected">
         {{ $t("main.connection.disconnect") }}
       </button>
     </li>
