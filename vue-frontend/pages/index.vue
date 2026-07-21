@@ -167,8 +167,9 @@ function redo() {
          <div class="layoutbox rounded" style="overflow: hidden; display: flex; flex-direction: column;">
 
             <div class="layoutbox-title text-black p-1 h3 m-0 w-100 background-secondary" style="flex: 0 0 auto;">
-               {{ $t('main.programming') }}
-
+               <span class="d-none d-md-inline">
+                  {{ $t('main.programming') }}
+               </span>
                <div class="btn-group" role="group" aria-label="View mode">
 
                   <input type="radio" class="btn-check" name="viewMode" id="blockly" autocomplete="off" value="blockly"

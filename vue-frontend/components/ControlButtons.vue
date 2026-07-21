@@ -1,49 +1,122 @@
 <template>
     <div>
-        <button class="btn btn-outline-light mx-2" :title="$t('programming.undo')" @click="$emit('undo')">
-            <ClientOnly>
-                <FontAwesomeIcon icon="undo" />
-            </ClientOnly>
-        </button>
 
-        <button class="btn btn-outline-light mr-2" :title="$t('programming.redo')" @click="$emit('redo')">
-            <ClientOnly>
-                <FontAwesomeIcon icon="redo" />
-            </ClientOnly>
-        </button>
+        <!-- Desktop -->
+        <div class="d-none d-md-flex">
 
-        <span class="nav-spacer"></span>
-
-        <span :title="$t('programming.start')" style="display: inline-block;">
-            <button :disabled="!isPlayEnabled" class="btn btn-outline-light mx-2" @click="startCode">
+            <button class="btn btn-outline-light mx-2" :title="$t('programming.undo')" @click="$emit('undo')">
                 <ClientOnly>
-                    <FontAwesomeIcon icon="play" />
+                    <FontAwesomeIcon icon="undo" />
                 </ClientOnly>
             </button>
-        </span>
 
-        <span :title="$t('programming.stop')" style="display: inline-block;">
-            <button :disabled="!isStopEnabled" class="btn btn-outline-light mr-2" @click="stopCode">
+            <button class="btn btn-outline-light me-2" :title="$t('programming.redo')" @click="$emit('redo')">
                 <ClientOnly>
-                    <FontAwesomeIcon icon="stop" />
+                    <FontAwesomeIcon icon="redo" />
                 </ClientOnly>
             </button>
-        </span>
 
-        <span class="nav-spacer"></span>
+            <span class="nav-spacer"></span>
 
-        <button href="#" class="btn btn-outline-light mx-2" :title="$t('programming.save')" @click="save">
-            <ClientOnly>
-                <FontAwesomeIcon icon="save" />
-            </ClientOnly>
-        </button>
+            <span :title="$t('programming.start')" style="display: inline-block;">
+                <button :disabled="!isPlayEnabled" class="btn btn-outline-light mx-2" @click="startCode">
+                    <ClientOnly>
+                        <FontAwesomeIcon icon="play" />
+                    </ClientOnly>
+                </button>
+            </span>
 
-        <button class="btn btn-outline-light mr-2" :title="$t('programming.open')" @click="openFileWindow">
-            <ClientOnly>
-                <FontAwesomeIcon :icon="['fas', 'folder-open']" />
-            </ClientOnly>
-            <input ref="file_input" @change="upload" type="file" name="name" style="display: none;" />
-        </button>
+            <span :title="$t('programming.stop')" style="display: inline-block;">
+                <button :disabled="!isStopEnabled" class="btn btn-outline-light me-2" @click="stopCode">
+                    <ClientOnly>
+                        <FontAwesomeIcon icon="stop" />
+                    </ClientOnly>
+                </button>
+            </span>
+
+            <span class="nav-spacer"></span>
+
+            <button class="btn btn-outline-light mx-2" :title="$t('programming.save')" @click="save">
+                <ClientOnly>
+                    <FontAwesomeIcon icon="save" />
+                </ClientOnly>
+            </button>
+
+            <button class="btn btn-outline-light mr-2" :title="$t('programming.open')" @click="openFileWindow">
+                <ClientOnly>
+                    <FontAwesomeIcon :icon="['fas', 'folder-open']" />
+                </ClientOnly>
+            </button>
+
+        </div>
+
+        <!-- Mobile / narrow -->
+        <div class="d-flex d-md-none align-items-center flex-wrap">
+
+            <span :title="$t('programming.start')">
+                <button :disabled="!isPlayEnabled" class="btn btn-outline-light mx-2" @click="startCode">
+                    <ClientOnly>
+                        <FontAwesomeIcon icon="play" />
+                    </ClientOnly>
+                </button>
+            </span>
+
+            <span :title="$t('programming.stop')">
+                <button :disabled="!isStopEnabled" class="btn btn-outline-light" @click="stopCode">
+                    <ClientOnly>
+                        <FontAwesomeIcon icon="stop" />
+                    </ClientOnly>
+                </button>
+            </span>
+
+            <div class="dropdown">
+                <button class="btn btn-outline-light mx-2" type="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    <ClientOnly>
+                        <FontAwesomeIcon icon="bars" />
+                    </ClientOnly>
+                </button>
+
+                <ul class="dropdown-menu dropdown-menu-end">
+
+                    <li>
+                        <button class="dropdown-item" @click="$emit('undo')">
+                            <FontAwesomeIcon icon="undo" class="me-2" />
+                            {{ $t('programming.undo') }}
+                        </button>
+                    </li>
+
+                    <li>
+                        <button class="dropdown-item" @click="$emit('redo')">
+                            <FontAwesomeIcon icon="redo" class="me-2" />
+                            {{ $t('programming.redo') }}
+                        </button>
+                    </li>
+
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+
+                    <li>
+                        <button class="dropdown-item" @click="save">
+                            <FontAwesomeIcon icon="save" class="me-2" />
+                            {{ $t('programming.save') }}
+                        </button>
+                    </li>
+
+                    <li>
+                        <button class="dropdown-item" @click="openFileWindow">
+                            <FontAwesomeIcon :icon="['fas', 'folder-open']" class="me-2" />
+                            {{ $t('programming.open') }}
+                        </button>
+                    </li>
+
+                </ul>
+            </div>
+
+        </div>
+
+        <input ref="file_input" @change="upload" type="file" name="name" style="display: none;" />
 
     </div>
 </template>
