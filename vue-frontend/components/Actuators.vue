@@ -11,7 +11,9 @@
       <div class="h5">{{ $t("settings.drive") }}
 
         <NuxtLink to="/drive" class="btn btn-sm float-end">
-          <font-awesome-icon icon="fa-expand" />
+          <ClientOnly>
+            <font-awesome-icon icon="fa-expand" />
+          </ClientOnly>
         </NuxtLink>
 
         <button class="btn btn-sm btn-outline-dark float-end" @click="toggleJoystickMode()">
@@ -44,13 +46,13 @@
 
 
         <div v-if="actuator === 'servo'">
-       
-            {{ instance }}: {{ actuator_values[actuator][instance] }}
-      
 
-            <input class="form-range" id="range-1" v-model="actuator_values[actuator][instance]"
-              @change="sendData(actuator, instance)" type="range" min="0" max="180" @contextmenu.prevent></input>
-      
+          {{ instance }}: {{ actuator_values[actuator][instance] }}
+
+
+          <input class="form-range" id="range-1" v-model="actuator_values[actuator][instance]"
+            @change="sendData(actuator, instance)" type="range" min="0" max="180" @contextmenu.prevent></input>
+
         </div>
 
         <div v-if="actuator === 'oled'">

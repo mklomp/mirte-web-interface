@@ -12,7 +12,9 @@
           {{ $t("settings.drive") }}
 
           <NuxtLink to="/" class="btn btn-sm float-end">
+          <ClientOnly>
             <font-awesome-icon icon="fa-compress" />
+            </ClientOnly>
           </NuxtLink>
         </div>
 

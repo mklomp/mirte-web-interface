@@ -2,7 +2,9 @@
   <div class="rounded background-tertiary p-3 mb-2 h-100 d-flex flex-column" :key="cameraKey">
     <div class="h5">Camera
       <NuxtLink :to="expanded ? '/' : '/drive'" class="btn btn-sm float-end">
-        <font-awesome-icon :icon="expanded ? 'fa-compress' : 'fa-expand'" />
+        <ClientOnly>
+          <font-awesome-icon :icon="expanded ? 'fa-compress' : 'fa-expand'" />
+        </ClientOnly>
       </NuxtLink>
     </div>
     <div class="camera-container" style="flex: 1;min-height: 0;overflow: hidden;">

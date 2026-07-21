@@ -81,14 +81,18 @@
 
                     <li>
                         <button class="dropdown-item" @click="$emit('undo')">
-                            <FontAwesomeIcon icon="undo" class="me-2" />
+                            <ClientOnly>
+                                <FontAwesomeIcon icon="undo" class="me-2" />
+                            </ClientOnly>
                             {{ $t('programming.undo') }}
                         </button>
                     </li>
 
                     <li>
                         <button class="dropdown-item" @click="$emit('redo')">
-                            <FontAwesomeIcon icon="redo" class="me-2" />
+                            <ClientOnly>
+                                <FontAwesomeIcon icon="redo" class="me-2" />
+                            </ClientOnly>
                             {{ $t('programming.redo') }}
                         </button>
                     </li>
@@ -99,14 +103,18 @@
 
                     <li>
                         <button class="dropdown-item" @click="save">
-                            <FontAwesomeIcon icon="save" class="me-2" />
+                            <ClientOnly>
+                                <FontAwesomeIcon icon="save" class="me-2" />
+                            </ClientOnly>
                             {{ $t('programming.save') }}
                         </button>
                     </li>
 
                     <li>
                         <button class="dropdown-item" @click="openFileWindow">
-                            <FontAwesomeIcon :icon="['fas', 'folder-open']" class="me-2" />
+                            <ClientOnly>
+                                <FontAwesomeIcon :icon="['fas', 'folder-open']" class="me-2" />
+                            </ClientOnly>
                             {{ $t('programming.open') }}
                         </button>
                     </li>
