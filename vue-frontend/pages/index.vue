@@ -9,6 +9,8 @@ useHead({
    ]
 })
 
+import { useMediaQuery } from '@vueuse/core'
+
 import { usePeripheralStore } from '@/stores/peripherals'
 import { useConnectionStore } from '@/stores/connection'
 import { useModal } from '~/composables/useModal'
@@ -28,10 +30,10 @@ const blocklyEditor = ref(null)
 const pythonEditor = ref(null)
 const blocklyContainer = ref()
 
-
+const isMobile = useMediaQuery('(max-width: 900px)')
 const split = ref(0)
 const lastSplit = ref(60)
-
+const splitHidden = ref(false)
 
 const splitThemeClass = computed(() =>
    split.value != 0 && split.value != 100 ? 'default-theme' : ''
@@ -47,12 +49,6 @@ const showSensors = computed(() => {
 
 const showActuators = computed(() => {
    return connectionStore.status == "connected"
-})
-
-const programmingClass = computed(() => {
-   if (showSensors.value && showActuators.value) { return 'col-8' }
-   if (!showSensors.value && showActuators.value) { return 'col-10' }
-   return 'col-12'
 })
 
 const viewMode = computed({
@@ -92,6 +88,18 @@ function onResize(event) {
       split.value = Math.round(newSize)
    }
 }
+
+watch(isMobile, (mobile) => {
+   if (mobile && lastSplit.value == split.value) {
+      splitHidden.value = true
+      split.value = 100 // blockly
+   } else if (!mobile && splitHidden.value) {
+      split.value = lastSplit.value
+      splitHidden.value = false // split
+   }
+})
+
+
 
 watch(split, (val) => {
    codeStore.setSplit(val)
@@ -172,13 +180,15 @@ function redo() {
                      </ClientOnly>
                   </label>
 
-                  <input type="radio" class="btn-check" name="viewMode" id="split" autocomplete="off" value="split"
-                     v-model="viewMode">
-                  <label class="btn btn-outline-light" for="split">
+
+                  <input type="radio" class="btn-check split-btn" name="viewMode" id="split" autocomplete="off"
+                     value="split" v-model="viewMode">
+                  <label class="btn btn-outline-light split-btn" for="split">
                      <ClientOnly>
                         <FontAwesomeIcon icon="table-columns" />
                      </ClientOnly>
                   </label>
+
 
                   <input type="radio" class="btn-check" name="viewMode" id="python" autocomplete="off" value="python"
                      v-model="viewMode">
@@ -274,6 +284,11 @@ function redo() {
    }
 }
 
+@media (max-width: 900px) {
+   .split-btn {
+      display: none;
+   }
+}
 
 @media (max-width: 575px) {
    .sidebar {
@@ -281,6 +296,4 @@ function redo() {
       width: 100%;
    }
 }
-
-
 </style>
