@@ -254,7 +254,7 @@ function redo() {
    height: 100%;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1300px) {
    .main-layout {
       flex-wrap: wrap;
    }
@@ -275,7 +275,7 @@ function redo() {
 }
 
 
-@media (max-width: 768px) {
+@media (max-width: 575px) {
    .sidebar {
       flex: 0 0 100%;
       width: 100%;
