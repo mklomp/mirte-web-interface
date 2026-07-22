@@ -17,7 +17,7 @@ const langs = [
 </script>
 
 <template>
-  <a class="nav-link dropdown-toggle locale-selector"
+  <a class="nav-link dropdown-toggle locale-selector rounded"
      href="#"
      id="localeDropdown"
      role="button"

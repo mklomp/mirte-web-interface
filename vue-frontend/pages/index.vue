@@ -170,7 +170,7 @@ function redo() {
                <span class="d-none d-md-inline">
                   {{ $t('main.programming') }}
                </span>
-               <div class="btn-group" role="group" aria-label="View mode">
+               <div class="btn-group mx-2" role="group" aria-label="View mode">
 
                   <input type="radio" class="btn-check" name="viewMode" id="blockly" autocomplete="off" value="blockly"
                      v-model="viewMode">
