@@ -10,9 +10,11 @@ const visible = ref(false)
 onMounted(async () => {
   // autoconnect if there are existing connections 
   // and I was previously connected
-  const ports = await navigator.serial.getPorts()
-  if (ports.length > 0 && connectionStore.status == "connected") {
-    await useConnection().connect("mcu", "serial", true)
+  if ('serial' in navigator) {
+    const ports = await navigator.serial.getPorts()
+    if (ports.length > 0 && connectionStore.status == "connected") {
+      await useConnection().connect("mcu", "serial", true)
+    }
   }
 
   peripheralStoreStore.loadFromLocalStorage()
