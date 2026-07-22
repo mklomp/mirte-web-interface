@@ -43,8 +43,12 @@ const pythonReadOnly = computed(() =>
    split.value != 0
 )
 
+const isNetwork = computed(() => {
+   return connectionStore.transport == 'network'
+})
+
 const showSensors = computed(() => {
-   return connectionStore.status == "connected" && connectionStore.transport == 'network'
+   return connectionStore.status == "connected"
 })
 
 const showActuators = computed(() => {
@@ -149,17 +153,19 @@ function redo() {
 
    <div class="main-layout h-100">
 
-      <div v-show="showSensors" class="sidebar sensors" style="overflow: hidden;">
-         <div class="layoutbox rounded h-100" style="overflow: hidden; display: flex; flex-flow: column;">
+      <div v-if="isNetwork">
+         <div v-show="showSensors" class="sidebar sensors" style="overflow: hidden;">
+            <div class="layoutbox rounded h-100" style="overflow: hidden; display: flex; flex-flow: column;">
 
-            <div class="text-black p-1 h3 m-0 layoutbox-title w-100 background-secondary">
-               {{ $t('main.sensors') }}
+               <div class="text-black p-1 h3 m-0 layoutbox-title w-100 background-secondary">
+                  {{ $t('main.sensors') }}
+               </div>
+
+               <div class="h-100" style="overflow-y: auto;">
+                  <Sensors />
+               </div>
+
             </div>
-
-            <div class="h-100" style="overflow-y: auto;">
-               <Sensors />
-            </div>
-
          </div>
       </div>
 

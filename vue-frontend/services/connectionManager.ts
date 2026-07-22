@@ -196,7 +196,6 @@ export class ConnectionManager {
       } else {
         addToast($i18n.t('toast.connected'), 'success', 'connection-status')
       }
-
       connectionStore.setConnectionStatus("connected")
       useState("programming-state").value = "idle"
       useConnectionStore().setConnectionType(type, transport)

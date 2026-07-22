@@ -10,13 +10,14 @@ const connectionStore = useConnectionStore()
 const { connect, disconnect } = useConnection()
 
 const isConnected = computed(() => connectionStore.status == "connected")
-const connectionType = computed(() => connectionStore.transport)
+const connectionTransport = computed(() => connectionStore.transport)
+const connectionType = computed(() => connectionStore.connectionType)
 
 const { t } = useI18n()
 
 const mounted = ref(false)
 const connectedText = computed(() =>
-  isConnected && useState("programming-state").value == "idle"
+  isConnected.value && (connectionType.value == "mcu" || useState("programming-state").value == "idle")
     ? "connected"
     : "disconnected"
 );
@@ -65,7 +66,7 @@ function reboot() {
     <li>
       <button class="dropdown-item" @click="connect('mcu', 'serial'); visible = false;" :disabled="mounted && isConnected">
         USB <ClientOnly>
-          <FontAwesomeIcon v-if="isConnected && connectionType == 'serial'" icon="check" />
+          <FontAwesomeIcon v-if="isConnected && connectionTransport == 'serial'" icon="check" />
         </ClientOnly>
       </button>
 
@@ -73,7 +74,7 @@ function reboot() {
     <!--  <li>
       <button class="dropdown-item" @click="connect('mcu', 'ble')" :disabled="mounted && isConnected">
         Bluetooth <ClientOnly>
-          <FontAwesomeIcon v-if="isConnected && connectionType == 'ble'" icon="check" />
+          <FontAwesomeIcon v-if="isConnected && connectionTransport == 'ble'" icon="check" />
         </ClientOnly>
       </button>
     </li> -->
@@ -82,23 +83,23 @@ function reboot() {
     <li>
       <button class="dropdown-item" @click="connect('sbc', 'network'); visible = false;" :disabled="mounted && isConnected">
         WiFi/Network <ClientOnly>
-          <FontAwesomeIcon v-if="isConnected && connectionType == 'network'" icon="check" />
+          <FontAwesomeIcon v-if="isConnected && connectionTransport == 'network'" icon="check" />
         </ClientOnly>
       </button>
     </li>
 
     <ClientOnly>
-      <li v-if="connectionType == 'network'">
+      <li v-if="connectionTransport == 'network'">
         <hr class="dropdown-divider">
       </li>
 
-      <li v-if="connectionType == 'network'">
+      <li v-if="connectionTransport == 'network'">
         <button class="dropdown-item" @click="shutdown(); visible = false;"  :disabled="mounted && !isConnected">
           {{ $t("main.connection.shutdown") }}
         </button>
       </li>
 
-      <li v-if="connectionType == 'network'">
+      <li v-if="connectionTransport == 'network'">
         <button class="dropdown-item" @click="reboot(); visible = false;" :disabled="mounted && !isConnected">
           {{ $t("main.connection.reboot") }}
         </button>

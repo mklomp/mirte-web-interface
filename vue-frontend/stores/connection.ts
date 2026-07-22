@@ -55,10 +55,6 @@ export const useConnectionStore = defineStore('connection', {
       localStorage.setItem('connection', JSON.stringify(connection))
     },
     setConnectionStatus(status) {
-
-      console.trace()
-      console.log("chaning connectionstate")
-      console.log(status)
       // update store
       this.status = status
 

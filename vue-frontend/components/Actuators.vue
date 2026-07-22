@@ -155,7 +155,7 @@ export default {
       return useConnectionStore().device == "sbc"
     },
     isROSConnected() {
-      return useConnectionStore().ros_status == "connected"
+      return useConnectionStore().ros_status == "connected" || useConnectionStore().device == "mcu"
     },
     sendData(actuator, instance) {
       var request = {};
