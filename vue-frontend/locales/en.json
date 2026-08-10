@@ -158,6 +158,7 @@
     "uploading_mirte_scripts": "Installing MIRTE scripts.",
     "uploading_mirte_scripts_error": "Failed to install MIRTE scripts.",
     "downloading_mirte_config_error": "Connected device has corrupt settings, did not load them.",
+    "downloading_mirte_config_empty_error": "Connected device has empty settings, please chose another option.",
     "downloading_mirte_config_compare_error": "Connected device has different settings than local, using the one from connected device.",
     "downloading_mirte_config": "Settings loaded from device.",
     "loading_blocks_error": "Found blocks that are not in settings. Cleared your workspace.",

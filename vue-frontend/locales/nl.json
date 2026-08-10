@@ -158,6 +158,7 @@
     "uploading_mirte_scripts": "Installeert MIRTE scripts.",
     "uploading_mirte_scripts_error": "Fout tijdens installeren van MIRTE scripts.",
     "downloading_mirte_config_error": "Verbonden device heeft onleesbare instellingen, deze zijn niet geladen.",
+    "downloading_mirte_config_empty_error": "Verbonden device heeft lege instellingen, kies een andere optie.",
     "downloading_mirte_config_compare_error": "Verbonden device heeft een andere instellingen, die van de device wordt gebruikt.",
     "downloading_mirte_config": "Instellingen geladen van device.",
     "loading_blocks_error": "Blokken gevonden die niet in de instellingen staan. De workspace is geleegd.",

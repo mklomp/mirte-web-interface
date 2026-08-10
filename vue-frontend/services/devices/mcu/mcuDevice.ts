@@ -77,6 +77,7 @@ export class MCUDevice {
         // upload localSettings to robotSettings
         this.uploadSettings(localsettings)
       }
+      addToast($i18n.t('toast.downloading_mirte_config_empty_error'), 'error')
     } else {
       if (Object.keys(localsettings).length < 2) { // local setting is empty or just "device"
         // save the robot settings to local settings

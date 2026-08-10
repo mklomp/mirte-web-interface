@@ -190,10 +190,10 @@ function redo() {
 
                   <input type="radio" class="btn-check split-btn" name="viewMode" id="split" autocomplete="off"
                      value="split" v-model="viewMode">
-                  <label class="btn btn-outline-light split-btn" for="split" :title="$t('main.programming-type.both')" >
+                  <label class="btn btn-outline-light split-btn" for="split" :title="$t('main.programming-type.both')">
                      <ClientOnly>
-                     <FontAwesomeIcon icon=" table-columns" />
-                  </ClientOnly>
+                        <FontAwesomeIcon icon="table-columns" />
+                     </ClientOnly>
                   </label>
 
 
