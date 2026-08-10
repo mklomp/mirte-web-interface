@@ -12,6 +12,9 @@ import { useCodeStore } from "@/stores/user_code"
 
 import { Compartment } from "@codemirror/state"
 
+const { addToast } = useToast()
+const { $i18n } = useNuxtApp()
+
 const readOnlyCompartment = new Compartment()
 const editableCompartment = new Compartment()
 
@@ -49,9 +52,12 @@ onMounted(() => {
       EditorView.updateListener.of(update => {
         if (suppressStore) return
         const newCode = update.state.doc.toString()
-        if (update.docChanged &&
-          newCode != codeStore.python) {
+        if (update.docChanged && newCode != codeStore.python) {
           codeStore.setPython(newCode)
+          if (!useState("python-user-modified").value) {
+            addToast($i18n.t('toast.python-changed'), "warning", "python-changed", -1)
+          }
+          useState("python-user-modified").value = true;
         }
       })
     ]

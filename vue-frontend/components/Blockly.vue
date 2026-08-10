@@ -118,6 +118,7 @@ function storeCode() {
   const newCode = Blockly.Xml.domToText(workspaceDOM)
   if (newCode != codeStore.python) {
     codeStore.setBlockly(newCode)
+    useState("python-user-modified").value = false
     codeStore.setPython(pythonGenerator.workspaceToCode(workspace))
   }
 }
@@ -295,7 +296,8 @@ watch(() => codeStore.reinit_blockly, () => {
 defineExpose({
   undo,
   redo,
-  resize
+  resize,
+  storeCode
 })
 
 </script>

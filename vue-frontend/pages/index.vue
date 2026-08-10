@@ -36,6 +36,8 @@ const split = ref(0)
 const lastSplit = ref(60)
 const splitHidden = ref(false)
 
+useState("python-user-modified").value = false
+
 const splitThemeClass = computed(() =>
    split.value != 0 && split.value != 100 ? 'default-theme' : ''
 )
@@ -111,6 +113,11 @@ watch(split, (val) => {
    codeStore.setSplit(val)
    if (val > 0 && val < 100) {
       lastSplit.value = val
+   }
+
+   // Blockly or Split mode
+   if (val > 0) {
+      blocklyEditor.value?.storeCode()
    }
 })
 
@@ -215,7 +222,8 @@ function redo() {
 
             </div>
 
-            <div v-show="codeStoreLoaded" class="layoutbox-content" style="flex: 1 1 auto; min-height: 0; padding: 0; margin: 0;">
+            <div v-show="codeStoreLoaded" class="layoutbox-content"
+               style="flex: 1 1 auto; min-height: 0; padding: 0; margin: 0;">
                <Splitpanes :class="splitThemeClass" @resized="onResize">
                   <Pane :size="split">
                      <div ref="blocklyContainer" class="h-100">
