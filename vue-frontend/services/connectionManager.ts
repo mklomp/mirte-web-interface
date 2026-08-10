@@ -173,8 +173,7 @@ export class ConnectionManager {
       // "__START__": detecting when execution started (see main.py)
       // "__STOP__": detecting when execution stopped (see main.py)
       this.transport?.onData((data) => {
-        this.term.write(data)
-        //this.parseData(data)
+        this.parseData(data)
       })
 
       // make sure the terminal is in a determined state
