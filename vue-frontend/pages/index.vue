@@ -29,6 +29,7 @@ const peripheralStore = usePeripheralStore()
 const blocklyEditor = ref(null)
 const pythonEditor = ref(null)
 const blocklyContainer = ref()
+const codeStoreLoaded = ref(false)
 
 const isMobile = useMediaQuery('(max-width: 900px)')
 const split = ref(0)
@@ -74,6 +75,7 @@ const viewMode = computed({
 
 onMounted(() => {
    split.value = codeStore.split
+   codeStoreLoaded.value = true
    const observer = new ResizeObserver(() => {
       blocklyEditor.value?.resize()
    })
@@ -176,7 +178,7 @@ function redo() {
                <span class="d-none d-md-inline">
                   {{ $t('main.programming') }}
                </span>
-               <div class="btn-group mx-2" role="group" aria-label="View mode">
+               <div v-show="codeStoreLoaded" class="btn-group mx-2" role="group" aria-label="View mode">
 
                   <input type="radio" class="btn-check" name="viewMode" id="blockly" autocomplete="off" value="blockly"
                      v-model="viewMode">
@@ -213,7 +215,7 @@ function redo() {
 
             </div>
 
-            <div class="layoutbox-content" style="flex: 1 1 auto; min-height: 0; padding: 0; margin: 0;">
+            <div v-show="codeStoreLoaded" class="layoutbox-content" style="flex: 1 1 auto; min-height: 0; padding: 0; margin: 0;">
                <Splitpanes :class="splitThemeClass" @resized="onResize">
                   <Pane :size="split">
                      <div ref="blocklyContainer" class="h-100">

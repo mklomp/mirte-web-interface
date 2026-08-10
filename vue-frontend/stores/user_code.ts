@@ -11,7 +11,7 @@ export const useCodeStore = defineStore('user_code', {
       if (process.client) {
         this.blockly = localStorage.getItem('blockly') || ""
         this.python = localStorage.getItem('python') || ""
-        this.split = localStorage.getItem('split') || 60
+        this.split = localStorage.getItem('split') || 100 // defaults to blockly
       }
     },
     setBlockly(value, reinit = false) {
