@@ -15,7 +15,14 @@
       "connected": "Connected",
       "disconnect": "Disconnect",
       "reboot": "Reboot",
-      "shutdown": "Shutdown"
+      "shutdown": "Shutdown",
+      "network": "Network",
+      "robot_hardware": "Robot hardware"
+    },
+    "programming-type": {
+      "blockly": "Visual block-based programming",
+      "both": "Visual programming with Python code visible",
+      "python": "Textual programming with Python"
     }
   },
   "settings": {
@@ -153,7 +160,15 @@
     "downloading_mirte_config_error": "Connected device has corrupt settings, did not load them.",
     "downloading_mirte_config_compare_error": "Connected device has different settings than local, using the one from connected device.",
     "downloading_mirte_config": "Settings loaded from device.",
-    "loading_blocks_error": "Found blocks that are not in settings. Cleared your workspace."
+    "loading_blocks_error": "Found blocks that are not in settings. Cleared your workspace.",
+    "ros_restarted": "ROS restarted.",
+    "ros_disconnected": "ROS disconnected.",
+    "restarting_ros": "Restarting ROS.",
+    "websocket_lost": "Terminal connection lost.",
+    "shutting_down": "Shutting down.",
+    "restarting_robot": "Restarting robot.",
+    "config_errors": "There are errors in you configuration. Check the orange fields.",
+    "motor_name_error": "Left and right motor must be different motors."
   },
   "modals": {
     "load-settings": {

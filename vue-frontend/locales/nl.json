@@ -15,7 +15,14 @@
       "connected": "Verbonden",
       "disconnect": "Disconnect",
       "reboot": "Herstart",
-      "shutdown": "Afsluiten"
+      "shutdown": "Afsluiten",
+      "network": "Netwerk",
+      "robot_hardware": "Robot hardware"
+    },
+    "programming-type": {
+      "blockly": "Visueel blokken programmeren",
+      "both": "Visueel programmeren met Python code zichtbaar",
+      "python": "Tekstueel programmeren met Python"
     }
   },
   "settings": {
@@ -153,7 +160,15 @@
     "downloading_mirte_config_error": "Verbonden device heeft onleesbare instellingen, deze zijn niet geladen.",
     "downloading_mirte_config_compare_error": "Verbonden device heeft een andere instellingen, die van de device wordt gebruikt.",
     "downloading_mirte_config": "Instellingen geladen van device.",
-    "loading_blocks_error": "Blokken gevonden die niet in de instellingen staan. De workspace is geleegd."
+    "loading_blocks_error": "Blokken gevonden die niet in de instellingen staan. De workspace is geleegd.",
+    "ros_restarted": "ROS opnieuw opgestart.",
+    "ros_disconnected": "ROS verbinding verbroken.",
+    "restarting_ros": "ROS opnieuw verbinden.",
+    "websocket_lost": "Terminal verbinding verbroken.",
+    "shutting_down": "Robot wordt uitgeshakeld.",
+    "restarting_robot": "Robt wordt opnieuw opgestart.",
+    "config_errors": "Er zijn configuratiefouten aanwezig. Controleer de oranje velden.",
+    "motor_name_error": "Linker en rechter motor moeten verschillend zijn."
   },
   "modals": {
     "load-settings": {

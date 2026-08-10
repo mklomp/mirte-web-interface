@@ -45,6 +45,10 @@ export class ConnectionManager {
   }
 
 
+  parseException(exception_text){
+    return exception_text
+  }
+
   parseData(data) {
 
     const { addToast } = useToast()
@@ -94,7 +98,8 @@ export class ConnectionManager {
         this.buffer = this.buffer.slice(idx + marker.length)
         this.next_status = "print"
 
-        addToast(this.exception_buffer, 'error', 'code-error')
+        let parsed_exceoption = this.parseException(this.exception_buffer)
+        addToast(parsed_exceoption, 'error', 'code-error')
         this.exception_buffer = ""
       }
 

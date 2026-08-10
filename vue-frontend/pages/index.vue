@@ -181,7 +181,7 @@ function redo() {
                   <input type="radio" class="btn-check" name="viewMode" id="blockly" autocomplete="off" value="blockly"
                      v-model="viewMode">
                   <label class="btn btn-outline-light" for="blockly" data-bs-toggle="tooltip"
-                     title="Visual block-based programming">
+                     :title="$t('main.programming-type.blockly')">
                      <ClientOnly>
                         <FontAwesomeIcon icon="puzzle-piece" />
                      </ClientOnly>
@@ -190,16 +190,16 @@ function redo() {
 
                   <input type="radio" class="btn-check split-btn" name="viewMode" id="split" autocomplete="off"
                      value="split" v-model="viewMode">
-                  <label class="btn btn-outline-light split-btn" for="split">
+                  <label class="btn btn-outline-light split-btn" for="split" :title="$t('main.programming-type.both')" >
                      <ClientOnly>
-                        <FontAwesomeIcon icon="table-columns" />
-                     </ClientOnly>
+                     <FontAwesomeIcon icon=" table-columns" />
+                  </ClientOnly>
                   </label>
 
 
                   <input type="radio" class="btn-check" name="viewMode" id="python" autocomplete="off" value="python"
                      v-model="viewMode">
-                  <label class="btn btn-outline-light" for="python">
+                  <label class="btn btn-outline-light" for="python" :title="$t('main.programming-type.python')">
                      <ClientOnly>
                         <FontAwesomeIcon icon="code" />
                      </ClientOnly>

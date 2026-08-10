@@ -65,14 +65,14 @@ function openWifi() {
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="settingsDropdown">
             <li>
               <button class="dropdown-item" @click="openSettings(); visible = false; ">
-                Robot hardware
+                {{ $t("main.connection.robot_hardware") }}
               </button>
             </li>
 
             <ClientOnly>
               <li>
                 <button class="dropdown-item" @click="openWifi(); visible = false;" :disabled="!isConnected">
-                  Network
+                  {{ $t("main.connection.network") }}
                 </button>
               </li>
             </ClientOnly>

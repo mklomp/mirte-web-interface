@@ -39,7 +39,7 @@ onMounted(() => {
 function shutdown() {
   if (confirm(t('main.shutdown_confirm'))) {
     socket.send("sudo shutdown now\n")
-    addToast("Shutting down.", "success")
+    addToast($i18n.t('toast.shutting_down'), "success")
     connectionStore.setConnectionStatus("disconnected")
   }
 }
@@ -47,7 +47,7 @@ function shutdown() {
 function reboot() {
   if (confirm(t('main.reboot_confirm'))) {
     socket.send("sudo reboot now\n")
-    addToast("Rebooting robot.", "success")
+    addToast($i18n.t('toast.rebooting_robot'), "success")
     connectionStore.setConnectionStatus("disconnected")
   }
 }
@@ -82,7 +82,7 @@ function reboot() {
 
     <li>
       <button class="dropdown-item" @click="connect('sbc', 'network'); visible = false;" :disabled="mounted && isConnected">
-        WiFi/Network <ClientOnly>
+        WiFi/ {{ $t("main.connection.network") }}<ClientOnly>
           <FontAwesomeIcon v-if="isConnected && connectionTransport == 'network'" icon="check" />
         </ClientOnly>
       </button>

@@ -399,20 +399,12 @@ async function reinstall() {
 
 async function save() {
   if (hasErrors.value) {
-    addToast(
-      "Er zijn configuratiefouten aanwezig. Controleer de oranje velden.",
-      "error",
-      "settings-status"
-    )
+    addToast($i18n.t('toast.config_errors'), "error", "settings-status")
     return
   }
 
   if (driveErrors.value.sameMotor) {
-    addToast(
-      "Left and right motor must be different motors.",
-      "error",
-      "settings-status"
-    )
+    addToast($i18n.t('toast.motor_name_error'), "error", "settings-status")
     return
   }
 
@@ -431,12 +423,7 @@ async function save() {
     saveControlJSON(leftMotor.value, rightMotor.value)
     socket.send("sudo systemctl restart mirte-ros\n")
     connection.getTransport().restartRos()
-    addToast(
-      "Restarting ROS.",
-      "warning",
-      "restart-ros",
-      "-1"
-    )
+    addToast($i18n.t('toast.restarting_ros'), "warning", "restart-ros", -1)
   }
   finally {
     busy.value = false
