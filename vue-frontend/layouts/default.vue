@@ -27,7 +27,7 @@ import networkModal from '~/components/NetworkSettings.vue'
 const { openModal, closeModal } = useModal()
 
 const isConnected = computed(() => connectionStore.status == "connected")
-const connectionType = computed(() => connectionStore.transport)
+const connectionDevice = computed(() => connectionStore.device)
 
 
 function openSettings() {
@@ -71,7 +71,7 @@ function openWifi() {
 
             <ClientOnly>
               <li>
-                <button class="dropdown-item" @click="openWifi(); visible = false;" :disabled="!isConnected">
+                <button class="dropdown-item" @click="openWifi(); visible = false;" :disabled="!isConnected || connectionDevice != 'sbc'">
                   {{ $t("main.connection.network") }}
                 </button>
               </li>
