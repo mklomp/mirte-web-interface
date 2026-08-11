@@ -286,6 +286,10 @@ export class ConnectionManager {
   }
 
   disconnect(connectionLost = false) {
+    // remove all code toasts
+    const { addToast } = useToast()
+    addToast('', 'error', 'code-error') // clear the exception toast
+
     this.transport?.disconnect?.(connectionLost)
     this.transport = null
     this.device = null
