@@ -16,8 +16,8 @@
           </ClientOnly>
         </NuxtLink>
 
-        <button class="btn btn-sm btn-outline-dark float-end" @click="toggleJoystickMode()">
-          <font-awesome-icon :icon="joystickMode ? 'fa-solid fa-sliders' : 'fa-solid fa-gamepad'" />
+        <button class="btn btn-sm float-end" @click="toggleJoystickMode()">
+          <font-awesome-icon :icon="joystickMode ? 'fa-sliders' : 'fa-gamepad'" />
         </button>
 
       </div>
@@ -26,6 +26,11 @@
 
       <div v-else v-for="instance in getControlMotors()" class="rounded background-actuator p-2 text-white mb-2">
 
+        <button class="btn btn-sm float-end text-white"
+          @click="actuator_values['motor'][instance] = 0; sendData('motor', instance)" title="stop">
+          <font-awesome-icon icon="fa-stop" />
+        </button>
+
         <div>
           {{ instance }}: {{ actuator_values["motor"][instance] }}
         </div>
@@ -33,7 +38,6 @@
           <input class="form-range" id="motor-range" v-model="actuator_values['motor'][instance]"
             @change="sendData('motor', instance)" type="range" min="-100" max="100" @contextmenu.prevent></input>
         </div>
-
 
       </div>
     </div>
@@ -73,6 +77,12 @@
         </div>
 
         <div v-if="actuator == 'motor'">
+
+          <button class="btn btn-sm float-end text-white"
+            @click="actuator_values['motor'][instance] = 0; sendData('motor', instance)" title="stop">
+            <font-awesome-icon icon="fa-stop" />
+          </button>
+
           <div>
             {{ instance }}: {{ actuator_values[actuator][instance] }}
           </div>
