@@ -86,7 +86,7 @@
               <tbody>
                 <PeripheralRow v-for="item in state.peripherals" :key="item.id" :item="item"
                   :errors="validationErrors[item.id] || {}" :peripheralsDef="peripheralsDef" :usedPins="usedPins"
-                  :updatePeripheralPin="updatePeripheralPin" :getValidPins="getValidPins" @remove="removePeripheral" />
+                  :updatePeripheralPin="updatePeripheralPin" :getValidPins="getValidPins" @remove="removePeripheral" :isUsedInCode="isUsed(item.id)" />
               </tbody>
 
             </table>
@@ -251,6 +251,23 @@ watch(
   { immediate: true }
 )
 
+function isUsed(id){
+
+  // We can only try to find usages of blocks. We cannot do this
+  // with the python code, since it is undoable to also find
+  // usages where the instances are variables. 
+  // To easily find the string, we are looking for some string
+  // in the generated Python code.
+  // This assumes a Python call with the instancename as first
+  // functionparam.
+  const peripheral = state.value.peripherals.find(x => x.id === id);
+  const functions = peripheralsDef[peripheral.type].functions[0]
+  const instanceName = peripheral.name
+  const findString = functions + "('" + instanceName
+  const pythonCode = useCodeStore().python
+
+  return pythonCode.includes(findString)
+}
 
 function isUsablePeripheral(key) {
   const allowed =

@@ -20,9 +20,9 @@
       "robot_hardware": "Robot hardware"
     },
     "programming-type": {
-      "blockly": "Visual block-based programming",
-      "both": "Visual programming with Python code visible",
-      "python": "Textual programming with Python"
+      "blockly": "visual block-based programming",
+      "both": "visual programming with Python code visible",
+      "python": "textual programming with Python"
     }
   },
   "settings": {
@@ -46,7 +46,9 @@
     "wifi_password": "Password",
     "wifi_connect": "Connect",
     "wifi_connected": "Trying to connect to network. If this fails, the current network Mirte-XXXXXX will come up again.",
-    "wifi_message": "In case connecting fails, the current access point will come up again. Please reconnect to the Mirte-XXXXXX network and try again."
+    "wifi_message": "In case connecting fails, the current access point will come up again. Please reconnect to the Mirte-XXXXXX network and try again.",
+    "delete": "delete",
+    "used_in_code": "you cannot delete this one since it is used in your code"
   },
   "actuators": {
     "output": "Output",

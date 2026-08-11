@@ -20,9 +20,9 @@
       "robot_hardware": "Robot hardware"
     },
     "programming-type": {
-      "blockly": "Visueel blokken programmeren",
-      "both": "Visueel programmeren met Python code zichtbaar",
-      "python": "Tekstueel programmeren met Python"
+      "blockly": "visueel blokken programmeren",
+      "both": "visueel programmeren met Python code zichtbaar",
+      "python": "tekstueel programmeren met Python"
     }
   },
   "settings": {
@@ -46,7 +46,9 @@
     "wifi_password": "Wachtwoord",
     "wifi_connect": "Verbinden",
     "wifi_connected": "Er wordt geprobeerd verbinding te maken. Als dit niet lukt, komt Mirte-XXXXXX weer online.",
-    "wifi_message": "Als de verbinding niet tot stand, komt wordt het huidige access point weer gestart. Verbind daarna wederom met Mirte-XXXXXX and probeer het nogmaals."
+    "wifi_message": "Als de verbinding niet tot stand, komt wordt het huidige access point weer gestart. Verbind daarna wederom met Mirte-XXXXXX and probeer het nogmaals.",
+    "delete": "verwijder",
+    "used_in_code": "je kan deze niet verwijderen omdat deze in de code gebruikt wordt"
   },
   "actuators": {
     "output": "Output",

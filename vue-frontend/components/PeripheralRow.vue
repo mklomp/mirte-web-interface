@@ -1,13 +1,15 @@
 <template>
   <tr>
-
     <!-- TYPE + DELETE -->
     <td>
-      <button @click="$emit('remove', item.id)" class="btn">
-        <ClientOnly>
-          <FontAwesomeIcon icon="trash" />
-        </ClientOnly>
-      </button>
+
+      <span :title="isUsedInCode ? $t('settings.used_in_code') : $t('settings.delete')">
+        <button @click="$emit('remove', item.id)" class="btn" :disabled="isUsedInCode">
+          <ClientOnly>
+            <FontAwesomeIcon icon="trash" />
+          </ClientOnly>
+        </button>
+      </span>
 
       {{ $t("peripherals." + item.type) }}
     </td>
@@ -53,6 +55,7 @@ const props = defineProps({
   getValidPins: Function,
   usedPins: Object,
   updatePeripheralPin: Function,
+  isUsedInCode: Boolean,
 
   errors: {
     type: Object,
@@ -77,5 +80,10 @@ defineEmits([
 .is-invalid-custom {
   background-color: #ffe5b4 !important;
   border-color: #ff9800 !important;
+}
+
+.btn:disabled {
+  border-width: 0;
+  opacity: 0.3;
 }
 </style>

@@ -6,9 +6,7 @@
       "p2": "pwm"
     },
     "functions": [
-      "set_speed",
-      "stop",
-      "set_control"
+      "setMotorSpeed"
     ],
     "default_value": {
       "name": "SPEED",
@@ -28,7 +26,7 @@
       "analog": "analog"
     },
     "functions": [
-      "get_value"
+      "getLine"
     ],
     "rel_path": "Sensors\\IR_sensor\\digital_ir_sensor\\digital_ir_sensor.py",
     "message_type": "mirte_msgs/Intensity",
@@ -40,7 +38,7 @@
       "digital": "digital"
     },
     "functions": [
-      "get_value"
+      "getObject"
     ],
     "rel_path": "Sensors\\IR_sensor\\digital_ir_sensor\\digital_ir_sensor.py",
     "message_type": "mirte_msgs/IntensityDigital",
@@ -53,7 +51,7 @@
       "sda": "digital"
     },
     "functions": [
-      "get"
+      "getColor"
     ],
     "rel_path": "Sensors\\color_sensor\\color_sensor\\color_sensor.py",
     "message_type": "mirte_msgs/ColorHSLStamped",
@@ -66,7 +64,7 @@
       "echo": "digital"
     },
     "functions": [
-      "get_value"
+      "getDistance"
     ],
     "rel_path": "Sensors\\IR_sensor\\ultrasound_distance_sensor\\ultrasound_distance_sensor.py",
     "message_type": "sensor_msgs/Range",
@@ -78,7 +76,7 @@
       "pin": "digital"
     },
     "functions": [
-      "set_angle"
+      "setServoAngle"
     ],
     "default_value": {
       "name": "ANGLE",
@@ -98,7 +96,7 @@
       "sda": "digital"
     },
     "functions": [
-      "set_oled"
+      "setOled"
     ],
     "default_value": {
       "name": "VALUE",
@@ -116,7 +114,7 @@
       "pin": "analog"
     },
     "functions": [
-      "get_button"
+      "getKeypad"
     ],
     "rel_path": "Sensors\\Keypad\\keypad\\keypad.py",
     "message_type": "mirte_msgs/Keypad",
