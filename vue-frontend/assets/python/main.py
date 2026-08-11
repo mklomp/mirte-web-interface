@@ -17,7 +17,7 @@ def run():
     stop()
   except Exception as e:
     print("__START_EXCEPTION__")
-    print(sys.print_exception(e))
+    sys.print_exception(e)
     print("__STOP_EXCEPTION__")
   finally:
     if 'main.py' in os.listdir():
