@@ -15,11 +15,17 @@ export class ConnectionManager {
   debug: boolean = false
 
   private buffer = ""
+  private print_buffer = ""
   private exception_buffer = ""
   private running = false
   private buffer_status = "filter" // "filter, print, exception"
-  private next_status = "filter"
-  private stopped_found = false
+
+  private start_tag = "__START__\r\n"
+  private stop_tag = "__STOP__\r\n"
+  private start_exception_tag = "__START_EXCEPTION__\r\n"
+  private stop_exception_tag = "__STOP_EXCEPTION__\r\n"
+  private heartbeat_tag = "__HB__\r\n"
+
   private lastHeartbeat = Date.now()
   private heartbeatTimer = {}
 
@@ -45,20 +51,18 @@ export class ConnectionManager {
   }
 
 
-  parseException(exception_text){
+  parseException(exception_text) {
     return exception_text
   }
 
   parseData(data) {
 
     const { addToast } = useToast()
-    const { $i18n } = useNuxtApp()
-
     this.buffer += data
 
     // detecting heartbeat __HB__, and removing if found
-    if (this.transporttype == "ble" && this.buffer.includes("__HB__\r\n")) {
-      this.buffer = this.buffer.replaceAll("__HB__\r\n", "") // remove all heartbeats (except when in debug)
+    if (this.transporttype == "ble" && this.buffer.includes(this.heartbeat_tag)) {
+      this.buffer = this.buffer.replaceAll(this.heartbeat_tag, "") // remove all heartbeats
       this.lastHeartbeat = Date.now()
     }
 
@@ -66,84 +70,76 @@ export class ConnectionManager {
     // code which was started on boot of the MCU
     if (this.running) {
 
-      // detecting __START__, only stripping the buffer
-      if (this.buffer.includes("__START__\r\n")) {
-        const marker = "__START__\r\n"
-        const idx = this.buffer.indexOf(marker)
-        this.buffer = this.buffer.slice(idx + marker.length) // throw away everyting before __START__
-        this.next_status = "print"
-        // Just start printing, as long as it does not seem to be the start of an exception
-        if (this.buffer.length > 0 && this.buffer[0] != "_") {
-          this.buffer_status = "print"
-        }
+      // detecting __START__
+      if (this.buffer.includes(this.start_tag)) {
+        const idx = this.buffer.indexOf(this.start_tag)
+        this.buffer = this.buffer.slice(idx + this.start_tag.length) // throw away everyting before __START__
+        this.buffer_status = "print"
+        // Note that we cannot fill the print_buffer since there might be other tags in the buffer
       }
 
+      // detecting __START_EXCEPTION__
+      if (this.buffer.includes(this.start_exception_tag)) {
+        const idx = this.buffer.indexOf(this.start_exception_tag)
 
-      // detecting __START_EXCEPTION__, strip from buffer but keep exception
-      else if (this.buffer.includes("__START_EXCEPTION__\r\n")) {
-        const marker = "__START_EXCEPTION__\r\n"
-        const idx = this.buffer.indexOf(marker)
-
-        this.exception_buffer = this.exception_buffer + this.buffer.slice(idx + marker.length)
-        this.buffer = this.buffer.slice(0, idx) // keep everything before
-        this.next_status = "exception"
+        this.print_buffer += this.buffer.slice(0, idx) // everything before this tag can be printed
+        this.buffer = this.buffer.slice(idx + this.start_exception_tag.length) // and throw away everyting before __START_EXCEPTION__
+        this.buffer_status = "exception"
+        // Note that we cannot fill the exception_buffer since there might be other tags in the buffer
       }
 
-      // detecting __STOP_EXCEPTION__, only stripping the buffer
-      else if (this.buffer.includes("__STOP_EXCEPTION__\r\n")) {
-        const marker = "__STOP_EXCEPTION__\r\n"
-        const idx = this.buffer.indexOf(marker)
+      // detecting __STOP_EXCEPTION__
+      if (this.buffer.includes(this.stop_exception_tag)) {
+        const idx = this.buffer.indexOf(this.stop_exception_tag)
 
-        this.exception_buffer = this.exception_buffer + this.buffer.slice(0, idx)
-        this.buffer = this.buffer.slice(idx + marker.length)
-        this.next_status = "print"
+        this.exception_buffer += this.buffer.slice(0, idx) // everything before this tag is part of the exception
+        this.buffer = this.buffer.slice(idx + this.stop_exception_tag.length) // throw away everyting before __STOP_EXCEPTION__
+        this.buffer_status = "print"
 
-        let parsed_exceoption = this.parseException(this.exception_buffer)
-        addToast(parsed_exceoption, 'error', 'code-error')
+        // the exception can be shown
+        let parsed_exception = this.parseException(this.exception_buffer)
+        addToast(parsed_exception, 'error', 'code-error')
         this.exception_buffer = ""
       }
 
-      // detecting __STOP__, only stripping the buffer
-      else if (this.buffer.includes("__STOP__\r\n")) {
-        const marker = "__STOP__\r\n"
-        const idx = this.buffer.indexOf(marker)
+      // detecting __STOP__
+      if (this.buffer.includes(this.stop_tag)) {
+        const idx = this.buffer.indexOf(this.stop_tag)
 
+        this.print_buffer = this.buffer.slice(0, idx) // everything before this tag is part of the print
+        this.buffer = this.buffer.slice(idx + this.stop_tag.length) // throw away everyting before __STOP__
+        this.buffer_status = "filter"
 
-        this.next_status = "filter"
-        this.stopped_found = true
-        this.buffer = this.buffer.slice(0, idx) // throw away everything after __STOP__
-
+        // we can stop the code
         useState("programming-state").value = "idle"
+        this.running = false
       }
 
-      // write and remove all newlines in the buffer
-      if (this.buffer_status == "print") {
-        let index
-        while ((index = this.buffer.indexOf("\r\n")) !== -1) {
-          const line = this.buffer.slice(0, index + 2)
-          this.buffer = this.buffer.slice(index + 2)
-          if (!this.debug) {
-            this.term.write(line)
-          }
+      // Now that we parsed all tags (or none were found)
+      // we can add the (remaining) buffer to the right print/expection buffer
+      // but only if we know that the end is not posiibly part of 
+      // a new tag
+      const idx = this.buffer.indexOf("_")
+      // if no _ found in the last part of the buffer
+      if (!idx) {
+        if (this.buffer_status == "exception") {
+          this.exception_buffer += this.buffer
         }
-      }
-    }
 
-    // clear the buffer after __STOP__ or when not running
-    if (this.stopped_found || !this.running) {
-      const marker = "__HB__\r\n"
-      const idx = this.buffer.indexOf(marker)
-      if (this.transporttype == "ble" && idx > 0) {
-        this.buffer = this.buffer.slice(idx + marker.length)
-      } else {
+        if (this.buffer_status == "print") {
+          this.print_buffer += this.buffer
+        }
         this.buffer = ""
       }
 
-      this.stopped_found = false
-      this.running = false
+      // now we can safely print and clear the print_buffer
+      if (!this.debug) {
+        this.term.write(this.print_buffer)
+        this.print_buffer = ""
+      }
+    } else {
+      this.buffer = ""
     }
-
-    this.buffer_status = this.next_status
 
     if (this.debug) {
       this.term.write(data)
@@ -252,9 +248,8 @@ export class ConnectionManager {
 
   startCode() {
     if (!this.debug) { this.term.write('\x1bc'); } // full terminal reset
-    this.device.startCode(this.transporttype == "ble")
     this.running = true
-    this.started_found = false
+    this.device.startCode(this.transporttype == "ble")
   }
 
   stopCode() {
