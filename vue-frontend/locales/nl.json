@@ -170,7 +170,8 @@
     "restarting_robot": "Robt wordt opnieuw opgestart.",
     "config_errors": "Er zijn configuratiefouten aanwezig. Controleer de oranje velden.",
     "motor_name_error": "Linker en rechter motor moeten verschillend zijn.",
-    "python-changed": "Door de Python code aan te passen is deze code niet meer synchroon met de blokken. Als je terug naar de blokken gaat zullen je wijzigingen verdwijnen."
+    "python-changed": "Door de Python code aan te passen is deze code niet meer synchroon met de blokken. Als je terug naar de blokken gaat zullen je wijzigingen verdwijnen.",
+    "error_in_line": "Fout in regel"
   },
   "modals": {
     "load-settings": {

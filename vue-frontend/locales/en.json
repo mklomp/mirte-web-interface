@@ -170,7 +170,8 @@
     "restarting_robot": "Restarting robot.",
     "config_errors": "There are errors in you configuration. Check the orange fields.",
     "motor_name_error": "Left and right motor must be different motors.",
-    "python-changed": "By changing the python code, it is not in sync witht he blokcs anymore. You will lose these changes when you switch back to  blocks."
+    "python-changed": "By changing the python code, it is not in sync witht he blokcs anymore. You will lose these changes when you switch back to blocks.",
+    "error_in_line": "Error in line"
   },
   "modals": {
     "load-settings": {

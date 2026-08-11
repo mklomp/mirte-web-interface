@@ -51,7 +51,18 @@ export class ConnectionManager {
   }
 
 
-  parseException(exception_text) {
+  parseException(exception_text: string) {
+    const { $i18n } = useNuxtApp()
+    const match = exception_text.match(/File "<string>", line (\d+), in .*?\r?\n([\s\S]*)/);
+
+    if (match) {
+      const line = Number(match[1]);
+      const error = match[2].trim();
+
+      const message = $i18n.t('toast.error_in_line') + ": " + line + "\r\n\r\n" + error;
+      return message
+    }
+
     return exception_text
   }
 
