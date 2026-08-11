@@ -48,8 +48,8 @@
               </select>
             </div>
 
-            <button @click="reinstall" class="btn btn-mirte float-end mx-2"
-              :disabled="connectionType !== 'serial' || !isConnected">
+
+            <button @click="reinstall" class="btn btn-mirte float-end mx-2" :disabled="!isMCU || !isConnected">
               {{ $t("settings.reinstall") }}
             </button>
           </div>
@@ -85,8 +85,8 @@
 
               <tbody>
                 <PeripheralRow v-for="item in state.peripherals" :key="item.id" :item="item"
-                  :errors="validationErrors[item.id] || {}" :peripheralsDef="peripheralsDef" :usedPins="usedPins" :updatePeripheralPin="updatePeripheralPin"
-                  :getValidPins="getValidPins" @remove="removePeripheral" />
+                  :errors="validationErrors[item.id] || {}" :peripheralsDef="peripheralsDef" :usedPins="usedPins"
+                  :updatePeripheralPin="updatePeripheralPin" :getValidPins="getValidPins" @remove="removePeripheral" />
               </tbody>
 
             </table>
@@ -177,7 +177,7 @@ const {
 const connection = useConnection()
 const connectionStore = useConnectionStore()
 const isConnected = computed(() => connectionStore.status == "connected")
-const connectionType = computed(() => connectionStore.device)
+const isMCU = computed(() => connectionStore.device == "mcu")
 
 const activeTab = ref("peripherals")
 
@@ -411,19 +411,23 @@ async function save() {
   busy.value = true
 
   if (leftMotor.value != "" && rightMotor.value != "") {
-    socket.send("sed -i 's/left_motor_name:.*/left_motor_name: \"" + leftMotor.value +
-      "\"/' /home/mirte/mirte_ws/src/mirte-ros-packages/mirte_control/mirte_pioneer_control/bringup/config/mirte_diff_drive_controllers.yaml " +
-      " && sed -i 's/right_motor_name:.*/right_motor_name: \"" + rightMotor.value +
-      "\"/' /home/mirte/mirte_ws/src/mirte-ros-packages/mirte_control/mirte_pioneer_control/bringup/config/mirte_diff_drive_controllers.yaml " +
-      "\n")
+    if (socket) {
+      socket.send("sed -i 's/left_motor_name:.*/left_motor_name: \"" + leftMotor.value +
+        "\"/' /home/mirte/mirte_ws/src/mirte-ros-packages/mirte_control/mirte_pioneer_control/bringup/config/mirte_diff_drive_controllers.yaml " +
+        " && sed -i 's/right_motor_name:.*/right_motor_name: \"" + rightMotor.value +
+        "\"/' /home/mirte/mirte_ws/src/mirte-ros-packages/mirte_control/mirte_pioneer_control/bringup/config/mirte_diff_drive_controllers.yaml " +
+        "\n")
+    }
   }
 
   try {
     await saveJSON()
     saveControlJSON(leftMotor.value, rightMotor.value)
-    socket.send("sudo systemctl restart mirte-ros\n")
-    connection.getTransport().restartRos()
-    addToast($i18n.t('toast.restarting_ros'), "warning", "restart-ros", -1)
+    if (!isMCU) {
+      if (socket) { socket.send("sudo systemctl restart mirte-ros\n") }
+      connection.getTransport().restartRos()
+      addToast($i18n.t('toast.restarting_ros'), "warning", "restart-ros", -1)
+    }
   }
   finally {
     busy.value = false

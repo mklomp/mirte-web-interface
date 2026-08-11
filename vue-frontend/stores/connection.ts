@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 export const useConnectionStore = defineStore('connection', {
   state: () => ({
     transport: "",
-    device: "",
+    device: "a",
     ip_address: "",
     status: "disconnected",
     ros_status: "disconnected"

@@ -45,8 +45,6 @@ export const usePeripheralStore = defineStore('peripherals', {
 
       // and store to the robot
       if (connectionStore.status == "connected") {
-        console.trace()
-        console.log("hier: " + onlyLocally)
         if (!onlyLocally) {
           const { uploadSettings } = useConnection()
           await uploadSettings(value)
