@@ -36,15 +36,22 @@ const { toasts, removeToast } = useToast()
   display: flex;
   flex-direction: column;
   gap: 10px;
+
+  align-items: center;
 }
 
 .toast {
   position: relative;
   display: inline-block;
+
+  min-width: 250px;
+  max-width: 600px;
   width: fit-content;
+
   padding: 10px 16px;
   padding-right: 40px;
   border-radius: 8px;
+
   color: white;
 }
 
