@@ -155,7 +155,6 @@ function control(command) {
 
 
 function save() {
-    console.log(codeStore.split)
     if (codeStore.split != 0) {
         var text = codeStore.blockly;
         var filename = "mirte.xml";
@@ -198,7 +197,7 @@ function upload(event) {
 
     fr.onload = () => {
         if (codeStore.split != 0) {
-            codeStore.setBlockly(fr.result, true)
+            codeStore.setBlockly(fr.result)
         } else {
             codeStore.setPython(fr.result)
         }

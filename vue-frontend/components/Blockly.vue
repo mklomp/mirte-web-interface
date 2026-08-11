@@ -30,8 +30,6 @@ const { locale } = useI18n()
 const codeStore = useCodeStore()
 const { addToast } = useToast()
 const peripheralStore = usePeripheralStore()
-const isMounted = ref(false)
-
 
 // Blockly state
 let workspaceDOM = null
@@ -39,7 +37,7 @@ let flyout_visible = false
 let scale = 0.8
 let scrollX = 0
 let scrollY = 0
-let suppressStore = false
+let suppressSave = false
 
 // TODO: import colors from scss
 Blockly.Msg.FLOW_RGB = "#b8d1eb"
@@ -47,6 +45,8 @@ Blockly.Msg.DATA_RGB = "#9b372a"
 Blockly.Msg.MODULES_RGB = "#cf0000"
 Blockly.Msg.SENSORS_RGB = "#6089ba"
 Blockly.Msg.ACTIONS_RGB = "#fbb927"
+
+const delay = ms => new Promise(res => setTimeout(res, ms));
 
 function addToToolbox(type, item) {
   const category = toolBox.contents.find(c => c.id === type)
@@ -182,13 +182,7 @@ function getCleanWorkspace() {
 }
 
 
-// There are three options that this function can be called:
-// - First time (with nothing in localStorage)
-// - At a language/settings change
-// - After refresh (or any revisit, so with something in localStorage)
-// STATES: keep state (flyout, blokcl location, zoomlevel) or not
-function initBlockly(reason = "clean") {
-
+async function initBlockly(reason) {
   // Set workspaceDOM from previous session
   if (codeStore.blockly) {
     workspaceDOM = Blockly.utils.xml.textToDom(codeStore.blockly)
@@ -196,8 +190,8 @@ function initBlockly(reason = "clean") {
     workspaceDOM = null
   }
 
-  // Save workspace if language changed
-  if (reason == "lang_change" || reason == "tab_change") {
+  // Save workspace if language or settings changed
+  if (reason == "lang_changed" || reason == "settings_changed") {
     saveWorkspace()
   }
 
@@ -214,8 +208,17 @@ function initBlockly(reason = "clean") {
   workspace = getCleanWorkspace()
 
   // Restore workspace (including location), or scroll to center
-  if (workspaceDOM) restoreWorkspace()
-  if (reason != "lang_change" && reason != "tab_change") workspace.scrollCenter()
+  if (workspaceDOM) { 
+    if (reason == "split_changed") { await delay(200); } // wait until the split has been fully recovered
+    restoreWorkspace() 
+  }
+  if (reason == "clean") {
+    // make sure the DOM is loaded
+    requestAnimationFrame(() => {
+      Blockly.svgResize(workspace)
+      workspace.scrollCenter()
+    })
+  }
 
   // Set color of control_if, since it is part of the logic_blocks
   const i = Blockly.Blocks['controls_if'].init;
@@ -224,8 +227,7 @@ function initBlockly(reason = "clean") {
   Blockly.Blocks['text_print'].init = function () { j.call(this); this.setColour(Blockly.Msg.ACTIONS_RGB); };
 
   workspace.addChangeListener((event) => {
-    // Ignore UI events (scroll, selection, toolbox open, etc.)
-    if (event.isUiEvent || suppressStore) return
+    if (suppressSave) return
 
     // Only store meaningful changes
     if (
@@ -233,64 +235,59 @@ function initBlockly(reason = "clean") {
       event.type === Blockly.Events.BLOCK_DELETE ||
       event.type === Blockly.Events.BLOCK_CHANGE ||
       event.type === Blockly.Events.BLOCK_MOVE ||
-      event.type === Blockly.Events.BLOCK_FIELD_INTERMEDIATE_CHANGE
+      event.type === Blockly.Events.BLOCK_FIELD_INTERMEDIATE_CHANGE ||
+      event.type === Blockly.Events.VIEWPORT_CHANGE
     ) {
       storeCode()
+      saveWorkspace() // we need to save it on every change, since the split can make changes
     }
   })
-
 }
 
 onMounted(() => {
   peripheralStore.loadFromLocalStorage()
   loadCustomModules(peripheralStore.peripherals)
   codeStore.loadFromLocalStorage()
-  initBlockly()
-  isMounted.value = true
+  initBlockly("clean")
 })
 
-onBeforeUnmount(() => {
-  // We need to close the blockly elements
-  // that are not inside the Blockly-div 
-  // (eg dropdowns). Otherwise they will still
-  // be rendered in the python tab.
-  Blockly.hideChaff()
+// When user selects different view
+watch(() => codeStore.split, (newVal, oldVal) => {
+  if (newVal == 0) { //python
+    // We need to close the blockly elements
+    // that are not inside the Blockly-div 
+    // (eg dropdowns). Otherwise they will still
+    // be rendered in the python tab.
+    Blockly.hideChaff()
+    suppressSave = true
+  }
+
+  if (oldVal == 0) { // from python to (partial) blockly
+    initBlockly("split_changed")
+    suppressSave = false
+  }
+})
+
+// When codeStore block changed (ie user loaded from file)
+watch(() => codeStore.blockly, (newVal) => {
+  workspaceDOM = Blockly.Xml.workspaceToDom(workspace)
+  const currentCode = Blockly.Xml.domToText(workspaceDOM)
+  if (newVal != currentCode) {
+    initBlockly("blockly_loaded")
+  }
 })
 
 // When user changes locale
 watch(locale, () => {
-  initBlockly("lang_change")
+  initBlockly("lang_changed")
 })
 
-// TODO: we could rewrite initBlockly in a way that we only
-// need to do Blockly.resizeSvg() in these two watches.
-// Only the lang_change, really needs a re-init of the
-// whole blockly workspace.
-/*
-watch(() => codeStore.active, (newVal) => {
-  // TODO: check if this is working at all. does not seem to work
-  // when settings change due to connecting
-  if (newVal == "blockly" && isMounted.value) {
-    nextTick(() => {
-      initBlockly("tab_change")
-    })
-  }
-})
-*/
+// When settings change or user connects (ie settings change)
+watch(() => peripheralStore.peripherals, (newVal, oldVal) => {
+  if (JSON.stringify(newVal) === JSON.stringify(oldVal)) { return }
 
-// When in Blocky, and user connects (ie settings change)
-watch(() => peripheralStore.peripherals, (newStatus) => {
   loadCustomModules(peripheralStore.peripherals)
-  initBlockly("tab_change")
-})
-
-// TODO: we need to rethink if we really need codeStore changes.
-// why would we need to update blokcky?
-watch(() => codeStore.reinit_blockly, () => {
-  nextTick(() => {
-    initBlockly("xml_loaded")
-    codeStore.reinit_blockly = false
-  })
+  initBlockly("settings_changed")
 })
 
 defineExpose({

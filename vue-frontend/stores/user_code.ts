@@ -2,8 +2,7 @@ export const useCodeStore = defineStore('user_code', {
   state: () => ({
     blockly: "",
     python: "",
-    split: 0,
-    reinit_blockly: false
+    split: 100
   }),
 
   actions: {
@@ -14,9 +13,8 @@ export const useCodeStore = defineStore('user_code', {
         this.split = localStorage.getItem('split') || 100 // defaults to blockly
       }
     },
-    setBlockly(value, reinit = false) {
+    setBlockly(value) {
       this.blockly = value
-      this.reinit_blockly = reinit
       localStorage.setItem('blockly', value)
     },
     setPython(value) {
