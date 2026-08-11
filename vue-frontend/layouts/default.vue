@@ -4,20 +4,50 @@ const localePath = useLocalePath()
 const head = useLocaleHead()
 const connectionStore = useConnectionStore()
 const peripheralStoreStore = usePeripheralStore()
-
+const config = useRuntimeConfig()
 const visible = ref(false)
 
+const route = useRoute()
+
+// TODO: or should this be in app.vue?
 onMounted(async () => {
+  // Load peripherals 
+  peripheralStoreStore.loadFromLocalStorage()
+
+  // Determine if we are MCU (default) or SBC (running on a robot)
+  // If the ENV variable MIRTE_SBC_IDE is set, we are running from the robot/SBC
+  connectionStore.setConnectionDevice("mcu")
+  if (config.sbcIDE) { connectionStore.setConnectionDevice("sbc") }
+
+  // Determine the host to connect to
+  if (connectionStore.device == "sbc") {
+    connectionStore.setConnectionHostname(location.hostname)
+  } else {
+    connectionStore.setConnectionHostname("")
+  }
+
+  // For development purposes we can also connect to a remote SBC
+  if (location.hostname == "localhost" && route.query.ip){
+    connectionStore.setConnectionDevice("sbc")
+    connectionStore.setConnectionHostname(route.query.ip)
+  }
+
+  // Set debug value
+  if (location.hostname == "localhost" && route.query.ip){
+    useState("debug").value = true
+  }
+
   // autoconnect if there are existing connections 
-  // and I was previously connected
-  if ('serial' in navigator) {
+  // and you were previously connected
+  if (connectionStore.device == "mcu" && 'serial' in navigator) {
     const ports = await navigator.serial.getPorts()
     if (ports.length > 0 && connectionStore.status == "connected") {
       await useConnection().connect("mcu", "serial", true)
     }
   }
-
-  peripheralStoreStore.loadFromLocalStorage()
+  if (connectionStore.device == "sbc") {
+    await useConnection().connect("sbc", "network", true)
+  }
 })
 
 
@@ -27,7 +57,7 @@ import networkModal from '~/components/NetworkSettings.vue'
 const { openModal, closeModal } = useModal()
 
 const isConnected = computed(() => connectionStore.status == "connected")
-const connectionDevice = computed(() => connectionStore.device)
+const deviceType = computed(() => connectionStore.device)
 
 
 function openSettings() {
@@ -70,8 +100,8 @@ function openWifi() {
             </li>
 
             <ClientOnly>
-              <li>
-                <button class="dropdown-item" @click="openWifi(); visible = false;" :disabled="!isConnected || connectionDevice != 'sbc'">
+              <li v-if="deviceType == 'sbc'">
+                <button class="dropdown-item" @click="openWifi(); visible = false;" :disabled="!isConnected">
                   {{ $t("main.connection.network") }}
                 </button>
               </li>

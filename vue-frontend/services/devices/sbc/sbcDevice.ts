@@ -228,8 +228,8 @@ export class SBCDevice {
     let yaml = YAML.load(JSON.stringify(content));
     yaml = { "/**": { "ros__parameters": yaml } };
 
-    let ip = useConnectionStore().ip_address
-    fetch(`http://${ip}/api/settings`, {
+    let hostname = useConnectionStore().hostname
+    fetch(`http://${hostname}/api/settings`, {
       method: 'POST',
       body: YAML.dump(yaml)
     })
@@ -285,8 +285,8 @@ export class SBCDevice {
     const { $i18n } = useNuxtApp()
 
     if (toast) { addToast($i18n.t('toast.uploading_code'), 'info', 'uploading-user-code') }
-    let ip = useConnectionStore().ip_address
-    const pythonUrl = `http://${ip}/api/python`;
+    let hostname = useConnectionStore().hostname
+    const pythonUrl = `http://${hostname}/api/python`;
     const pythonCode = useCodeStore().python
 
     fetch(pythonUrl, {

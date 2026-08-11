@@ -2,7 +2,6 @@ export function useXTermBase() {
   let term: any = null
   let fitAddon: any = null
   let resizeObserver: ResizeObserver | null = null
-  let debug: boolean = false
 
   async function init() {
     // 🔹 dynamic import (client only)
@@ -19,17 +18,14 @@ export function useXTermBase() {
       //cursor: '#000000',
     }
 
-    //if (debug){ term.options.disableStdin = true; }
- 
     term.loadAddon(fitAddon)
 
     return term
   }
 
-  function attachContainer(container: HTMLElement, debug) {
+  function attachContainer(container: HTMLElement) {
     if (!term) return
 
-    debug = debug
     term.open(container)
     fitAddon.fit()
 

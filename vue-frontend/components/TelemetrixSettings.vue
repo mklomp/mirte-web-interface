@@ -15,7 +15,7 @@
               </button>
             </li>
 
-            <li class="nav-item">
+            <li v-if="!isMCU" class="nav-item">
               <button class="nav-link" :class="{ active: activeTab === 'drive' }" @click="activeTab = 'drive'">
                 {{ $t("settings.drive") }}
               </button>
@@ -208,8 +208,8 @@ let socket = null
 watch(
   connectionStore,
   (val) => {
-    if (val.status == "connected" && val.transport == "network" && val.ip_address != "") {
-      socket = new WebSocket(`ws://${val.ip_address}/ws/shell`)
+    if (val.status == "connected" && val.transport == "network" && val.hostname != "") {
+      socket = new WebSocket(`ws://${val.hostname}/ws/shell`)
     }
   }
 )
@@ -332,8 +332,8 @@ onMounted(() => {
   rightMotor.value = peripheralStore.controls.right_motor
 
 
-  if (connectionStore.status == "connected" && connectionStore.transport == "network" && connectionStore.ip_address != "") {
-    socket = new WebSocket(`ws://${connectionStore.ip_address}/ws/shell`)
+  if (connectionStore.status == "connected" && connectionStore.device == "sbc" && connectionStore.hostname != "") {
+    socket = new WebSocket(`ws://${connectionStore.hostname}/ws/shell`)
   }
 })
 

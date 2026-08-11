@@ -2,9 +2,7 @@ import { useToast } from '~/composables/useToast'
 import { useConnectionStore } from '../../stores/connection'
 
 export class NetworkTransport {
-  ip: string = '192.168.1.151'
-
-  //socket: WebSocket | null = null
+  hostname: string = ''
 
   private listeners: Array<(data: string) => void> = []
   private disconnectHandler: (() => void) | null = null
@@ -20,20 +18,20 @@ export class NetworkTransport {
     const { $i18n } = useNuxtApp()
 
     const connectionStore = useConnectionStore()
-    connectionStore.setConnectionIP(this.ip)
+    this.hostname = connectionStore.hostname
 
     // ROS connection
     // TODO: in order fot this to work, we need to empty /etc/nginx/nginx_logon.conf
     // otherwise yo will get an error. 
-    this.ros.connect(`ws://${this.ip}/ws/ros`)
+    this.ros.connect(`ws://${this.hostname}/ws/ros`)
 
     this.connectTerminal()
 
     this.ros.on('connection', () => {
-      connectionStore.ros_status = "connected"      
+      connectionStore.ros_status = "connected"
       if (this.restartingRos) {
-        this.socket = new WebSocket(`ws://${this.ip}/ws/shell`)
-        addToast('ROS Restarted', 'success', 'ros-restarting')
+        this.socket = new WebSocket(`ws://${this.hostname}/ws/shell`)
+        addToast($i18n.t('toast.ros_restarted'), 'success', 'ros-restarting')
         this.restartingRos = false
       }
 
@@ -52,7 +50,7 @@ export class NetworkTransport {
       }
 
       if (connectionStore.status === 'connected') {
-        addToast('ROS disconnected.', 'error', 'connection-lost')
+        addToast($i18n.t('toast.ros_disconnected'), 'error', 'connection-lost')
         //this.disconnect()
       }
     })
@@ -60,16 +58,16 @@ export class NetworkTransport {
     return this.socket
   }
 
-  getTermSocket(){
+  getTermSocket() {
     return this.socket
   }
 
   connectTerminal() {
     const { addToast } = useToast()
+    const { $i18n } = useNuxtApp()
     // Shell connection
-    this.socket = new WebSocket(`ws://${this.ip}/ws/shell`)
+    this.socket = new WebSocket(`ws://${this.hostname}/ws/shell`)
     const connectionStore = useConnectionStore()
-    connectionStore.setConnectionIP(this.ip)
 
     this.socket.onmessage = (event) => {
       const data = event.data as string
@@ -92,18 +90,19 @@ export class NetworkTransport {
     this.socket.onclose = () => {
       //console.log('Shell disconnected')
       if (connectionStore.status == "connected" && !this.restartRos) {
-        addToast("WebSocket connection lost.", "error", "connection-lost")
+        addToast($i18n.t('toast.websocket_lost'), "error", "connection-lost")
       }
     }
   }
 
   restartRos() {
     const { addToast } = useToast()
+    const { $i18n } = useNuxtApp()
 
     this.socket?.close() // closed socket will make sure that mirte_python_api node is stopped
     this.restartingRos = true
 
-    addToast('Restarting ROS...', 'info', 'ros-restarting', -1)
+    addToast($i18n.t('toast.restartting_ros'), 'info', 'ros-restarting', -1)
   }
 
 
@@ -116,7 +115,7 @@ export class NetworkTransport {
       //console.log('Trying ROS reconnect...')
 
       try {
-        this.ros.connect(`ws://${this.ip}/ws/ros`)
+        this.ros.connect(`ws://${this.hostname}/ws/ros`)
       }
       catch (err) {
         //console.error(err)

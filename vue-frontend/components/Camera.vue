@@ -79,8 +79,8 @@ export default {
           this.cameraSrc = ""
           return
         }
-        const ip = connectionStore.ip_address
-        this.cameraSrc = `http://${ip}/ros-video/stream?topic=/video1/image_raw&type=mjpeg`
+        const hostname = connectionStore.hostname
+        this.cameraSrc = `http://${hostname}/ros-video/stream?topic=/video1/image_raw&type=mjpeg`
         this.checkCameraAvailability()
       },
       {

@@ -16,7 +16,7 @@
 
 					<div class="row before-submit">
 						<div class="col">
-							<form class="form form-horizontal" id='connect-form' :action="`http://${this.ip}/wifi-connect/connect`"
+							<form class="form form-horizontal" id='connect-form' :action="`http://${this.hostname}/wifi-connect/connect`"
 								method='post'>
 								<div class="form-group">
 									<label for="ssid-select" class="control-label col">{{ $t('settings.wifi_network') }}</label>
@@ -82,8 +82,7 @@ export default {
 			security: "wpa",
 			hostname: "",
 			selected: { password: "", ssid: "", identity: "" },
-			passwordFieldType: "password",
-			ip: ""
+			passwordFieldType: "password"
 		}
 	},
 	methods: {
@@ -104,7 +103,7 @@ export default {
 			data.append("ssid", this.selected.ssid);
 			data.append("identity", this.selected.identity);
 			data.append("passphrase", this.selected.password);
-			fetch(`http://${this.ip}/wifi-connect/connect`, {
+			fetch(`http://${this.hostname}/wifi-connect/connect`, {
 				"method": "POST",
 				"mode": "cors",
 				"body": data
@@ -120,9 +119,9 @@ export default {
 	mounted() {
 
 		const connectionStore = useConnectionStore()
-		this.ip = connectionStore.ip_address
+		this.hostname = connectionStore.hostname
 
-		fetch(`http://${this.ip}/wifi-connect/networks`, {
+		fetch(`http://${this.hostname}/wifi-connect/networks`, {
 			"method": "GET",
 			"mode": "cors"
 		})

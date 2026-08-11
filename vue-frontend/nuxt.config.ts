@@ -23,6 +23,10 @@ export default defineNuxtConfig({
   plugins: ['@/plugins/bootstrap.client.js'],
   modules: ['@nuxtjs/i18n', '@nuxt/image', '@nuxt/fonts', '@pinia/nuxt'],
 
+  runtimeConfig: {
+    sbcIDE: process.env.MIRTE_SBC_IDE
+  },
+
   fonts: {
     families: [
       {
@@ -73,7 +77,7 @@ export default defineNuxtConfig({
 
   vite: {
     plugins: [
-      require('vite-svg-loader')({svgo: false}) // disables SVGO optimization, keeps IDs intact for translations
+      require('vite-svg-loader')({ svgo: false }) // disables SVGO optimization, keeps IDs intact for translations
     ]
   },
 

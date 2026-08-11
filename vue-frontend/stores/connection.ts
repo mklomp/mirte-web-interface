@@ -3,14 +3,15 @@ import { defineStore } from 'pinia'
 export const useConnectionStore = defineStore('connection', {
   state: () => ({
     transport: "",
-    device: "a",
-    ip_address: "",
+    device: "",
+    hostname: "",
     status: "disconnected",
     ros_status: "disconnected"
   }),
 
   actions: {
     async loadFromLocalStorage() {
+
       if (!process.client) return
 
       try {
@@ -35,26 +36,31 @@ export const useConnectionStore = defineStore('connection', {
         console.warn("Failed to parse connection from localStorage", e)
       }
     },
-    setConnectionType(device, transport) {
-      // update store
-      this.transport = transport
+    setConnectionDevice(device) {
       this.device = device
 
       // update localstorage
       const connection = JSON.parse(localStorage.getItem('connection')) || {};
-      connection.transport = transport
       connection.device = device
       localStorage.setItem('connection', JSON.stringify(connection))
     },
-    setConnectionIP(ip) {
-      this.ip_address = ip
+    setConnectionTransport(transport) {
+      this.transport = transport
 
       // update localstorage
       const connection = JSON.parse(localStorage.getItem('connection')) || {};
-      connection.ip_address = ip
+      connection.transport = transport
       localStorage.setItem('connection', JSON.stringify(connection))
     },
-    setConnectionStatus(status) {
+    setConnectionHostname(hostname: string) {
+      this.hostname = hostname
+
+      // update localstorage
+      const connection = JSON.parse(localStorage.getItem('connection')) || {};
+      connection.hostname = hostname
+      localStorage.setItem('connection', JSON.stringify(connection))
+    },
+    setConnectionStatus(status: string) {
       // update store
       this.status = status
 

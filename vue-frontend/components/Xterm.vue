@@ -27,18 +27,13 @@ let isLoading = ref(true);
 //const { $attachContainer, $connect, $connectMCU } = useNuxtApp();
 let shell = null;
 
-// connectionStore.loadFromLocalStorage()
-
-let debug = false
-
-
 onMounted(async () => {
   if (terminal.value) {
     const term = await init()
-    shell = attachContainer(terminal.value, debug);
+    shell = attachContainer(terminal.value);
 
     // Attach terminal to transport output
-    attachTerminal(term, debug)
+    attachTerminal(term)
   }
 })
 

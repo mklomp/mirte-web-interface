@@ -209,7 +209,6 @@ export class ConnectionManager {
       }
       connectionStore.setConnectionStatus("connected")
       useState("programming-state").value = "idle"
-      useConnectionStore().setConnectionType(type, transport)
       return true
     }
 
@@ -234,7 +233,6 @@ export class ConnectionManager {
       //this.device.initializeTerm(socket)
       this.device.initializeROS()
       connectionStore.setConnectionStatus("connected")
-      useConnectionStore().setConnectionType(type, transport)
       await this.device.waitForPrompt()
       useState("programming-state").value = "idle"
       addToast($i18n.t('toast.connected'), 'success', 'connection-status')
@@ -246,9 +244,9 @@ export class ConnectionManager {
     return false
   }
 
-  attachTerminal(term, debug) {
+  attachTerminal(term) {
     this.term = term
-    this.debug = debug
+    this.debug = useState("debug").value
 
     // Send user input to transport
     this.term.onData(async (data) => {
