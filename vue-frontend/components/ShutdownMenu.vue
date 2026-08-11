@@ -11,13 +11,13 @@ const { connect, disconnect } = useConnection()
 
 const isConnected = computed(() => connectionStore.status == "connected")
 const connectionTransport = computed(() => connectionStore.transport)
-const connectionType = computed(() => connectionStore.connectionType)
+const deviceType = computed(() => connectionStore.device)
 
 const { t } = useI18n()
 
 const mounted = ref(false)
 const connectedText = computed(() =>
-  isConnected.value && (connectionType.value == "mcu" || useState("programming-state").value == "idle")
+  isConnected.value && (deviceType.value == "mcu" || useState("programming-state").value == "idle")
     ? "connected"
     : "disconnected"
 );
