@@ -21,6 +21,7 @@ export function useToast() {
     id?: string,
     duration = 5
   ) {
+    if (message == "") { removeToast(id); return; }
     if (type == "error") { duration = -1 }
     const toastId = id ?? `${Date.now()}`
 

@@ -247,7 +247,9 @@ export class ConnectionManager {
   }
 
   startCode() {
+    const { addToast } = useToast()
     if (!this.debug) { this.term.write('\x1bc'); } // full terminal reset
+    addToast('', 'error', 'code-error') // clear the exception toast
     this.running = true
     this.device.startCode(this.transporttype == "ble")
   }
