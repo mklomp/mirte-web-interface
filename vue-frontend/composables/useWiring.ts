@@ -207,7 +207,9 @@ export function useWiring(
       device: {
         mirte: {
           type: state.value.type,
+          version: 0.8,
           board: state.value.board,
+          max_frequency: 25 // not that this is not read from the config yet. And alos does not work for MCU
         },
       },
     }
