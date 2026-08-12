@@ -33,7 +33,7 @@ onMounted(async () => {
   }
 
   // Set debug value
-  if (location.hostname == "localhost" && route.query.ip){
+  if (location.hostname == "localhost" && route.query.debug){
     useState("debug").value = true
   }
 

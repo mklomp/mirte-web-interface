@@ -25,7 +25,7 @@ let socket = null
 watch(
   connectionStore,
   (val) => {
-    if (val.status == "connected" && val.transport == "network" && val.hostname != "") {
+    if (val.status == "connected" && val.device == "sbc" && val.hostname != "") {
       socket = new WebSocket(`ws://${val.hostname}/ws/shell`)
     }
   }
