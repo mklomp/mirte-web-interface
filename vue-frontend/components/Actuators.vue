@@ -10,7 +10,7 @@
     <div v-if="isSBC()" class="rounded background-tertiary p-3 mb-2" @contextmenu.prevent>
       <div class="h5">{{ $t("settings.drive") }}
 
-        <NuxtLink :to="{path: '/drive', query: route.query}" class="btn btn-sm float-end">
+        <NuxtLink :to="{ path: '/drive', query: route.query }" class="btn btn-sm float-end">
           <ClientOnly>
             <font-awesome-icon icon="fa-expand" />
           </ClientOnly>
@@ -182,6 +182,7 @@ export default {
     },
     reloadActuator(peripherals) {
 
+      this.actuators = {}
       for (const [actuator_type, peripheral] of Object.entries(peripherals)) {
         if (actuator_type == "device" || properties_ph[actuator_type].rel_path.split("\\")[0] != "Actuators") { continue }
 
@@ -217,7 +218,7 @@ export default {
     return {
       programming: true,
       peripherals: properties_ph,
-      actuators: {},
+      actuators: reactive({}),
       actuator_values: {},
       actuator_services: {},
       oled_options: ["text", "image", "animation"],
@@ -238,23 +239,24 @@ export default {
     const connectionStore = useConnectionStore()
     const { status } = storeToRefs(connectionStore)
 
-    // TODO: also watch eripheral chnages
     watch(
-      status,
-      (newVal) => {
-        if (newVal != "connected") { return }
-        this.reloadActuator(peripheralStore.peripherals)
+      () => ({
+        status: connectionStore.status,
+        rosStatus: connectionStore.ros_status,
+        peripherals: peripheralStore.peripherals
+      }),
+      ({ status, rosStatus, peripherals }) => {
+        if (status != "connected") {
+          return
+        }
+        this.reloadActuator(peripherals)
       },
-      { immediate: true }
+      {
+        immediate: true,
+        deep: true
+      }
     )
 
-    watch(
-      storePeripherals,
-      (newVal) => {
-        this.reloadActuator(newVal)
-      },
-      { immediate: true }
-    )
 
   }
 
