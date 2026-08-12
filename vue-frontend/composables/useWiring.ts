@@ -207,9 +207,9 @@ export function useWiring(
       device: {
         mirte: {
           type: state.value.type,
-          version: 0.8,
+          version: state.value.version,
           board: state.value.board,
-          max_frequency: 25 // not that this is not read from the config yet. And alos does not work for MCU
+          max_frequency: state.value.max_frequency // not that this does nothing on the MCU
         },
       },
     }
@@ -230,8 +230,10 @@ export function useWiring(
     const list: PeripheralInstance[] = []
 
     if (data?.device?.mirte) {
-      state.value.board = data.device.mirte.board || "pico"
       state.value.type = data.device.mirte.type || "pcb"
+      state.value.version = data.device.mirte.version || "0.8"
+      state.value.board = data.device.mirte.board || "pico"
+      state.value.max_frequency = data.device.mirte.max_frequency || "25"
     }
 
     if (data) {
