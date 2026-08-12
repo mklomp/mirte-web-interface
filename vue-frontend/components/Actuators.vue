@@ -10,7 +10,7 @@
     <div v-if="isSBC()" class="rounded background-tertiary p-3 mb-2" @contextmenu.prevent>
       <div class="h5">{{ $t("settings.drive") }}
 
-        <NuxtLink to="/drive" class="btn btn-sm float-end">
+        <NuxtLink :to="{path: '/drive', query: route.query}" class="btn btn-sm float-end">
           <ClientOnly>
             <font-awesome-icon icon="fa-expand" />
           </ClientOnly>
@@ -99,6 +99,10 @@
   </div>
 
 </template>
+
+<script setup>
+const route = useRoute()
+</script>
 
 
 <script>

@@ -11,9 +11,9 @@
         <div class="h5">
           {{ $t("settings.drive") }}
 
-          <NuxtLink to="/" class="btn btn-sm float-end">
-          <ClientOnly>
-            <font-awesome-icon icon="fa-compress" />
+          <NuxtLink :to="{ path: '/', query: route.query }" class="btn btn-sm float-end">
+            <ClientOnly>
+              <font-awesome-icon icon="fa-compress" />
             </ClientOnly>
           </NuxtLink>
         </div>
@@ -23,6 +23,10 @@
     </div>
   </div>
 </template>
+
+<script setup>
+const route = useRoute();
+</script>
 
 <style scoped>
 .control-layout {
