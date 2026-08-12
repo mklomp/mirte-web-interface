@@ -24,7 +24,9 @@ export default defineNuxtConfig({
   modules: ['@nuxtjs/i18n', '@nuxt/image', '@nuxt/fonts', '@pinia/nuxt'],
 
   runtimeConfig: {
-    sbcIDE: process.env.MIRTE_SBC_IDE
+    public: {
+      sbcIDE: process.env.MIRTE_SBC_IDE
+    }
   },
 
   fonts: {

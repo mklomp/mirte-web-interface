@@ -17,7 +17,7 @@ onMounted(async () => {
   // Determine if we are MCU (default) or SBC (running on a robot)
   // If the ENV variable MIRTE_SBC_IDE is set, we are running from the robot/SBC
   connectionStore.setConnectionDevice("mcu")
-  if (config.sbcIDE) { connectionStore.setConnectionDevice("sbc") }
+  if (config.public.sbcIDE) { connectionStore.setConnectionDevice("sbc") }
 
   // Determine the host to connect to
   if (connectionStore.device == "sbc") {
