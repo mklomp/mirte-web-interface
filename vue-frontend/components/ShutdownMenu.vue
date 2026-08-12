@@ -15,8 +15,9 @@ const deviceType = computed(() => connectionStore.device)
 const { t } = useI18n()
 
 const mounted = ref(false)
+// TODO: for the SBC version, think of a good way to show status (connected to ip, ros connected, terminal ready)
 const connectedText = computed(() =>
-  isConnected.value && (deviceType.value == "mcu" || useState("programming-state").value == "idle")
+  isConnected.value //&& (deviceType.value == "mcu" || useState("programming-state").value == "idle")
     ? "connected"
     : "disconnected"
 );
