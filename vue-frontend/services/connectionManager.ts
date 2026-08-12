@@ -130,9 +130,9 @@ export class ConnectionManager {
       // we can add the (remaining) buffer to the right print/expection buffer
       // but only if we know that the end is not posiibly part of 
       // a new tag
-      const idx = this.buffer.indexOf("_")
+
       // if no _ found in the last part of the buffer
-      if (!idx) {
+      if (!this.buffer.includes("_")) {
         if (this.buffer_status == "exception") {
           this.exception_buffer += this.buffer
         }
