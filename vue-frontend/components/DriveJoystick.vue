@@ -93,9 +93,11 @@ export default {
 
     publishTwist() {
       const maxTravel = this.outerRadius - this.stickRadius;
+      const scaleAngular = 0.04;
+      const scaleLinear = 0.5;
 
-      const angular = -this.stickX / maxTravel;
-      const linear = -(this.stickY / maxTravel);
+      const angular = -this.stickX / maxTravel * scaleAngular;
+      const linear = -(this.stickY / maxTravel) * scaleLinear;
 
       this.cmdVel.publish({
         linear: {
