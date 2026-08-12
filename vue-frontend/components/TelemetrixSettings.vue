@@ -154,6 +154,7 @@ import { useModal } from '~/composables/useModal'
 
 const { addToast } = useToast()
 const { closeModal } = useModal()
+const { $i18n } = useNuxtApp()
 
 import PeripheralRow from "~/components/PeripheralRow.vue"
 
@@ -271,7 +272,7 @@ function isUsed(id){
 
 function isUsablePeripheral(key) {
   const allowed =
-    useConnectionStore().transport === "network"
+    useConnectionStore().device === "sbc"
       ? ['motor', 'intensity', 'servo', 'keypad', 'distance', 'line', 'object', 'oled', 'color']
       : ['motor', 'intensity', 'servo', 'keypad', 'distance', 'line', 'object']
 
@@ -440,10 +441,9 @@ async function save() {
   try {
     await saveJSON()
     saveControlJSON(leftMotor.value, rightMotor.value)
-    if (!isMCU) {
-      if (socket) { socket.send("sudo systemctl restart mirte-ros\n") }
+    if (!isMCU.value) {
+      socket.send("sudo systemctl restart mirte-ros\n")
       connection.getTransport().restartRos()
-      addToast($i18n.t('toast.restarting_ros'), "warning", "restart-ros", -1)
     }
   }
   finally {

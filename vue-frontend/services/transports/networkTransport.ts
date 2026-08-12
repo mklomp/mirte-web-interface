@@ -88,7 +88,6 @@ export class NetworkTransport {
     }
 
     this.socket.onclose = () => {
-      //console.log('Shell disconnected')
       if (connectionStore.status == "connected" && !this.restartRos) {
         addToast($i18n.t('toast.websocket_lost'), "error", "connection-lost")
       }
@@ -102,7 +101,7 @@ export class NetworkTransport {
     this.socket?.close() // closed socket will make sure that mirte_python_api node is stopped
     this.restartingRos = true
 
-    addToast($i18n.t('toast.restartting_ros'), 'info', 'ros-restarting', -1)
+    addToast($i18n.t('toast.restarting_ros'), 'info', 'ros-restarting', -1)
   }
 
 
