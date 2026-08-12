@@ -14,7 +14,7 @@
         ×
       </button>
 
-      <div v-html="toast.message" />
+      <div v-html="toast.message" style="text-align: center;" />
     </div>
   </div>
 </template>
