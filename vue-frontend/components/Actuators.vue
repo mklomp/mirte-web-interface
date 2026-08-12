@@ -46,7 +46,8 @@
     <div v-if="isSBC()" v-for="actuator in getActuators()" class="rounded background-tertiary p-3 mb-2"
       @contextmenu.prevent>
       <div class="h5">{{ $t('peripherals.' + peripherals[actuator].text) }}</div>
-      <div v-for="instance in getInstances(actuator)" class="rounded background-actuator p-2 text-white mb-2">
+      <div v-for="instance in getInstances(actuator)"
+        class="rounded background-actuator p-2 text-white mb-2 d-flex align-items-center" style="white-space: pre;">
 
 
         <div v-if="actuator === 'servo'">
@@ -59,21 +60,10 @@
 
         </div>
 
-        <div v-if="actuator === 'oled'">
-          <div class="row">
-            <div class="col-2">
-              {{ instance }}
-            </div>
-            <!--
-                         <div class="col-5">
-                             <b-form-select v-model="actuator_values[actuator][instance].type" :options="oled_options"></b-form-select>
-                         </div>
--->
-            <div class="col-10">
-              <input class="form-text" v-model="actuator_values[actuator][instance].text"
-                @change="set_oled(actuator, instance)" placeholder=""></input>
-            </div>
-          </div>
+        <div v-if="actuator === 'oled'" class="d-flex align-items-center w-100">
+          <span>{{ instance }}:</span>
+          <input class="form-control ms-2 flex-grow-1" v-model="actuator_values[actuator][instance].text"
+            @change="set_oled(actuator, instance)" placeholder=""></input>
         </div>
 
         <div v-if="actuator == 'motor'">
