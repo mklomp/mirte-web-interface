@@ -20,6 +20,8 @@ export function useWiring(
   const state = ref({
     board: "pico",
     type: "breadboard",
+    version: "0.8",
+    max_frequency: 25,
     peripherals: [] as PeripheralInstance[],
   })
 
@@ -233,7 +235,7 @@ export function useWiring(
       state.value.type = data.device.mirte.type || "pcb"
       state.value.version = data.device.mirte.version || "0.8"
       state.value.board = data.device.mirte.board || "pico"
-      state.value.max_frequency = data.device.mirte.max_frequency || "25"
+      state.value.max_frequency = data.device.mirte.max_frequency || 25
     }
 
     if (data) {
@@ -268,7 +270,7 @@ export function useWiring(
     addPeripheral,
     removePeripheral,
     getValidPins,
-    updatePeripheralPin, // <-- use this in PeripheralRow
+    updatePeripheralPin,
     loadFromYAML,
     saveYAML,
     saveJSON,

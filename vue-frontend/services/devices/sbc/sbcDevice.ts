@@ -127,6 +127,8 @@ export class SBCDevice {
           name.endsWith('.name') ||
           name.endsWith('.device') ||
           name.endsWith('.board') ||
+          name.endsWith('.max_frequency') ||
+          name.endsWith('.version') ||
           (name.startsWith('device.') && name.endsWith('.type')) ||
           name.includes('.pins.')
         );
