@@ -70,8 +70,8 @@ export default {
       return Object.keys(this.sensors[sensor_type])
     },
     getSensorImage(type) {
-      const images = import.meta.glob('../assets/images/*.jpg', { eager: true })
-      const key = Object.keys(images).find(k => k.endsWith(type + ".jpg"))
+      const images = import.meta.glob('../assets/images/*.png', { eager: true })
+      const key = Object.keys(images).find(k => k.endsWith(type + ".png"))
       return key ? images[key].default : null
     },
     reloadPeripherals(newVal) {
