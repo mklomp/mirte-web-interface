@@ -195,8 +195,8 @@ export function useWiring(
     }
   }
 
-  function saveControlJSON(left_motor, right_motor) {
-    peripheralStore.setControl(left_motor, right_motor)
+  function saveControlJSON(left_motor, right_motor, driveEnabled) {
+    peripheralStore.setControlAll(left_motor, right_motor, driveEnabled)
   }
 
   async function saveJSON() {

@@ -48,7 +48,9 @@
     "wifi_connected": "Er wordt geprobeerd verbinding te maken. Als dit niet lukt, komt Mirte-XXXXXX weer online.",
     "wifi_message": "Als de verbinding niet tot stand, komt wordt het huidige access point weer gestart. Verbind daarna wederom met Mirte-XXXXXX and probeer het nogmaals.",
     "delete": "verwijder",
-    "used_in_code": "je kan deze niet verwijderen omdat deze in de code gebruikt wordt"
+    "used_in_code": "je kan deze niet verwijderen omdat deze in de code gebruikt wordt",
+    "diffdrive": "Differential drive",
+    "diffdrive_text": "Zet de differential drive control aan of uit."
   },
   "actuators": {
     "output": "Output",

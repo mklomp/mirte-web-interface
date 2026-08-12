@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 export const usePeripheralStore = defineStore('peripherals', {
   state: () => ({
     peripherals: {},
-    controls: {'left_motor' : '', 'right_motor': ''}
+    controls: { 'driveEnabled': '', motors: { 'left_motor': '', 'right_motor': '' } }
   }),
 
   actions: {
@@ -28,9 +28,17 @@ export const usePeripheralStore = defineStore('peripherals', {
 
     },
 
-    setControl(left_motor, right_motor){
-      this.controls['left_motor'] = left_motor
-      this.controls['right_motor'] = right_motor
+    setControl(left_motor, right_motor) {
+      this.controls.motors['left_motor'] = left_motor
+      this.controls.motors['right_motor'] = right_motor
+      if (this.controls.driveEnabled === "") { this.controls.driveEnabled = true}
+      localStorage.setItem('controls', JSON.stringify(this.controls))
+    },
+
+    setControlAll(left_motor, right_motor, driveEnabled) {
+      this.controls.motors['left_motor'] = left_motor
+      this.controls.motors['right_motor'] = right_motor
+      this.controls['driveEnabled'] = driveEnabled
       localStorage.setItem('controls', JSON.stringify(this.controls))
     },
 

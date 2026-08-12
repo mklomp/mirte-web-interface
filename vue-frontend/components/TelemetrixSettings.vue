@@ -86,7 +86,8 @@
               <tbody>
                 <PeripheralRow v-for="item in state.peripherals" :key="item.id" :item="item"
                   :errors="validationErrors[item.id] || {}" :peripheralsDef="peripheralsDef" :usedPins="usedPins"
-                  :updatePeripheralPin="updatePeripheralPin" :getValidPins="getValidPins" @remove="removePeripheral" :isUsedInCode="isUsed(item.id)" />
+                  :updatePeripheralPin="updatePeripheralPin" :getValidPins="getValidPins" @remove="removePeripheral"
+                  :isUsedInCode="isUsed(item.id)" />
               </tbody>
 
             </table>
@@ -99,36 +100,65 @@
 
           <div class="p-3">
 
+            <div class="card shadow-sm mb-3">
+              <div class="card-body">
+
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <h6 class="mb-1">{{ $t("settings.diffdrive") }}</h6>
+                    <small class="text-muted">
+                      {{ $t("settings.diffdrive_text") }}
+                    </small>
+                  </div>
+
+                  <div class="form-check form-switch mb-0">
+                    <input id="driveEnabled" v-model="driveEnabled" class="form-check-input" type="checkbox"
+                      :disabled="!hasEnoughMotors">
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
             <div v-if="!hasEnoughMotors" class="alert alert-warning">
               {{ $t("settings.drive_message") }}
-
             </div>
 
-            <div class="mb-3">
-              <label class="form-label">Left motor</label>
+            <template v-if="driveEnabled && hasEnoughMotors">
 
-              <select v-model="leftMotor" class="form-control" :class="{ 'warning-field': driveErrors.sameMotor }"
-                :disabled="!hasEnoughMotors">
-                <option v-for="motor in motors" :key="motor" :value="motor">
-                  {{ motor }}
-                </option>
-              </select>
-            </div>
+              <div class="card">
+                <div class="card-body">
 
-            <div class="mb-3">
-              <label class="form-label">Right motor</label>
+                  <div class="mb-3">
+                    <label class="form-label">Left motor</label>
 
-              <select v-model="rightMotor" class="form-control" :class="{ 'warning-field': driveErrors.sameMotor }"
-                :disabled="!hasEnoughMotors">
-                <option v-for="motor in motors" :key="motor" :value="motor">
-                  {{ motor }}
-                </option>
-              </select>
-            </div>
+                    <select v-model="leftMotor" class="form-control"
+                      :class="{ 'warning-field': driveErrors.sameMotor }">
+                      <option v-for="motor in motors" :key="motor" :value="motor">
+                        {{ motor }}
+                      </option>
+                    </select>
+                  </div>
 
-            <div v-if="driveErrors.sameMotor" class="alert alert-warning">
-              Left and right motor must be different motors.
-            </div>
+                  <div class="mb-0">
+                    <label class="form-label">Right motor</label>
+
+                    <select v-model="rightMotor" class="form-control"
+                      :class="{ 'warning-field': driveErrors.sameMotor }">
+                      <option v-for="motor in motors" :key="motor" :value="motor">
+                        {{ motor }}
+                      </option>
+                    </select>
+                  </div>
+
+                </div>
+              </div>
+
+              <div v-if="driveErrors.sameMotor" class="alert alert-warning mt-3">
+                Left and right motor must be different motors.
+              </div>
+
+            </template>
 
           </div>
 
@@ -184,6 +214,7 @@ const activeTab = ref("peripherals")
 
 const leftMotor = ref("")
 const rightMotor = ref("")
+const driveEnabled = ref("")
 
 const motors = computed(() =>
   (state.value.peripherals || [])
@@ -220,6 +251,7 @@ watch(
   (val) => {
     leftMotor.value = val.left_motor
     rightMotor.value = val.right_motor
+    driveEnabled.value = val.driveEnabled
   },
   { immediate: true }
 )
@@ -252,7 +284,7 @@ watch(
   { immediate: true }
 )
 
-function isUsed(id){
+function isUsed(id) {
 
   // We can only try to find usages of blocks. We cannot do this
   // with the python code, since it is undoable to also find
@@ -428,7 +460,7 @@ async function save() {
 
   busy.value = true
 
-  if (leftMotor.value != "" && rightMotor.value != "") {
+  if (driveEnabled.value) {
     if (socket) {
       socket.send("sed -i 's/left_motor_name:.*/left_motor_name: \"" + leftMotor.value +
         "\"/' /home/mirte/mirte_ws/src/mirte-ros-packages/mirte_control/mirte_pioneer_control/bringup/config/mirte_diff_drive_controllers.yaml " +
@@ -440,7 +472,7 @@ async function save() {
 
   try {
     await saveJSON()
-    saveControlJSON(leftMotor.value, rightMotor.value)
+    saveControlJSON(leftMotor.value, rightMotor.value, driveEnabled.value)
     if (!isMCU.value) {
       socket.send("sudo systemctl restart mirte-ros\n")
       connection.getTransport().restartRos()
@@ -488,5 +520,14 @@ async function save() {
 .warning-field {
   background-color: #fff3cd;
   border-color: #ffc107;
+}
+
+.form-check-input:checked {
+    background-color: #ffc107;
+    border-color: #ffc107;
+}
+
+.form-check-input:focus {
+    border-color: #ffc107;
 }
 </style>
