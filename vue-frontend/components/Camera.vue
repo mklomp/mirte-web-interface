@@ -1,25 +1,19 @@
 <template>
-  <div
-    class="rounded background-tertiary p-3 mb-2 h-100 d-flex flex-column"
-    :key="cameraKey"
-  >
+  <div class="rounded background-tertiary p-3 mb-2 h-100 d-flex flex-column" :key="cameraKey">
     <div class="h5">
       Camera
-      <NuxtLink
-        :to="{ path: expanded ? '/' : '/drive', query: route.query }"
-        class="btn btn-sm float-end"
-      >
+      <NuxtLink :to="{ path: expanded ? '/' : '/drive', query: route.query }" class="btn btn-sm float-end">
         <ClientOnly>
           <font-awesome-icon :icon="expanded ? 'fa-compress' : 'fa-expand'" />
         </ClientOnly>
       </NuxtLink>
     </div>
+
+
+
+
     <div class="camera-container" style="flex: 1; min-height: 0; overflow: hidden">
-      <img
-        ref="camera"
-        :src="`${cameraSrc}`"
-        style="width: 100%; height: 100%; object-fit: contain"
-      />
+      <img ref="camera" :src="`${cameraSrc}`" style="width: 100%; height: 100%; object-fit: contain" />
     </div>
   </div>
 </template>
@@ -32,6 +26,8 @@ const props = defineProps({
     default: false,
   },
 });
+
+
 </script>
 
 <script>
@@ -69,6 +65,17 @@ export default {
 
     const connectionStore = useConnectionStore();
     const { connection: storeConnection } = storeToRefs(connectionStore);
+
+    // FIX for chromium based browsers. When you press CTRL-S, the browser
+    // stops the stream, but is not recovering from it.
+    // Possible future fixes (as soon as there are nice ROS ways of doing this)
+    // include looking into WebRPC.
+    window.addEventListener("focus", () => {
+      const hostname = connectionStore.hostname;
+      this.cameraSrc =
+        `http://${hostname}/ros-video/stream` +
+        `?topic=/video1/image_raw&type=mjpeg&_=${Date.now()}`;
+    });
 
     watch(
       () => ({
