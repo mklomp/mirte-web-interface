@@ -53,7 +53,13 @@ export class ConnectionManager {
 
   parseException(exception_text: string) {
     const { $i18n } = useNuxtApp()
-    const match = exception_text.match(/File "<string>", line (\d+), in .*?\r?\n([\s\S]*)/);
+
+    let match = null
+    if (useConnectionStore().device == "mcu") {
+      match = exception_text.match(/File "<string>", line (\d+), in .*?\r?\n([\s\S]*)/);
+    } else if (useConnectionStore().device == "sbc") {
+      match = exception_text.match(/File "\/home\/mirte\/workdir\/mirte\.py", line (\d+),.*?\r?\n([\s\S]*)/);
+    }
 
     if (match) {
       const line = Number(match[1]);
@@ -109,7 +115,7 @@ export class ConnectionManager {
 
         // the exception can be shown
         let parsed_exception = this.parseException(this.exception_buffer)
-        addToast(parsed_exception, 'error', 'code-error')
+        addToast(parsed_exception, 'exception', 'code-error')
         this.exception_buffer = ""
       }
 

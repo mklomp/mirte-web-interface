@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 
-type ToastType = 'info' | 'success' | 'warning' | 'error'
+type ToastType = 'info' | 'success' | 'warning' | 'error' | 'exception'
 
 interface Toast {
   id: string
@@ -22,7 +22,7 @@ export function useToast() {
     duration = 5
   ) {
     if (message == "") { removeToast(id); return; }
-    if (type == "error") { duration = -1 }
+    if (type == "error" || type == "exception") { duration = -1 }
     const toastId = id ?? `${Date.now()}`
 
     const formattedMessage = message.replace(/\n/g, '<br>')

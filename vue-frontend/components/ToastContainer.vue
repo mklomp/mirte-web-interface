@@ -14,7 +14,7 @@
         ×
       </button>
 
-      <div v-html="toast.message" style="text-align: center;" />
+      <div v-html="toast.message" :style="toast.type !== 'exception' ? { textAlign: 'center' } : {}" />
     </div>
   </div>
 </template>

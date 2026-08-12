@@ -182,8 +182,6 @@ export class SBCDevice {
         this.peripheralStore.setPeripherals(robotSettings, true, true)
         addToast($i18n.t('toast.downloading_mirte_config'), 'info')
       } else { // localsettings is not empty
-        console.log(robotSettings)
-        console.log(localsettings)
         if (!this.deepEqual(localsettings, robotSettings)) { // local and robot setting are not the same
           // save the robot settings to local settings
           addToast($i18n.t('toast.downloading_mirte_config_compare_error'), 'error')
@@ -275,7 +273,7 @@ export class SBCDevice {
     this.runCommand('    print("\\r", end="")\n');
     this.runCommand('  except Exception as e:\n');
     this.runCommand('    print("__START_EXCEPTION__")\n');
-    this.runCommand('    print(traceback.print_exception(e))\n');
+    this.runCommand('    traceback.print_exception(e)\n');
     this.runCommand('    print("__STOP_EXCEPTION__")\n');
     this.runCommand('  finally:\n');
     this.runCommand('    mirte.stop()\n');
