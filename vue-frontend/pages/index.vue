@@ -162,8 +162,8 @@ function redo() {
 
    <div class="main-layout h-100">
 
-      <div v-if="isSBC">
-         <div v-show="showSensors" class="sidebar sensors" style="overflow: hidden;">
+      
+         <div v-if="isSBC" v-show="showSensors" class="sidebar sensors" style="overflow: hidden;">
             <div class="layoutbox rounded h-100" style="overflow: hidden; display: flex; flex-flow: column;">
 
                <div class="text-black p-1 h3 m-0 layoutbox-title w-100 background-secondary">
@@ -176,7 +176,7 @@ function redo() {
 
             </div>
          </div>
-      </div>
+      
 
       <div class="programming-area" style="overflow: hidden;">
          <div class="layoutbox rounded" style="overflow: hidden; display: flex; flex-direction: column;">
