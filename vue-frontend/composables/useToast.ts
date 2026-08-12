@@ -51,7 +51,7 @@ export function useToast() {
       timers.delete(toastId)
     }
 
-    if (duration !== -1) {
+    if (duration > 0) {
       const timer = setTimeout(() => {
         toasts.value = toasts.value.filter(t => t.id !== toastId)
         timers.delete(toastId)

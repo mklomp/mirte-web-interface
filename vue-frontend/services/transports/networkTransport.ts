@@ -101,7 +101,7 @@ export class NetworkTransport {
     this.socket?.close() // closed socket will make sure that mirte_python_api node is stopped
     this.restartingRos = true
 
-    addToast($i18n.t('toast.restarting_ros'), 'info', 'ros-restarting', -1)
+    addToast($i18n.t('toast.restarting_ros'), 'info', 'ros-restarting', 0)
   }
 
 

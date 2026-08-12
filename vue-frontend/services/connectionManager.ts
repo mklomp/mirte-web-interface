@@ -216,7 +216,7 @@ export class ConnectionManager {
     if (type === "sbc") {
       this.transport = new NetworkTransport()
       let socket = this.transport.connect()
-      addToast($i18n.t('toast.connected_and_initializing'), 'info', 'connection-status', -1)
+      addToast($i18n.t('toast.connected_and_initializing'), 'info', 'connection-status', 0)
 
       this.transport?.onData((data) => {
         this.parseData(data)
