@@ -23,12 +23,6 @@ export default defineNuxtConfig({
   plugins: ['@/plugins/bootstrap.client.js'],
   modules: ['@nuxtjs/i18n', '@nuxt/image', '@nuxt/fonts', '@pinia/nuxt'],
 
-  runtimeConfig: {
-    public: {
-      sbcIDE: process.env.MIRTE_SBC_IDE
-    }
-  },
-
   fonts: {
     families: [
       {

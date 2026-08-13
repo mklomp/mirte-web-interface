@@ -14,10 +14,17 @@ onMounted(async () => {
   // Load peripherals 
   peripheralStoreStore.loadFromLocalStorage()
 
-  // Determine if we are MCU (default) or SBC (running on a robot)
-  // If the ENV variable MIRTE_SBC_IDE is set, we are running from the robot/SBC
-  connectionStore.setConnectionDevice("mcu")
-  if (config.public.sbcIDE) { connectionStore.setConnectionDevice("sbc") }
+  // Determine if we are running on the robot (ie. we can access the api)
+  try {
+    const response = await fetch('/api/self')
+    if (response.ok) {
+      connectionStore.setConnectionDevice("sbc")
+    } else {
+      connectionStore.setConnectionDevice("mcu")
+    }
+  } catch {
+    connectionStore.setConnectionDevice("mcu")
+  }
 
   // Determine the host to connect to
   if (connectionStore.device == "sbc") {
@@ -27,13 +34,13 @@ onMounted(async () => {
   }
 
   // For development purposes we can also connect to a remote SBC
-  if (location.hostname == "localhost" && route.query.ip){
+  if (location.hostname == "localhost" && route.query.ip) {
     connectionStore.setConnectionDevice("sbc")
     connectionStore.setConnectionHostname(route.query.ip)
   }
 
   // Set debug value
-  if (location.hostname == "localhost" && route.query.debug){
+  if (location.hostname == "localhost" && route.query.debug) {
     useState("debug").value = true
   }
 
@@ -94,7 +101,7 @@ function openWifi() {
 
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="settingsDropdown">
             <li>
-              <button class="dropdown-item" @click="openSettings(); visible = false; ">
+              <button class="dropdown-item" @click="openSettings(); visible = false;">
                 {{ $t("main.connection.robot_hardware") }}
               </button>
             </li>
@@ -109,7 +116,7 @@ function openWifi() {
           </ul>
         </li>
         <li class="nav-item dropdown">
-          <ShutdownMenu v-model:visible="visible"/>
+          <ShutdownMenu v-model:visible="visible" />
         </li>
         <li class="nav-item dropdown">
           <LocaleChanger />

@@ -27,8 +27,7 @@ source node_env/bin/activate
 
   ```sh
   npm install
-  export NUXT_APP_BASE_URL=/
-  npm run generate
+  NUXT_APP_BASE_URL=/ npm run generate
   python3 -m http.server -d dist
   # visit http://localhost:8000
   ```
@@ -41,4 +40,12 @@ source node_env/bin/activate
   mv dist mirte-web-interface
   python3 -m http.server
   # visit http://localhost:8000/mirte-web-interface
+  ```
+
+- deploy on a robot
+
+  ```sh
+  npm install
+  NUXT_APP_BASE_URL=/ npm run generate
+  scp -r dist mirte@mirte.local:/usr/local/src/mirte/mirte-web-interface/vue-frontend/
   ```

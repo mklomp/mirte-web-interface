@@ -1,5 +1,6 @@
 import { ref } from "vue"
 import { usePeripheralStore } from "@/stores/peripherals"
+import { v4 as uuidv4 } from 'uuid'
 
 export type PeripheralInstance = {
   id: string
@@ -115,7 +116,7 @@ export function useWiring(
     )
 
     const peripheral: PeripheralInstance = {
-      id: crypto.randomUUID(),
+      id: uuidv4(),
       type,
       name: "",
       pins,
@@ -244,7 +245,7 @@ export function useWiring(
 
         for (const [name, item] of Object.entries(group as any)) {
           list.push({
-            id: crypto.randomUUID(),
+            id: uuidv4(),
             type,
             name: item.name || name,
             pins: { ...item.pins },
